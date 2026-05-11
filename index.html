@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -14,451 +13,86 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background: radial-gradient(circle at 20% 30%, rgba(202, 2, 35, 0.08), rgba(16, 211, 221, 0.03));
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
-
-        /* Liquid Glass effect - iOS 26 style */
-        .glass, .header, .search-box, .product-card, .admin-panel, .modal-content, .floating-drawer {
-            background: rgba(255, 250, 245, 0.65);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 245, 0.6);
-            border-radius: 32px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-        }
-
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            padding: 12px 24px;
-            margin-bottom: 20px;
-            border-radius: 0 0 36px 36px;
-            background: rgba(255, 250, 245, 0.8);
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        .top-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-img {
-            height: 48px;
-            width: auto;
-            border-radius: 24px;
-            background: rgba(255, 240, 245, 0.5);
-            padding: 4px;
-            transition: transform 0.2s;
-        }
-
-        .site-title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #ca0223, #10d3dd);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 8px;
-            background: rgba(255, 240, 245, 0.6);
-            padding: 6px 16px;
-            border-radius: 60px;
-            backdrop-filter: blur(12px);
-        }
-
-        .nav-btn {
-            background: transparent;
-            border: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            padding: 8px 20px;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #ca0223;
-        }
-
-        .nav-btn.special {
-            background: #ca0223;
-            color: white;
-            box-shadow: 0 4px 12px rgba(202, 2, 35, 0.3);
-        }
-
-        .nav-btn:hover {
-            transform: scale(1.02);
-            background: rgba(202, 2, 35, 0.1);
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 10px 24px;
-            margin: 24px 0 20px;
-            border-radius: 60px;
-        }
-
-        .search-box input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 14px 0;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        .news-badge {
-            display: inline-block;
-            background: linear-gradient(95deg, #10d3dd, #0647b7);
-            padding: 8px 24px;
-            border-radius: 60px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.85rem;
-            margin-bottom: 28px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: radial-gradient(circle at 20% 30%, rgba(202,2,35,0.05), rgba(16,211,221,0.02)); min-height: 100vh; padding-bottom: 80px; }
+        .glass { background: rgba(255, 250, 245, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,245,0.5); border-radius: 32px; }
+        .header { position: sticky; top: 0; z-index: 100; padding: 8px 16px; background: rgba(255, 250, 245, 0.82); backdrop-filter: blur(25px); border-radius: 0 0 28px 28px; margin-bottom: 8px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
+        
+        /* Layout do topo: logo e nome à esquerda, redes sociais à direita */
+        .top-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+        .logo-area { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .logo-img { height: 42px; width: auto; border-radius: 16px; background: rgba(255,240,245,0.5); padding: 3px; }
+        .site-title { font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg, #ca0223, #10d3dd); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        .social-mini-header { display: flex; gap: 12px; font-size: 1.2rem; }
+        .social-mini-header a { color: #ca0223; }
+        
+        /* Menu de navegação em linha única, compacto */
+        .nav-links { display: flex; gap: 6px; background: rgba(255,240,245,0.5); padding: 4px 8px; border-radius: 60px; backdrop-filter: blur(8px); margin-top: 8px; justify-content: center; }
+        .nav-btn { background: transparent; border: none; font-weight: 600; font-size: 0.8rem; padding: 6px 12px; border-radius: 40px; cursor: pointer; transition: 0.2s; color: #ca0223; white-space: nowrap; }
+        .nav-btn.special { background: #ca0223; color: white; box-shadow: 0 2px 8px rgba(202,2,35,0.3); }
+        
+        /* Busca compacta */
+        .search-box { display: flex; align-items: center; gap: 8px; padding: 6px 16px; margin: 10px 0 8px; background: rgba(255,255,245,0.75); backdrop-filter: blur(16px); border-radius: 60px; }
+        .search-box i { font-size: 0.9rem; color: #ca0223; }
+        .search-box input { flex: 1; background: transparent; border: none; padding: 8px 0; font-size: 0.85rem; outline: none; }
+        .news-badge { display: inline-block; background: linear-gradient(95deg, #10d3dd, #0647b7); padding: 4px 16px; border-radius: 60px; color: white; font-weight: 600; font-size: 0.7rem; margin-bottom: 12px; }
+        
+        /* Grid responsivo: mobile 2 colunas, tablet 3 colunas, desktop 3 colunas */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 28px;
-            margin: 30px 0 50px;
-        }
-
-        .product-card {
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.7);
-        }
-
-        .product-card:hover {
-            transform: translateY(-8px);
-            background: rgba(255, 255, 250, 0.9);
-            box-shadow: 0 20px 40px -12px rgba(202, 2, 35, 0.3);
-            border-color: rgba(202, 2, 35, 0.3);
-        }
-
-        .card-img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background: #faf0f3;
-            transition: transform 0.3s;
-        }
-
-        .product-card:hover .card-img {
-            transform: scale(1.02);
-        }
-
-        .card-info {
-            padding: 16px;
-        }
-
-        .card-title {
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 6px;
-            color: #1a1a1a;
-        }
-
-        .card-desc {
-            font-size: 0.75rem;
-            color: #4a2c3a;
-            opacity: 0.8;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            margin-bottom: 8px;
-        }
-
-        .btn-buy {
-            background: #ca0223;
-            color: white;
-            border: none;
-            padding: 10px 0;
-            border-radius: 40px;
-            font-weight: 600;
-            width: 100%;
-            margin-top: 12px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-buy:hover {
-            background: #a8011c;
-            transform: scale(0.98);
-        }
-
-        .visit-counter {
-            font-size: 0.7rem;
-            background: rgba(202, 2, 35, 0.1);
-            display: inline-block;
-            padding: 4px 14px;
-            border-radius: 30px;
-            margin-top: 8px;
-        }
-
-        .floating-drawer {
-            display: none;
-            position: fixed;
-            bottom: 100px;
-            right: 24px;
-            width: 360px;
-            max-width: calc(100vw - 48px);
-            background: rgba(255, 250, 245, 0.95);
-            backdrop-filter: blur(35px);
-            border-radius: 36px;
-            flex-direction: column;
-            z-index: 200;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        }
-
-        .drawer-header {
-            padding: 18px 20px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .drawer-tabs {
-            display: flex;
-            gap: 8px;
-            padding: 12px 16px;
-        }
-
-        .drawer-tab {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .drawer-tab.active {
-            background: #ca0223;
-            color: white;
-        }
-
-        .drawer-content {
-            padding: 16px;
-            max-height: 420px;
-            overflow-y: auto;
-        }
-
-        .fab-trigger {
-            position: fixed;
-            bottom: 28px;
-            right: 28px;
-            background: #ca0223;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 24px rgba(202, 2, 35, 0.5);
-            cursor: pointer;
-            color: white;
-            font-size: 28px;
-            z-index: 150;
-            backdrop-filter: blur(12px);
-            transition: all 0.2s;
-        }
-
-        .fab-trigger:hover {
-            transform: scale(1.05);
-        }
-
-        .tooltip-fab {
-            position: absolute;
-            bottom: 80px;
-            right: 0;
-            background: #0647b7;
-            color: white;
-            padding: 8px 18px;
-            border-radius: 60px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            backdrop-filter: blur(8px);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(12px);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            max-width: 500px;
-            width: 90%;
-            padding: 28px;
-            text-align: center;
-            border-radius: 48px;
-        }
-
-        .admin-panel {
-            padding: 32px;
-            margin: 24px 0;
-        }
-
-        input, textarea, select, button {
-            border-radius: 60px;
-            border: 1px solid rgba(202, 2, 35, 0.2);
-            padding: 12px 18px;
-            background: rgba(255, 250, 245, 0.95);
-            width: 100%;
-            margin: 8px 0;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #ca0223;
-            box-shadow: 0 0 0 2px rgba(202, 2, 35, 0.2);
-        }
-
-        button {
-            background: #ca0223;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        button:hover:not(:disabled) {
-            background: #a8011c;
-        }
-
-        .admin-item {
-            background: rgba(255, 240, 245, 0.7);
-            border-radius: 60px;
-            padding: 12px 20px;
-            margin: 12px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            font-size: 0.75rem;
-            color: #6b4c5c;
-        }
-
-        .social-mini {
-            display: flex;
             gap: 16px;
-            font-size: 1.4rem;
+            margin: 20px 0 40px;
         }
-
-        .social-mini a {
-            color: #ca0223;
-            transition: transform 0.2s;
+        /* Mobile (celular): 2 colunas */
+        @media (max-width: 640px) {
+            .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
         }
-
-        .social-mini a:hover {
-            transform: scale(1.1);
+        /* Tablet e desktop: 3 colunas */
+        @media (min-width: 641px) {
+            .products-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
         }
-
-        .loading-spinner {
-            text-align: center;
-            padding: 40px;
-            font-size: 1.2rem;
-            color: #ca0223;
-        }
-
-        .toast-message {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 60px;
-            font-size: 0.9rem;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            animation: fadeInOut 3s ease forwards;
-        }
-
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-            10% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            90% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-        }
-
-        @media (max-width: 680px) {
-            .nav-btn {
-                padding: 6px 14px;
-                font-size: 0.75rem;
-            }
-            .site-title {
-                font-size: 1.2rem;
-            }
-            .logo-img {
-                height: 38px;
-            }
-            .products-grid {
-                gap: 16px;
-            }
+        
+        .product-card { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(18px); border-radius: 24px; overflow: hidden; transition: 0.2s ease; cursor: pointer; border: 1px solid rgba(255,255,240,0.7); }
+        .product-card:hover { transform: translateY(-4px); background: rgba(255,255,250,0.92); box-shadow: 0 12px 24px -12px rgba(202,2,35,0.25); }
+        .card-img { width: 100%; height: 160px; object-fit: cover; background: #faf0f3; }
+        .card-info { padding: 10px; }
+        .card-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-desc { font-size: 0.65rem; color: #4a2c3a; opacity: 0.8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
+        .btn-buy { background: #ca0223; color: white; border: none; padding: 6px 0; border-radius: 40px; font-weight: 600; width: 100%; margin-top: 8px; font-size: 0.65rem; cursor: pointer; }
+        .visit-counter { font-size: 0.6rem; background: rgba(202,2,35,0.1); display: inline-block; padding: 2px 8px; border-radius: 20px; margin-top: 4px; }
+        
+        /* Drawer flutuante */
+        .floating-drawer { display: none; position: fixed; bottom: 90px; right: 20px; width: 320px; max-width: calc(100vw - 40px); background: rgba(255, 250, 245, 0.96); backdrop-filter: blur(35px); border-radius: 32px; flex-direction: column; z-index: 200; border: 1px solid rgba(255,245,230,0.8); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+        .drawer-header { padding: 14px 18px; font-weight: bold; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 0.9rem; }
+        .drawer-tabs { display: flex; gap: 4px; padding: 8px 12px; }
+        .drawer-tab { flex: 1; text-align: center; padding: 6px; border-radius: 40px; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
+        .drawer-tab.active { background: #ca0223; color: white; }
+        .drawer-content { padding: 12px; max-height: 380px; overflow-y: auto; font-size: 0.8rem; }
+        .fab-trigger { position: fixed; bottom: 20px; right: 20px; background: #ca0223; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(202,2,35,0.4); cursor: pointer; color: white; font-size: 24px; z-index: 150; backdrop-filter: blur(12px); }
+        .tooltip-fab { position: absolute; bottom: 68px; right: 0; background: #0647b7; color: white; padding: 4px 12px; border-radius: 60px; font-size: 0.7rem; white-space: nowrap; backdrop-filter: blur(8px); }
+        
+        /* Modal Produto */
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: rgba(255, 248, 245, 0.96); backdrop-filter: blur(35px); border-radius: 40px; max-width: 480px; width: 90%; padding: 20px; text-align: center; }
+        .modal-img { max-height: 220px; }
+        
+        /* Admin Panel - sem alterações funcionais */
+        .admin-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border-radius: 40px; padding: 24px; margin: 20px 0; }
+        input, textarea, select, button { border-radius: 60px; border: 1px solid rgba(202,2,35,0.2); padding: 10px 16px; background: rgba(255,250,245,0.9); width: 100%; margin: 6px 0; font-size: 0.9rem; }
+        button { background: #ca0223; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .admin-item { background: rgba(255,240,245,0.7); border-radius: 60px; padding: 10px 16px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; font-size: 0.85rem; }
+        .hidden { display: none; }
+        footer { text-align: center; padding: 20px; font-size: 0.65rem; color: #6b4c5c; }
+        .social-mini-footer { display: flex; gap: 12px; justify-content: center; margin-bottom: 8px; }
+        .social-mini-footer a { color: #ca0223; font-size: 1.2rem; }
+        
+        @media (max-width: 480px) {
+            .card-img { height: 140px; }
+            .card-title { font-size: 0.75rem; }
+            .nav-btn { padding: 4px 8px; font-size: 0.7rem; }
+            .logo-img { height: 34px; }
+            .site-title { font-size: 1rem; }
         }
     </style>
 </head>
@@ -471,21 +105,21 @@
                 <img id="siteLogo" class="logo-img" src="https://i.ibb.co/Fk3bdXRb/logo.png" alt="Logo">
                 <span class="site-title">Ofertas da Poli</span>
             </div>
-            <div class="nav-links">
-                <button class="nav-btn special" id="btnClienteNav">Cliente</button>
-                <button class="nav-btn" id="btnOfertasNav">Ofertas</button>
-                <button class="nav-btn" id="btnCupomNav">Cupom</button>
-                <button class="nav-btn" id="btnAdminNav">Admin</button>
-            </div>
-            <div class="social-mini" id="socialMiniHeader"></div>
+            <div class="social-mini-header" id="socialMiniHeader"></div>
+        </div>
+        <div class="nav-links">
+            <button class="nav-btn special" id="btnClienteNav">Cliente</button>
+            <button class="nav-btn" id="btnOfertasNav">Ofertas</button>
+            <button class="nav-btn" id="btnCupomNav">Cupom</button>
+            <button class="nav-btn" id="btnAdminNav">Admin</button>
         </div>
     </div>
 </div>
 
 <main class="container">
     <div id="clienteView">
-        <div class="search-box glass">
-            <i class="fas fa-search" style="color:#ca0223;"></i>
+        <div class="search-box">
+            <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="Buscar produtos...">
         </div>
         <div class="news-badge"><i class="fas fa-gem"></i> NOVIDADES + OFERTAS RELÂMPAGO</div>
@@ -493,54 +127,18 @@
     </div>
 
     <div id="adminView" class="hidden">
-        <div class="admin-panel glass">
+        <div class="admin-panel">
             <div id="adminLoginArea">
-                <h3>🔐 Acesso Admin</h3>
-                <input id="adminUser" placeholder="Usuário" value="poli">
-                <input id="adminPass" type="password" placeholder="Senha" value="ofertas2024">
-                <button id="doLogin">Entrar</button>
+                <div><h3>🔐 Acesso Admin</h3><input id="adminUser" placeholder="Usuário" value="poli"><input id="adminPass" type="password" placeholder="Senha" value="ofertas2024"><button id="doLogin">Entrar</button></div>
             </div>
             <div id="adminDashboard" class="hidden">
                 <h2>✨ Painel da Poli</h2>
-                <div>
-                    <h4>🖼️ Logo do Site</h4>
-                    <input type="text" id="logoUrlInput" placeholder="URL da logo">
-                    <button id="saveLogoBtn">Salvar Logo</button>
-                </div>
-                <div>
-                    <h4>📱 Redes Sociais</h4>
-                    <input id="instaInput" placeholder="Instagram URL">
-                    <input id="whatsInput" placeholder="WhatsApp Grupo Link">
-                    <button id="saveSocialBtn">Salvar</button>
-                </div>
-                <div>
-                    <h3>➕ Adicionar Produto</h3>
-                    <input id="prodLink" placeholder="Link Afiliado *">
-                    <button id="autoFetchBtn">🔍 Buscar dados automaticamente</button>
-                    <div id="fetchStatus" style="font-size:0.75rem; margin:6px;"></div>
-                    <input id="prodTitle" placeholder="Título *">
-                    <textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea>
-                    <input id="prodImage" placeholder="URL da imagem (opcional)">
-                    <button id="saveProductBtn">Salvar Produto</button>
-                </div>
-                <div>
-                    <h3>⚡ Gerenciar Ofertas Relâmpago</h3>
-                    <div id="adminOffersList"></div>
-                    <select id="offerSelect"></select>
-                    <input id="offerDiscount" placeholder="Ex: 30% OFF + Frete Grátis">
-                    <button id="addOfferBtn">Adicionar Oferta</button>
-                </div>
-                <div>
-                    <h3>🎫 Cupons de Desconto</h3>
-                    <div id="adminCouponsList"></div>
-                    <input id="couponCode" placeholder="Código (ex: POLI10)">
-                    <input id="couponDesc" placeholder="Descrição (10% off)">
-                    <button id="addCouponBtn">Adicionar Cupom</button>
-                </div>
-                <div>
-                    <h3>📦 Produtos Cadastrados</h3>
-                    <div id="adminProductsList"></div>
-                </div>
+                <div><h4>🖼️ Logo do Site (URL)</h4><input type="text" id="logoUrlInput" placeholder="URL da logo"><button id="saveLogoBtn">Salvar Logo</button></div>
+                <div><h4>📱 Redes Sociais</h4><input id="instaInput" placeholder="Instagram URL"><input id="whatsInput" placeholder="WhatsApp Grupo Link"><button id="saveSocialBtn">Salvar</button></div>
+                <div><h3>➕ Adicionar Produto</h3><input id="prodLink" placeholder="Link Afiliado"><button id="autoFetchBtn">🔍 Buscar dados automaticamente</button><div id="fetchStatus" style="font-size:0.7rem; margin:4px;"></div><input id="prodTitle" placeholder="Título *"><textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea><input id="prodImage" placeholder="URL da imagem"><button id="saveProductBtn">Salvar Produto</button></div>
+                <div><h3>⚡ Gerenciar Ofertas Relâmpago</h3><div id="adminOffersList"></div><select id="offerSelect"></select><input id="offerDiscount" placeholder="Ex: 30% OFF + Frete Grátis"><button id="addOfferBtn">Adicionar Oferta</button></div>
+                <div><h3>🎫 Cupons de Desconto</h3><div id="adminCouponsList"></div><input id="couponCode" placeholder="Código (ex: POLI10)"><input id="couponDesc" placeholder="Descrição (10% off)"><button id="addCouponBtn">Adicionar Cupom</button></div>
+                <div><h3>📦 Produtos Cadastrados</h3><div id="adminProductsList"></div></div>
                 <button id="logoutAdmin">Sair do Admin</button>
             </div>
         </div>
@@ -548,15 +146,12 @@
 </main>
 
 <footer>
-    <div class="social-mini" style="justify-content:center; margin-bottom:16px;" id="footerSocial"></div>
+    <div class="social-mini-footer" id="footerSocial"></div>
     <p>✨ Ofertas da Poli – Beleza, estilo & economia ✨</p>
 </footer>
 
 <div id="floatingDrawer" class="floating-drawer">
-    <div class="drawer-header">
-        <span>⚡ Ofertas & Cupons</span>
-        <span id="closeDrawer" style="cursor:pointer;">✕</span>
-    </div>
+    <div class="drawer-header"><span>⚡ Ofertas & Cupons</span><span id="closeDrawer" style="cursor:pointer;">✕</span></div>
     <div class="drawer-tabs">
         <div class="drawer-tab active" data-tab="offers">Ofertas</div>
         <div class="drawer-tab" data-tab="coupons">Cupons</div>
@@ -565,18 +160,15 @@
     <div class="drawer-content" id="drawerContent"></div>
 </div>
 
-<div class="fab-trigger" id="fabTrigger">
-    <i class="fas fa-tag"></i>
-    <div class="tooltip-fab" id="fabTooltip">🎁 Cupons e ofertas! <span id="closeTooltip" style="margin-left:10px; cursor:pointer;">✕</span></div>
-</div>
+<div class="fab-trigger" id="fabTrigger"><i class="fas fa-tag"></i><div class="tooltip-fab" id="fabTooltip">🎁 Cupons e ofertas! <span id="closeTooltip" style="margin-left:8px; cursor:pointer;">✕</span></div></div>
 
 <div id="productModal" class="modal">
     <div class="modal-content">
-        <span style="float:right; font-size:32px; cursor:pointer;" id="closeModalBtn">&times;</span>
-        <img id="modalImg" style="width:100%; border-radius:28px; max-height:260px; object-fit:contain;">
-        <h3 id="modalTitle" style="margin-top:16px;"></h3>
-        <p id="modalDescFull" style="margin:16px 0;"></p>
-        <div style="background:#10d3dd; padding:14px; border-radius:60px; margin:20px 0;">
+        <span style="float:right; font-size:28px; cursor:pointer;" id="closeModalBtn">&times;</span>
+        <img id="modalImg" class="modal-img" style="width:100%; border-radius:24px; max-height:220px; object-fit:contain;">
+        <h3 id="modalTitle" style="margin-top:12px; font-size:1.2rem;"></h3>
+        <p id="modalDescFull" style="margin:12px 0; font-size:0.85rem;"></p>
+        <div style="background:#10d3dd; padding:10px; border-radius:60px; margin:16px 0;">
             <a id="modalBuyLink" href="#" target="_blank" style="color:white; text-decoration:none; font-weight:bold;">🛍️ COMPRAR AGORA</a>
         </div>
         <button id="modalCloseBtn" style="background:#ca0223;">Fechar</button>
@@ -584,7 +176,7 @@
 </div>
 
 <script>
-    // Firebase Configuration
+    // Configuração Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyDNsPEpaYJ_RfMTXQqPxb3A-wu1sb5UClc",
         authDomain: "ofertasdapoliana.firebaseapp.com",
@@ -594,326 +186,121 @@
         appId: "1:688903682077:web:259c751cd41b28529d6ef4",
         measurementId: "G-29GH65XLXX"
     };
-    
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    
-    // Global State
+
+    // Estado
     let products = [];
     let offers = [];
     let coupons = [];
     let social = { instagram: "", whatsapp: "" };
     let logoUrl = "https://i.ibb.co/Fk3bdXRb/logo.png";
     let isAdmin = false;
-    
-    // Helper: Show toast message
-    function showToast(message, isError = false) {
-        const toast = document.createElement('div');
-        toast.className = 'toast-message';
-        toast.style.backgroundColor = isError ? 'rgba(202, 2, 35, 0.9)' : 'rgba(0,0,0,0.8)';
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-    
-    function showLoading(containerId, isLoading) {
-        const grid = document.getElementById(containerId);
-        if (isLoading && grid) {
-            grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-pulse"></i> Carregando...</div>';
-        }
-    }
-    
-    // Render client products
-    async function renderCliente(searchTerm = "") {
+
+    function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    async function renderCliente(search = "") {
+        const filtered = products.filter(p => p.title.toLowerCase().includes(search.toLowerCase()));
         const grid = document.getElementById("produtosGrid");
-        if (!grid) return;
-        
-        const filtered = products.filter(p => 
-            p.title && p.title.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        
-        if (filtered.length === 0) {
-            grid.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:40px;'>Nenhum produto encontrado 💔</div>";
-            return;
-        }
-        
+        if (!filtered.length) { grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>Nenhum produto encontrado 💔</div>"; return; }
         grid.innerHTML = filtered.map(prod => `
             <div class="product-card" data-id="${prod.id}">
-                <img class="card-img" src="${prod.imageUrl || 'https://placehold.co/400x250/ca0223/white'}" 
-                     onerror="this.src='https://placehold.co/400x250/ca0223/white'" alt="${escapeHtml(prod.title)}">
+                <img class="card-img" src="${prod.imageUrl || 'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'">
                 <div class="card-info">
                     <div class="card-title">${escapeHtml(prod.title)}</div>
-                    <div class="card-desc">${escapeHtml(prod.description?.substring(0, 100) || 'Sem descrição')}</div>
-                    <div class="visit-counter"><i class="fas fa-eye"></i> ${prod.visitCount || 0} visitas</div>
-                    <button class="btn-buy" data-link="${prod.affiliateLink || '#'}"><i class="fas fa-shopping-bag"></i> Comprar</button>
+                    <div class="card-desc">${escapeHtml(prod.description?.substring(0,80) || '')}</div>
+                    <div class="visit-counter"><i class="fas fa-eye"></i> ${prod.visitCount || 0}</div>
+                    <button class="btn-buy" data-link="${prod.affiliateLink}"><i class="fas fa-shopping-bag"></i> Comprar</button>
                 </div>
             </div>
         `).join('');
-        
-        // Attach events
+
         document.querySelectorAll('.product-card').forEach(card => {
-            const buyBtn = card.querySelector('.btn-buy');
-            buyBtn?.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const link = buyBtn.getAttribute('data-link');
-                if (link && link !== '#') window.open(link, '_blank');
-            });
-            
             card.addEventListener('click', async (e) => {
-                if (e.target.classList.contains('btn-buy')) return;
+                if (e.target.classList.contains('btn-buy')) {
+                    const link = e.target.getAttribute('data-link');
+                    if (link) window.open(link, '_blank');
+                    e.stopPropagation();
+                    return;
+                }
                 const id = card.dataset.id;
                 const prod = products.find(p => p.id === id);
                 if (prod) {
-                    try {
-                        const newCount = (prod.visitCount || 0) + 1;
-                        await db.collection("products").doc(prod.id).update({ visitCount: newCount });
-                        prod.visitCount = newCount;
-                        openModal(prod);
-                        renderCliente(document.getElementById("searchInput")?.value || "");
-                    } catch (error) {
-                        console.error("Erro ao atualizar visita:", error);
-                        openModal(prod);
-                    }
+                    const newCount = (prod.visitCount || 0) + 1;
+                    await db.collection("products").doc(prod.id).update({ visitCount: newCount });
+                    prod.visitCount = newCount;
+                    openModal(prod);
+                    renderCliente(document.getElementById("searchInput").value);
                 }
+            });
+            card.querySelector('.btn-buy')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const link = card.querySelector('.btn-buy').dataset.link;
+                if (link) window.open(link, '_blank');
             });
         });
     }
-    
+
     function openModal(prod) {
         const modal = document.getElementById("productModal");
-        if (!modal) return;
         document.getElementById("modalImg").src = prod.imageUrl || 'https://placehold.co/400x250/ca0223/white';
-        document.getElementById("modalTitle").innerText = prod.title || "Produto";
-        document.getElementById("modalDescFull").innerHTML = `<strong>Descrição:</strong> ${escapeHtml(prod.description || '')}<br><br>👀 ${prod.visitCount || 0} visualizações`;
-        document.getElementById("modalBuyLink").href = prod.affiliateLink || '#';
+        document.getElementById("modalTitle").innerText = prod.title;
+        document.getElementById("modalDescFull").innerHTML = `<strong>Descrição:</strong> ${prod.description}<br><br>👀 ${prod.visitCount} visualizações`;
+        document.getElementById("modalBuyLink").href = prod.affiliateLink;
         modal.style.display = "flex";
     }
-    
-    function closeModal() {
-        const modal = document.getElementById("productModal");
-        if (modal) modal.style.display = "none";
-    }
-    
-    // Update floating drawer
+    function closeModal() { document.getElementById("productModal").style.display = "none"; }
+
     function updateDrawerContent(tab) {
         const container = document.getElementById("drawerContent");
-        if (!container) return;
-        
         if (tab === "offers") {
-            let html = `<div style="font-weight:bold; margin-bottom:16px;">🔥 Ofertas Relâmpago</div>`;
-            const activeOffers = offers.filter(off => products.some(p => p.id === off.productId));
-            if (activeOffers.length === 0) {
-                html += "<p>Nenhuma oferta ativa no momento.</p>";
-            } else {
-                activeOffers.forEach(off => {
-                    const prod = products.find(p => p.id === off.productId);
-                    if (prod) {
-                        html += `
-                            <div style="background:rgba(255,240,245,0.8); border-radius:28px; padding:12px; margin-bottom:16px; display:flex; gap:12px; align-items:center;">
-                                <img src="${prod.imageUrl || 'https://placehold.co/60x60'}" style="width:60px; height:60px; border-radius:20px; object-fit:cover;">
-                                <div style="flex:1">
-                                    <b>${escapeHtml(prod.title)}</b><br>
-                                    <span style="color:#ca0223; font-size:0.8rem;">${escapeHtml(off.discountText)}</span>
-                                    <button class="offer-buy-btn" data-link="${prod.affiliateLink}" style="background:#ca0223; border:none; border-radius:40px; padding:6px 16px; margin-top:8px; cursor:pointer;">Comprar</button>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-            }
-            container.innerHTML = html;
-            document.querySelectorAll('.offer-buy-btn').forEach(btn => {
-                btn.addEventListener('click', () => window.open(btn.dataset.link, '_blank'));
+            let html = `<div style="font-weight:bold; margin-bottom:10px;">🔥 Ofertas Relâmpago</div>`;
+            offers.forEach(off => {
+                const prod = products.find(p => p.id === off.productId);
+                if (prod) {
+                    html += `<div style="background:rgba(255,240,245,0.8); border-radius:20px; padding:10px; margin-bottom:10px; display:flex; gap:10px; align-items:center;">
+                        <img src="${prod.imageUrl}" style="width:50px; height:50px; border-radius:16px; object-fit:cover;">
+                        <div><b>${prod.title}</b><br>${off.discountText}<br><button class="offer-buy-btn" data-link="${prod.affiliateLink}" style="background:#ca0223; border:none; border-radius:40px; padding:3px 10px; margin-top:4px; font-size:0.7rem;">Comprar</button></div>
+                    </div>`;
+                }
             });
-        } 
-        else if (tab === "coupons") {
-            let html = `<div style="font-weight:bold; margin-bottom:16px;">🎟️ Cupons Exclusivos</div>`;
-            if (coupons.length === 0) {
-                html += "<p>Nenhum cupom cadastrado.</p>";
-            } else {
-                coupons.forEach(c => {
-                    html += `
-                        <div style="background:white; border-radius:24px; padding:16px; margin:12px 0; text-align:center;">
-                            <span style="background:#0647b7; color:white; padding:8px 18px; border-radius:50px; font-weight:bold; letter-spacing:1px;">${escapeHtml(c.code)}</span>
-                            <p style="margin-top:10px;"><small>${escapeHtml(c.description || 'Cupom de desconto')}</small></p>
-                        </div>
-                    `;
-                });
-            }
+            if (!offers.length) html += "<p>Nenhuma oferta ativa.</p>";
             container.innerHTML = html;
-        } 
-        else {
-            container.innerHTML = `
-                <div style="text-align:center;">
-                    <p>Siga nossas redes e fique por dentro das melhores ofertas:</p>
-                    <div style="display:flex; gap:30px; justify-content:center; font-size:2rem; margin:20px;">
-                        <a href="${social.instagram}" target="_blank" style="color:#ca0223;"><i class="fab fa-instagram"></i></a>
-                        <a href="${social.whatsapp}" target="_blank" style="color:#ca0223;"><i class="fab fa-whatsapp"></i></a>
-                    </div>
-                    <p>💎 Ofertas e cupons semanais!</p>
-                </div>
-            `;
+            document.querySelectorAll('.offer-buy-btn').forEach(btn => btn.addEventListener('click', () => window.open(btn.dataset.link, '_blank')));
+        } else if (tab === "coupons") {
+            let html = `<div style="font-weight:bold;">🎟️ Cupons Exclusivos</div>`;
+            coupons.forEach(c => {
+                html += `<div style="background:white; border-radius:16px; padding:8px; margin:8px 0;"><span style="background:#0647b7; color:white; padding:4px 12px; border-radius:50px; font-size:0.75rem;">${c.code}</span><br><small>${c.description}</small></div>`;
+            });
+            if (!coupons.length) html += "<p>Nenhum cupom cadastrado.</p>";
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = `<div style="text-align:center;"><p>Siga nossas redes:</p><div style="display:flex; gap:20px; justify-content:center; font-size:1.8rem; margin:12px;"><a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a><a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a></div><p>Ofertas e cupons semanais!</p></div>`;
         }
     }
-    
-    // Admin lists render
+
     function renderAdminLists() {
-        if (!isAdmin) return;
-        
         const offersDiv = document.getElementById("adminOffersList");
-        if (offersDiv) {
-            offersDiv.innerHTML = offers.map((off, idx) => `
-                <div class="admin-item">
-                    Produto: ${products.find(p => p.id === off.productId)?.title || '?'} - ${off.discountText}
-                    <button data-id="${off.id}" class="del-offer" style="background:#d44c6e;">🗑️</button>
-                </div>
-            `).join('');
-            document.querySelectorAll('.del-offer').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.dataset.id;
-                    if (id) await db.collection("offers").doc(id).delete();
-                    await loadAllData();
-                    showToast("Oferta removida");
-                });
-            });
-        }
-        
+        offersDiv.innerHTML = offers.map((off, idx) => `<div class="admin-item">${products.find(p=>p.id===off.productId)?.title || '?'} - ${off.discountText}<button data-idx="${idx}" class="del-offer" style="background:#d44c6e;">🗑️</button></div>`).join('');
+        document.querySelectorAll('.del-offer').forEach(btn => btn.addEventListener('click', async () => { const idx = btn.dataset.idx; const offToDel = offers[idx]; if(offToDel.id) await db.collection("offers").doc(offToDel.id).delete(); await loadAllData(); }));
         const couponsDiv = document.getElementById("adminCouponsList");
-        if (couponsDiv) {
-            couponsDiv.innerHTML = coupons.map(c => `
-                <div class="admin-item">
-                    ${c.code} - ${c.description || ''}
-                    <button data-id="${c.id}" class="del-coupon" style="background:#d44c6e;">🗑️</button>
-                </div>
-            `).join('');
-            document.querySelectorAll('.del-coupon').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = btn.dataset.id;
-                    if (id) await db.collection("coupons").doc(id).delete();
-                    await loadAllData();
-                    showToast("Cupom removido");
-                });
-            });
-        }
-        
+        couponsDiv.innerHTML = coupons.map((c, idx) => `<div class="admin-item">${c.code} - ${c.description}<button data-idx="${idx}" class="del-coupon" style="background:#d44c6e;">🗑️</button></div>`).join('');
+        document.querySelectorAll('.del-coupon').forEach(btn => btn.addEventListener('click', async () => { const idx = btn.dataset.idx; const coupDel = coupons[idx]; if(coupDel.id) await db.collection("coupons").doc(coupDel.id).delete(); await loadAllData(); }));
         const select = document.getElementById("offerSelect");
-        if (select) {
-            select.innerHTML = products.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
-        }
-        
+        if(select) select.innerHTML = products.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
         const prodList = document.getElementById("adminProductsList");
-        if (prodList) {
-            prodList.innerHTML = products.map(p => `
-                <div class="admin-item">
-                    ${p.title} (${p.visitCount || 0} visualizações)
-                    <button data-id="${p.id}" class="del-prod" style="background:#d44c6e;">Excluir</button>
-                </div>
-            `).join('');
-            document.querySelectorAll('.del-prod').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    if (confirm("Excluir produto permanentemente?")) {
-                        await db.collection("products").doc(btn.dataset.id).delete();
-                        await loadAllData();
-                        showToast("Produto excluído");
-                    }
-                });
-            });
-        }
+        prodList.innerHTML = products.map(p => `<div class="admin-item">${p.title} (${p.visitCount} vis) <button data-id="${p.id}" class="del-prod" style="background:#d44c6e;">Excluir</button></div>`).join('');
+        document.querySelectorAll('.del-prod').forEach(btn => btn.addEventListener('click', async () => { await db.collection("products").doc(btn.dataset.id).delete(); await loadAllData(); }));
     }
-    
-    // CRUD: Add Product with robust error handling
-    async function addProduct(link, title, desc, img) {
-        if (!link || !title) throw new Error("Link e título são obrigatórios");
-        
-        const imageUrl = img && img.trim() !== "" ? img : "https://placehold.co/400x250/ca0223/white";
-        
-        const productData = {
-            affiliateLink: link,
-            title: title.trim(),
-            description: desc ? desc.trim() : "",
-            imageUrl: imageUrl,
-            visitCount: 0,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        
-        try {
-            const docRef = await db.collection("products").add(productData);
-            console.log("Produto salvo com ID:", docRef.id);
-            await loadAllData();
-            return docRef.id;
-        } catch (error) {
-            console.error("Erro detalhado ao salvar produto:", error);
-            if (error.code === "permission-denied") {
-                throw new Error("Sem permissão para escrever no banco. Verifique as regras do Firestore.");
-            } else if (error.code === "unavailable") {
-                throw new Error("Serviço indisponível. Verifique sua conexão.");
-            } else {
-                throw new Error(`Erro ao salvar: ${error.message}`);
-            }
-        }
-    }
-    
-    async function addOffer(productId, discount) {
-        if (!productId || !discount) throw new Error("Produto e desconto são obrigatórios");
-        await db.collection("offers").add({ productId, discountText: discount });
-        await loadAllData();
-    }
-    
-    async function addCoupon(code, desc) {
-        if (!code) throw new Error("Código do cupom é obrigatório");
-        await db.collection("coupons").add({ code: code.toUpperCase(), description: desc || "" });
-        await loadAllData();
-    }
-    
-    async function updateConfig(logo, insta, wa) {
-        await db.collection("config").doc("site").set({ logoUrl: logo, instagram: insta, whatsapp: wa });
-        await loadAllData();
-    }
-    
-    async function autoFetch(link) {
-        const statusDiv = document.getElementById("fetchStatus");
-        statusDiv.innerText = "🔍 Buscando dados...";
-        try {
-            const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(link)}`);
-            const data = await res.json();
-            if (data.data) {
-                if (data.data.title) document.getElementById("prodTitle").value = data.data.title;
-                if (data.data.description) document.getElementById("prodDesc").value = data.data.description;
-                if (data.data.image?.url) document.getElementById("prodImage").value = data.data.image.url;
-                statusDiv.innerText = "✅ Dados obtidos com sucesso!";
-            } else {
-                statusDiv.innerText = "⚠️ Não foi possível extrair os dados";
-            }
-        } catch(e) {
-            statusDiv.innerText = "Erro na busca automática";
-            console.error(e);
-        }
-    }
-    
-    // Load all data from Firestore
+
     async function loadAllData() {
         try {
-            showLoading("produtosGrid", true);
-            
             const productsSnap = await db.collection("products").get();
-            products = productsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
+            products = productsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
             const offersSnap = await db.collection("offers").get();
-            offers = offersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
+            offers = offersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
             const couponsSnap = await db.collection("coupons").get();
-            coupons = couponsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
+            coupons = couponsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
             const configDoc = await db.collection("config").doc("site").get();
             if (configDoc.exists) {
                 const data = configDoc.data();
@@ -922,246 +309,68 @@
             } else {
                 await db.collection("config").doc("site").set({ logoUrl, instagram: "", whatsapp: "" });
             }
-            
             document.getElementById("siteLogo").src = logoUrl;
             document.getElementById("logoUrlInput").value = logoUrl;
             document.getElementById("instaInput").value = social.instagram;
             document.getElementById("whatsInput").value = social.whatsapp;
-            
-            const socialHtml = `
-                <a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a>
-            `;
-            const socialHeader = document.getElementById("socialMiniHeader");
-            const socialFooter = document.getElementById("footerSocial");
-            if (socialHeader) socialHeader.innerHTML = socialHtml;
-            if (socialFooter) socialFooter.innerHTML = socialHtml;
-            
-            const searchValue = document.getElementById("searchInput")?.value || "";
-            await renderCliente(searchValue);
+            const socialHtml = `<a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a><a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a>`;
+            document.getElementById("socialMiniHeader").innerHTML = socialHtml;
+            document.getElementById("footerSocial").innerHTML = socialHtml;
+            renderCliente(document.getElementById("searchInput")?.value || "");
             renderAdminLists();
-            
-            const activeTab = document.querySelector(".drawer-tab.active")?.dataset.tab || "offers";
-            updateDrawerContent(activeTab);
-            
-        } catch (error) {
-            console.error("Erro ao carregar dados:", error);
-            document.getElementById("produtosGrid").innerHTML = "<div style='text-align:center;padding:40px;color:red;'>Erro ao carregar produtos. Tente recarregar a página.</div>";
-            showToast("Erro ao conectar com o banco de dados", true);
-        } finally {
-            showLoading("produtosGrid", false);
-        }
+            updateDrawerContent(document.querySelector(".drawer-tab.active")?.dataset.tab || "offers");
+        } catch(err) { console.error(err); alert("Erro ao carregar dados."); }
     }
-    
-    // Initialize UI events
+
+    async function addProduct(link, title, desc, img) {
+        await db.collection("products").add({ affiliateLink: link, title, description: desc, imageUrl: img || "https://placehold.co/400x250/ca0223/white", visitCount: 0, createdAt: new Date().toISOString() });
+        await loadAllData();
+    }
+    async function addOffer(productId, discount) { await db.collection("offers").add({ productId, discountText: discount }); await loadAllData(); }
+    async function addCoupon(code, desc) { await db.collection("coupons").add({ code, description: desc }); await loadAllData(); }
+    async function updateConfig(logo, insta, wa) { await db.collection("config").doc("site").set({ logoUrl: logo, instagram: insta, whatsapp: wa }); await loadAllData(); }
+    async function autoFetch(link) {
+        const statusDiv = document.getElementById("fetchStatus");
+        statusDiv.innerText = "🔍 buscando...";
+        try {
+            const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(link)}`);
+            const data = await res.json();
+            if (data.data) {
+                if (data.data.title) document.getElementById("prodTitle").value = data.data.title;
+                if (data.data.description) document.getElementById("prodDesc").value = data.data.description;
+                if (data.data.image?.url) document.getElementById("prodImage").value = data.data.image.url;
+                statusDiv.innerText = "✅ Dados obtidos!";
+            } else statusDiv.innerText = "⚠️ Não foi possível extrair";
+        } catch(e) { statusDiv.innerText = "Erro na busca"; }
+    }
+
     function initUI() {
-        // Navigation
-        document.getElementById("btnClienteNav").onclick = () => {
-            document.getElementById("clienteView").classList.remove("hidden");
-            document.getElementById("adminView").classList.add("hidden");
-            renderCliente(document.getElementById("searchInput").value);
-        };
-        
-        document.getElementById("btnAdminNav").onclick = () => {
-            document.getElementById("clienteView").classList.add("hidden");
-            document.getElementById("adminView").classList.remove("hidden");
-            if (!isAdmin) {
-                document.getElementById("adminLoginArea").classList.remove("hidden");
-                document.getElementById("adminDashboard").classList.add("hidden");
-            } else {
-                document.getElementById("adminLoginArea").classList.add("hidden");
-                document.getElementById("adminDashboard").classList.remove("hidden");
-                renderAdminLists();
-            }
-        };
-        
-        // Admin Login
-        document.getElementById("doLogin").onclick = () => {
-            const user = document.getElementById("adminUser").value;
-            const pass = document.getElementById("adminPass").value;
-            if (user === "poli" && pass === "ofertas2024") {
-                isAdmin = true;
-                document.getElementById("adminLoginArea").classList.add("hidden");
-                document.getElementById("adminDashboard").classList.remove("hidden");
-                renderAdminLists();
-                showToast("Login realizado como Admin");
-            } else {
-                showToast("Acesso negado! Credenciais incorretas.", true);
-            }
-        };
-        
-        document.getElementById("logoutAdmin").onclick = () => {
-            isAdmin = false;
-            document.getElementById("adminDashboard").classList.add("hidden");
-            document.getElementById("adminLoginArea").classList.remove("hidden");
-            document.getElementById("clienteView").classList.remove("hidden");
-            document.getElementById("adminView").classList.add("hidden");
-            renderCliente(document.getElementById("searchInput").value);
-            showToast("Logout realizado");
-        };
-        
-        // Save Product with validation and loading state
-        document.getElementById("saveProductBtn").onclick = async () => {
-            const link = document.getElementById("prodLink").value.trim();
-            const title = document.getElementById("prodTitle").value.trim();
-            const desc = document.getElementById("prodDesc").value.trim();
-            const img = document.getElementById("prodImage").value.trim();
-            
-            if (!link) {
-                showToast("❌ O link do produto é obrigatório!", true);
-                document.getElementById("prodLink").focus();
-                return;
-            }
-            if (!title) {
-                showToast("❌ O título do produto é obrigatório!", true);
-                document.getElementById("prodTitle").focus();
-                return;
-            }
-            
-            const saveBtn = document.getElementById("saveProductBtn");
-            const originalText = saveBtn.innerText;
-            saveBtn.disabled = true;
-            saveBtn.innerText = "Salvando...";
-            
-            try {
-                await addProduct(link, title, desc, img);
-                showToast("✅ Produto salvo com sucesso!");
-                document.getElementById("prodLink").value = "";
-                document.getElementById("prodTitle").value = "";
-                document.getElementById("prodDesc").value = "";
-                document.getElementById("prodImage").value = "";
-                document.getElementById("fetchStatus").innerText = "";
-            } catch (error) {
-                showToast(`❌ Falha ao salvar: ${error.message}`, true);
-                console.error(error);
-            } finally {
-                saveBtn.disabled = false;
-                saveBtn.innerText = originalText;
-            }
-        };
-        
-        document.getElementById("addOfferBtn").onclick = async () => {
-            const pid = document.getElementById("offerSelect").value;
-            const discount = document.getElementById("offerDiscount").value.trim();
-            if (!discount) {
-                showToast("Digite o texto da oferta!", true);
-                return;
-            }
-            try {
-                await addOffer(pid, discount);
-                document.getElementById("offerDiscount").value = "";
-                showToast("Oferta adicionada!");
-            } catch (error) {
-                showToast(error.message, true);
-            }
-        };
-        
-        document.getElementById("addCouponBtn").onclick = async () => {
-            const code = document.getElementById("couponCode").value.trim();
-            const desc = document.getElementById("couponDesc").value.trim();
-            if (!code) {
-                showToast("Digite o código do cupom!", true);
-                return;
-            }
-            try {
-                await addCoupon(code, desc);
-                document.getElementById("couponCode").value = "";
-                document.getElementById("couponDesc").value = "";
-                showToast("Cupom adicionado!");
-            } catch (error) {
-                showToast(error.message, true);
-            }
-        };
-        
-        document.getElementById("saveLogoBtn").onclick = async () => {
-            const url = document.getElementById("logoUrlInput").value.trim();
-            if (url) await updateConfig(url, social.instagram, social.whatsapp);
-            else showToast("Insira uma URL válida para a logo", true);
-        };
-        
-        document.getElementById("saveSocialBtn").onclick = async () => {
-            const insta = document.getElementById("instaInput").value.trim();
-            const wa = document.getElementById("whatsInput").value.trim();
-            await updateConfig(logoUrl, insta, wa);
-            showToast("Redes sociais salvas!");
-        };
-        
-        document.getElementById("autoFetchBtn").onclick = async () => {
-            const link = document.getElementById("prodLink").value.trim();
-            if (!link) {
-                showToast("Cole um link de produto primeiro!", true);
-                return;
-            }
-            const fetchBtn = document.getElementById("autoFetchBtn");
-            const originalText = fetchBtn.innerText;
-            fetchBtn.disabled = true;
-            fetchBtn.innerText = "Buscando...";
-            try {
-                await autoFetch(link);
-            } catch (e) {
-                document.getElementById("fetchStatus").innerText = "Erro na busca";
-            } finally {
-                fetchBtn.disabled = false;
-                fetchBtn.innerText = originalText;
-            }
-        };
-        
-        document.getElementById("searchInput").addEventListener("input", (e) => {
-            renderCliente(e.target.value);
-        });
-        
-        // Drawer and FAB
+        document.getElementById("btnClienteNav").onclick = () => { document.getElementById("clienteView").classList.remove("hidden"); document.getElementById("adminView").classList.add("hidden"); renderCliente(document.getElementById("searchInput").value); };
+        document.getElementById("btnAdminNav").onclick = () => { if(isAdmin) { document.getElementById("clienteView").classList.add("hidden"); document.getElementById("adminView").classList.remove("hidden"); } else { document.getElementById("clienteView").classList.add("hidden"); document.getElementById("adminView").classList.remove("hidden"); document.getElementById("adminLoginArea").classList.remove("hidden"); document.getElementById("adminDashboard").classList.add("hidden"); } };
+        document.getElementById("doLogin").onclick = () => { const u = document.getElementById("adminUser").value, p = document.getElementById("adminPass").value; if(u === "poli" && p === "ofertas2024") { isAdmin = true; document.getElementById("adminLoginArea").classList.add("hidden"); document.getElementById("adminDashboard").classList.remove("hidden"); renderAdminLists(); } else alert("Acesso negado"); };
+        document.getElementById("logoutAdmin").onclick = () => { isAdmin = false; document.getElementById("adminDashboard").classList.add("hidden"); document.getElementById("adminLoginArea").classList.remove("hidden"); document.getElementById("clienteView").classList.remove("hidden"); document.getElementById("adminView").classList.add("hidden"); renderCliente(document.getElementById("searchInput").value); };
+        document.getElementById("saveProductBtn").onclick = async () => { const link = document.getElementById("prodLink").value.trim(), title = document.getElementById("prodTitle").value.trim(), desc = document.getElementById("prodDesc").value.trim(), img = document.getElementById("prodImage").value.trim(); if(!link || !title) { alert("Preencha link e título"); return; } await addProduct(link, title, desc, img); document.getElementById("prodLink").value = ""; document.getElementById("prodTitle").value = ""; document.getElementById("prodDesc").value = ""; document.getElementById("prodImage").value = ""; alert("Produto adicionado!"); };
+        document.getElementById("addOfferBtn").onclick = async () => { const pid = document.getElementById("offerSelect").value, disc = document.getElementById("offerDiscount").value.trim(); if(!disc) { alert("Digite o desconto"); return; } await addOffer(pid, disc); document.getElementById("offerDiscount").value = ""; alert("Oferta adicionada!"); };
+        document.getElementById("addCouponBtn").onclick = async () => { const code = document.getElementById("couponCode").value.trim(), desc = document.getElementById("couponDesc").value.trim(); if(!code) { alert("Digite o código"); return; } await addCoupon(code, desc); document.getElementById("couponCode").value = ""; document.getElementById("couponDesc").value = ""; alert("Cupom adicionado!"); };
+        document.getElementById("saveLogoBtn").onclick = async () => { const url = document.getElementById("logoUrlInput").value.trim(); if(url) await updateConfig(url, social.instagram, social.whatsapp); else alert("Insira URL"); };
+        document.getElementById("saveSocialBtn").onclick = async () => { const insta = document.getElementById("instaInput").value.trim(), wa = document.getElementById("whatsInput").value.trim(); await updateConfig(logoUrl, insta, wa); alert("Redes sociais salvas!"); };
+        document.getElementById("autoFetchBtn").onclick = () => { const link = document.getElementById("prodLink").value.trim(); if(link) autoFetch(link); else alert("Cole um link"); };
+        document.getElementById("searchInput").addEventListener("input", e => renderCliente(e.target.value));
+
         const drawer = document.getElementById("floatingDrawer");
-        document.getElementById("fabTrigger").onclick = () => {
-            const isVisible = drawer.style.display === "flex";
-            drawer.style.display = isVisible ? "none" : "flex";
-            if (!isVisible) {
-                const activeTab = document.querySelector(".drawer-tab.active")?.dataset.tab || "offers";
-                updateDrawerContent(activeTab);
-            }
-        };
+        document.getElementById("fabTrigger").onclick = () => { drawer.style.display = drawer.style.display === "flex" ? "none" : "flex"; if(drawer.style.display === "flex") updateDrawerContent(document.querySelector(".drawer-tab.active")?.dataset.tab); };
         document.getElementById("closeDrawer").onclick = () => drawer.style.display = "none";
-        
-        document.querySelectorAll(".drawer-tab").forEach(tab => {
-            tab.addEventListener("click", () => {
-                document.querySelectorAll(".drawer-tab").forEach(t => t.classList.remove("active"));
-                tab.classList.add("active");
-                updateDrawerContent(tab.dataset.tab);
-            });
-        });
-        
-        document.getElementById("btnOfertasNav").onclick = () => {
-            drawer.style.display = "flex";
-            updateDrawerContent("offers");
-        };
-        document.getElementById("btnCupomNav").onclick = () => {
-            drawer.style.display = "flex";
-            updateDrawerContent("coupons");
-        };
-        
-        if (localStorage.getItem("fabTooltipClosed")) {
-            const tooltip = document.getElementById("fabTooltip");
-            if (tooltip) tooltip.style.display = "none";
-        }
-        document.getElementById("closeTooltip").onclick = (e) => {
-            e.stopPropagation();
-            document.getElementById("fabTooltip").style.display = "none";
-            localStorage.setItem("fabTooltipClosed", "true");
-        };
-        
-        // Modal close
+        document.querySelectorAll(".drawer-tab").forEach(tab => { tab.addEventListener("click", () => { document.querySelectorAll(".drawer-tab").forEach(t => t.classList.remove("active")); tab.classList.add("active"); updateDrawerContent(tab.dataset.tab); }); });
+        document.getElementById("btnOfertasNav").onclick = () => { drawer.style.display = "flex"; updateDrawerContent("offers"); };
+        document.getElementById("btnCupomNav").onclick = () => { drawer.style.display = "flex"; updateDrawerContent("coupons"); };
+        document.getElementById("closeTooltip").onclick = () => { document.getElementById("fabTooltip").style.display = "none"; localStorage.setItem("fabTooltipClosed", "true"); };
+        if(localStorage.getItem("fabTooltipClosed")) document.getElementById("fabTooltip").style.display = "none";
         document.getElementById("closeModalBtn").onclick = closeModal;
         document.getElementById("modalCloseBtn").onclick = closeModal;
-        window.onclick = (e) => {
-            if (e.target === document.getElementById("productModal")) closeModal();
-        };
+        window.onclick = (e) => { if(e.target === document.getElementById("productModal")) closeModal(); };
     }
-    
-    // Start app
-    loadAllData().then(() => initUI()).catch(err => {
-        console.error("Falha na inicialização:", err);
-        showToast("Erro ao conectar com o banco de dados. Verifique sua internet.", true);
-    });
+
+    loadAllData().then(() => initUI());
 </script>
 </body>
 </html>
