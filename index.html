@@ -14,8 +14,15 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: radial-gradient(circle at 20% 30%, rgba(202,2,35,0.05), rgba(16,211,221,0.02)); min-height: 100vh; padding-bottom: 80px; }
+        /* Previne zoom via CSS adicional */
+        * {
+            touch-action: pan-x pan-y; /* Impede pinça zoom, mas permite rolagem */
+        }
+        body {
+            background: radial-gradient(circle at 20% 30%, rgba(202,2,35,0.05), rgba(16,211,221,0.02));
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
         .glass { background: rgba(255, 250, 245, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,245,0.5); border-radius: 32px; }
         .header { position: sticky; top: 0; z-index: 100; padding: 8px 16px; background: rgba(255, 250, 245, 0.82); backdrop-filter: blur(25px); border-radius: 0 0 28px 28px; margin-bottom: 8px; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
@@ -131,7 +138,7 @@
                 <h2>✨ Painel da Poli</h2>
                 <div><h4>🖼️ Logo do Site (URL)</h4><input type="text" id="logoUrlInput" placeholder="URL da logo"><button id="saveLogoBtn">Salvar Logo</button></div>
                 <div><h4>📱 Redes Sociais</h4><input id="instaInput" placeholder="Instagram URL"><input id="whatsInput" placeholder="WhatsApp Grupo Link"><button id="saveSocialBtn">Salvar</button></div>
-                <div><h3>➕ Adicionar Produto</h3><input id="prodLink" placeholder="Link Afiliado"><button id="autoFetchBtn">🔍 Buscar dados automaticamente (inclui preço)</button><div id="fetchStatus" style="font-size:0.7rem; margin:4px;"></div><input id="prodTitle" placeholder="Título *"><textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea><input id="prodImage" placeholder="URL da imagem"><div style="display:flex; gap:8px; flex-wrap:wrap;"><input id="prodOldPrice" placeholder="Preço original (ex: 99.90)" style="flex:1;"><input id="prodCurrentPrice" placeholder="Preço atual (ex: 49.90)" style="flex:1;"></div><select id="prodCategory"><option value="">Selecionar Categoria (opcional)</option></select><button id="saveProductBtn">Salvar Produto</button></div>
+                <div><h3>➕ Adicionar Produto</h3><input id="prodLink" placeholder="Link Afiliado"><button id="autoFetchBtn">🔍 Buscar dados automaticamente (inclui preço)</button><div id="fetchStatus" style="font-size:0.7rem; margin:4px;"></div><input id="prodTitle" placeholder="Título *"><textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea><input id="prodImage" placeholder="URL da imagem"><div style="display:flex; gap:8px; flex-wrap:wrap;"><input id="prodOldPrice" placeholder="Preço original (ex: 59,90)" style="flex:1;"><input id="prodCurrentPrice" placeholder="Preço atual (ex: 29,90)" style="flex:1;"></div><select id="prodCategory"><option value="">Selecionar Categoria (opcional)</option></select><button id="saveProductBtn">Salvar Produto</button></div>
                 <div><h3>⚡ Gerenciar Ofertas Relâmpago</h3><div id="adminOffersList"></div><select id="offerSelect"></select><input id="offerDiscount" placeholder="Ex: 30% OFF + Frete Grátis"><button id="addOfferBtn">Adicionar Oferta</button></div>
                 <div><h3>🎫 Cupons de Desconto</h3><div id="adminCouponsList"></div><input id="couponCode" placeholder="Código (ex: POLI10)"><input id="couponDesc" placeholder="Descrição (10% off)"><button id="addCouponBtn">Adicionar Cupom</button></div>
                 <div><h3>📦 Produtos Cadastrados</h3><div id="adminProductsGrid" class="admin-products-grid"></div></div>
@@ -161,7 +168,7 @@
         <textarea id="editDesc" rows="2" placeholder="Descrição"></textarea>
         <input type="text" id="editImage" placeholder="URL da imagem">
         <input type="text" id="editLink" placeholder="Link de afiliado">
-        <div style="display:flex; gap:8px; flex-wrap:wrap;"><input id="editOldPrice" placeholder="Preço original" style="flex:1;"><input id="editCurrentPrice" placeholder="Preço atual" style="flex:1;"></div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;"><input id="editOldPrice" placeholder="Preço original (ex: 99,90)" style="flex:1;"><input id="editCurrentPrice" placeholder="Preço atual (ex: 49,90)" style="flex:1;"></div>
         <select id="editCategory"><option value="">Selecionar Categoria</option></select>
         <button id="saveEditBtn">Salvar alterações</button>
         <button id="cancelEditBtn" style="background:#aaa;">Cancelar</button>
@@ -236,17 +243,28 @@
         return "";
     }
 
-    function formatPrice(value) {
-        if (!value) return null;
-        let num = parseFloat(value.toString().replace(/[^0-9.,-]/g, '').replace(',', '.'));
+    // Função para converter string de preço (ex: "40,59" ou "40.59" ou "40") para número com 2 decimais
+    function parsePriceToNumber(priceStr) {
+        if (!priceStr || priceStr.trim() === "") return null;
+        let cleaned = priceStr.toString().trim().replace(/[^\d,.-]/g, ''); // remove tudo exceto digitos, vírgula, ponto e hífen
+        cleaned = cleaned.replace(',', '.'); // substitui vírgula decimal por ponto
+        let num = parseFloat(cleaned);
         if (isNaN(num)) return null;
-        return num.toFixed(2);
+        // Arredondar para 2 casas decimais sem perder precisão
+        return Math.round(num * 100) / 100;
+    }
+
+    function formatPriceForDisplay(value) {
+        if (value === null || value === undefined || value === "") return null;
+        let num = typeof value === 'number' ? value : parsePriceToNumber(value);
+        if (num === null) return null;
+        return num.toFixed(2).replace('.', ',');
     }
 
     function getDiscountPercent(oldPrice, currentPrice) {
-        let oldNum = parseFloat(oldPrice);
-        let currNum = parseFloat(currentPrice);
-        if (isNaN(oldNum) || isNaN(currNum) || oldNum <= 0 || currNum <= 0) return null;
+        let oldNum = parsePriceToNumber(oldPrice);
+        let currNum = parsePriceToNumber(currentPrice);
+        if (oldNum === null || currNum === null || oldNum <= 0 || currNum <= 0) return null;
         let discount = ((oldNum - currNum) / oldNum) * 100;
         return Math.round(discount);
     }
@@ -305,6 +323,8 @@
         grid.innerHTML = filtered.map(prod => {
             let discountPercent = null;
             if (prod.oldPrice && prod.currentPrice) discountPercent = getDiscountPercent(prod.oldPrice, prod.currentPrice);
+            let oldPriceDisplay = prod.oldPrice ? formatPriceForDisplay(prod.oldPrice) : null;
+            let currentPriceDisplay = prod.currentPrice ? formatPriceForDisplay(prod.currentPrice) : null;
             return `
             <div class="product-card" data-id="${prod.id}">
                 ${discountPercent ? `<div class="price-badge">-${discountPercent}%</div>` : ''}
@@ -312,8 +332,8 @@
                 <div class="card-info">
                     <div class="card-title">${escapeHtml(prod.title)}</div>
                     <div class="price-info">
-                        ${prod.oldPrice ? `<span class="old-price">R$ ${parseFloat(prod.oldPrice).toFixed(2)}</span>` : ''}
-                        ${prod.currentPrice ? `<span class="current-price">R$ ${parseFloat(prod.currentPrice).toFixed(2)}</span>` : ''}
+                        ${oldPriceDisplay ? `<span class="old-price">R$ ${oldPriceDisplay}</span>` : ''}
+                        ${currentPriceDisplay ? `<span class="current-price">R$ ${currentPriceDisplay}</span>` : ''}
                         ${discountPercent ? `<span class="discount-percent">Economize ${discountPercent}%</span>` : ''}
                     </div>
                     <div class="card-desc">${escapeHtml(prod.description?.substring(0,80) || '')}</div>
@@ -356,11 +376,13 @@
         document.getElementById("modalTitle").innerText = prod.title;
         let discountPercent = null;
         if (prod.oldPrice && prod.currentPrice) discountPercent = getDiscountPercent(prod.oldPrice, prod.currentPrice);
+        let oldPriceDisplay = prod.oldPrice ? formatPriceForDisplay(prod.oldPrice) : null;
+        let currentPriceDisplay = prod.currentPrice ? formatPriceForDisplay(prod.currentPrice) : null;
         let priceHtml = '';
-        if (prod.oldPrice || prod.currentPrice) {
+        if (oldPriceDisplay || currentPriceDisplay) {
             priceHtml = `<div style="margin:10px 0;">
-                ${prod.oldPrice ? `<span style="text-decoration:line-through; color:#888; margin-right:10px;">R$ ${parseFloat(prod.oldPrice).toFixed(2)}</span>` : ''}
-                ${prod.currentPrice ? `<span style="font-size:1.3rem; font-weight:bold; color:#ca0223;">R$ ${parseFloat(prod.currentPrice).toFixed(2)}</span>` : ''}
+                ${oldPriceDisplay ? `<span style="text-decoration:line-through; color:#888; margin-right:10px;">R$ ${oldPriceDisplay}</span>` : ''}
+                ${currentPriceDisplay ? `<span style="font-size:1.3rem; font-weight:bold; color:#ca0223;">R$ ${currentPriceDisplay}</span>` : ''}
                 ${discountPercent ? `<span style="background:#10d3dd; padding:2px 10px; border-radius:20px; margin-left:10px;">${discountPercent}% OFF</span>` : ''}
             </div>`;
         }
@@ -406,21 +428,23 @@
         document.getElementById("editDesc").value = product.description || "";
         document.getElementById("editImage").value = product.imageUrl || "";
         document.getElementById("editLink").value = product.affiliateLink || "";
-        document.getElementById("editOldPrice").value = product.oldPrice || "";
-        document.getElementById("editCurrentPrice").value = product.currentPrice || "";
+        document.getElementById("editOldPrice").value = product.oldPrice ? formatPriceForDisplay(product.oldPrice) : "";
+        document.getElementById("editCurrentPrice").value = product.currentPrice ? formatPriceForDisplay(product.currentPrice) : "";
         const catSelect = document.getElementById("editCategory");
         catSelect.innerHTML = '<option value="">Selecionar Categoria</option>' + categories.map(c => `<option value="${c.name}" ${product.category === c.name ? 'selected' : ''}>${c.name}</option>`).join('');
         document.getElementById("editProductModal").style.display = "flex";
     }
     async function saveEdit() {
         if (!currentEditId) return;
+        const oldPriceRaw = document.getElementById("editOldPrice").value.trim();
+        const currentPriceRaw = document.getElementById("editCurrentPrice").value.trim();
         const updatedData = {
             title: document.getElementById("editTitle").value.trim(),
             description: document.getElementById("editDesc").value.trim(),
             imageUrl: document.getElementById("editImage").value.trim(),
             affiliateLink: document.getElementById("editLink").value.trim(),
-            oldPrice: document.getElementById("editOldPrice").value.trim(),
-            currentPrice: document.getElementById("editCurrentPrice").value.trim(),
+            oldPrice: oldPriceRaw ? parsePriceToNumber(oldPriceRaw) : "",
+            currentPrice: currentPriceRaw ? parsePriceToNumber(currentPriceRaw) : "",
             category: document.getElementById("editCategory").value
         };
         if (!updatedData.title) { alert("O título é obrigatório"); return; }
@@ -438,14 +462,17 @@
             container.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>Nenhum produto cadastrado</div>";
             return;
         }
-        container.innerHTML = products.map(prod => `
+        container.innerHTML = products.map(prod => {
+            let oldPriceDisplay = prod.oldPrice ? formatPriceForDisplay(prod.oldPrice) : "";
+            let currentPriceDisplay = prod.currentPrice ? formatPriceForDisplay(prod.currentPrice) : "";
+            return `
             <div class="product-card" style="cursor:default;">
                 <img class="card-img" src="${prod.imageUrl || 'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'">
                 <div class="card-info">
                     <div class="card-title">${escapeHtml(prod.title)}</div>
                     <div class="price-info" style="font-size:0.7rem;">
-                        ${prod.oldPrice ? `<span class="old-price">R$ ${parseFloat(prod.oldPrice).toFixed(2)}</span>` : ''}
-                        ${prod.currentPrice ? `<span class="current-price" style="font-size:0.8rem;">R$ ${parseFloat(prod.currentPrice).toFixed(2)}</span>` : ''}
+                        ${oldPriceDisplay ? `<span class="old-price">R$ ${oldPriceDisplay}</span>` : ''}
+                        ${currentPriceDisplay ? `<span class="current-price" style="font-size:0.8rem;">R$ ${currentPriceDisplay}</span>` : ''}
                     </div>
                     <div class="card-desc">${escapeHtml(prod.description?.substring(0,60) || '')}</div>
                     <div class="visit-counter"><i class="fas fa-eye"></i> ${prod.visitCount || 0} visitas</div>
@@ -455,7 +482,7 @@
                     </div>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
         
         document.querySelectorAll('.admin-card-btn.edit').forEach(btn => {
             btn.addEventListener('click', async () => {
@@ -498,11 +525,11 @@
                 const priceRegex = /(?:R\$|preço|por|apenas|de:?)\s*([0-9]{1,3}(?:[.:][0-9]{2})?)/i;
                 const match = text.match(priceRegex);
                 if (match) {
-                    let price = match[1].replace('.', '').replace(',', '.');
-                    let numPrice = parseFloat(price);
+                    let priceStr = match[1].replace('.', '').replace(',', '.');
+                    let numPrice = parseFloat(priceStr);
                     if (!isNaN(numPrice)) return numPrice.toFixed(2);
                 }
-                const numberRegex = /([0-9]{1,2}[.,][0-9]{2})/g;
+                const numberRegex = /([0-9]{1,3}[.,][0-9]{2})/g;
                 let numbers = text.match(numberRegex);
                 if (numbers && numbers.length) {
                     for (let n of numbers) {
@@ -576,11 +603,13 @@
         } catch(err) { console.error(err); alert("Erro ao carregar dados."); }
     }
 
-    async function addProduct(link, title, desc, img, category, oldPrice, currentPrice) {
+    async function addProduct(link, title, desc, img, category, oldPriceRaw, currentPriceRaw) {
+        let oldPrice = oldPriceRaw ? parsePriceToNumber(oldPriceRaw) : "";
+        let currentPrice = currentPriceRaw ? parsePriceToNumber(currentPriceRaw) : "";
         await db.collection("products").add({ 
             affiliateLink: link, title, description: desc, imageUrl: img || "https://placehold.co/400x250/ca0223/white", 
             visitCount: 0, createdAt: new Date().toISOString(), category: category || "",
-            oldPrice: oldPrice || "", currentPrice: currentPrice || ""
+            oldPrice: oldPrice, currentPrice: currentPrice
         });
         await loadAllData();
     }
@@ -621,6 +650,12 @@
         document.getElementById("closeEditModalBtn").onclick = closeEditModal;
         document.getElementById("cancelEditBtn").onclick = closeEditModal;
         document.getElementById("saveEditBtn").onclick = saveEdit;
+        
+        // Prevenir zoom com gestos de pinça adicionando event listener passivo
+        document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
+        document.addEventListener('touchmove', function(e) {
+            if (e.scale && e.scale !== 1) e.preventDefault();
+        }, { passive: false });
     }
 
     loadAllData().then(() => initUI());
