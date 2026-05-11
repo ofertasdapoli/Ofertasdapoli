@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Ofertas da Poli - Sua loja de descobertas femininas</title>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ca0223">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/Fk3bdXRb/logo.png">
     <!-- Google Fonts e Font Awesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -18,23 +24,22 @@
 
         body {
             background: linear-gradient(145deg, #fff5f8 0%, #ffeef4 100%);
-            color: #4a2c3a;
+            color: #2c2c2c;
         }
 
-        /* Cores psicologia feminina: rosa profundo, coral, dourado suave, lavanda */
+        /* Novas cores psicológicas: vermelho vibrante, ciano, azul royal */
         :root {
-            --primary: #e60073;
-            --primary-dark: #c2185b;
-            --secondary: #ff8c69;
-            --accent: #ffb347;
-            --soft-lavender: #f3e5f5;
+            --primary: #ca0223;      /* vermelho intenso: paixão, urgência */
+            --primary-dark: #a0001c;
+            --secondary: #10d3dd;    /* ciano: confiança, modernidade */
+            --accent: #0647b7;       /* azul royal: segurança, profissionalismo */
+            --soft-lavender: #f0f8ff;
             --bg-card: #ffffff;
-            --text-dark: #3e2a35;
+            --text-dark: #1e1e2f;
             --shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 20px 30px -12px rgba(230, 0, 115, 0.2);
+            --shadow-hover: 0 20px 30px -12px rgba(202, 2, 35, 0.3);
         }
 
-        /* Layout */
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -83,7 +88,7 @@
         .site-title {
             font-size: 1.8rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #e60073, #ff8c69);
+            background: linear-gradient(135deg, #ca0223, #10d3dd);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
@@ -123,6 +128,26 @@
             color: white;
         }
 
+        /* Seção de redes sociais (rodapé ou cabeçalho) */
+        .social-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 60px;
+            box-shadow: var(--shadow);
+        }
+        .social-links a {
+            color: var(--primary);
+            font-size: 1.6rem;
+            transition: transform 0.2s;
+        }
+        .social-links a:hover {
+            transform: scale(1.1);
+            color: var(--accent);
+        }
+
         /* Busca */
         .search-section {
             margin: 30px 0 20px;
@@ -150,7 +175,7 @@
         }
         .news-badge {
             display: inline-block;
-            background: linear-gradient(95deg, #ff8c69, #ffb347);
+            background: linear-gradient(95deg, #10d3dd, #0647b7);
             padding: 6px 18px;
             border-radius: 40px;
             color: white;
@@ -159,12 +184,22 @@
             margin: 10px 0 15px;
         }
 
-        /* Grid produtos */
+        /* Grid produtos - 3 cards por linha em desktop */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 30px;
             margin: 30px 0 50px;
+        }
+        @media (min-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            }
         }
 
         .product-card {
@@ -177,13 +212,13 @@
             display: flex;
             flex-direction: column;
             backdrop-filter: blur(2px);
-            border: 1px solid rgba(230,0,115,0.1);
+            border: 1px solid rgba(202,2,35,0.1);
         }
 
         .product-card:hover {
             transform: translateY(-8px);
             box-shadow: var(--shadow-hover);
-            border-color: rgba(230,0,115,0.3);
+            border-color: rgba(202,2,35,0.3);
         }
 
         .card-img {
@@ -223,7 +258,7 @@
             display: inline-block;
             padding: 4px 12px;
             border-radius: 50px;
-            color: #c2185b;
+            color: #ca0223;
             font-weight: 500;
         }
         .btn-buy {
@@ -307,7 +342,7 @@
             margin: 30px 0;
             box-shadow: var(--shadow);
         }
-        .login-form, .product-form, .logo-upload {
+        .login-form, .product-form, .logo-upload, .social-form {
             background: #fefafc;
             padding: 20px;
             border-radius: 28px;
@@ -346,7 +381,7 @@
         }
         .hidden { display: none; }
         .alert {
-            color: #e60073;
+            color: #ca0223;
             font-size: 0.8rem;
         }
 
@@ -354,9 +389,19 @@
             text-align: center;
             padding: 30px;
             color: #a06b7c;
+            background: white;
+            margin-top: 40px;
+            border-radius: 40px 40px 0 0;
+        }
+        .footer-social {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
         }
         @media (max-width: 700px) {
             .header-content { flex-direction: column; text-align: center; }
+            .social-links { margin-top: 10px; justify-content: center; }
             .products-grid { gap: 18px; }
         }
     </style>
@@ -366,8 +411,11 @@
 <div class="header">
     <div class="container header-content">
         <div class="logo-area">
-            <img id="siteLogo" class="logo-img" src="https://placehold.co/300x80/fce4ec/e60073?text=Ofertas+Poli" alt="Logo Ofertas da Poli">
+            <img id="siteLogo" class="logo-img" src="https://i.ibb.co/Fk3bdXRb/logo.png" alt="Logo Ofertas da Poli" onerror="this.src='https://placehold.co/300x80/ca0223/white?text=Ofertas+Poli'">
             <span class="site-title">Ofertas da Poli</span>
+        </div>
+        <div class="social-links" id="socialLinksHeader">
+            <!-- Links dinâmicos via JS -->
         </div>
         <div class="nav-buttons">
             <button class="btn-nav" id="btnClienteView">👗 Cliente</button>
@@ -406,9 +454,18 @@
                 <div class="logo-upload">
                     <h4>🖼️ Logo do Site</h4>
                     <input type="file" id="logoUploadInput" accept="image/*">
-                    <input type="text" id="logoUrlInput" placeholder="Ou cole URL da imagem do logo">
+                    <input type="text" id="logoUrlInput" placeholder="Ou cole URL da imagem do logo" value="https://i.ibb.co/Fk3bdXRb/logo.png">
                     <button id="saveLogoBtn">Salvar Logo</button>
                 </div>
+                
+                <!-- Links sociais admin -->
+                <div class="social-form">
+                    <h4><i class="fab fa-instagram"></i> + <i class="fab fa-whatsapp"></i> Redes Sociais</h4>
+                    <input type="text" id="instagramLink" placeholder="Link do Instagram (ex: https://instagram.com/seuperfil)">
+                    <input type="text" id="whatsappLink" placeholder="Link do grupo do WhatsApp (ex: https://chat.whatsapp.com/xxxx)">
+                    <button id="saveSocialLinks">Salvar links sociais</button>
+                </div>
+
                 <div class="product-form">
                     <h3>➕ Adicionar novo produto afiliado</h3>
                     <input type="text" id="prodLink" placeholder="Link de afiliado (Amazon, Mercado Livre, etc)">
@@ -428,7 +485,10 @@
         </div>
     </div>
 </main>
-<footer>✨ Ofertas da Poli - Para você brilhar ✨</footer>
+<footer>
+    <div class="footer-social" id="footerSocialLinks"></div>
+    <p>✨ Ofertas da Poli - Para você brilhar ✨</p>
+</footer>
 
 <div id="productModal" class="modal">
     <div class="modal-content">
@@ -445,11 +505,12 @@
 
 <script>
     // ---------- ESTRUTURA DE DADOS ----------
-    let products = [];       // cada produto: { id, affiliateLink, title, description, imageUrl, createdAt, visitCount }
+    let products = [];       
     let logoBase64 = "";
     let isAdminLogged = false;
+    let socialData = { instagram: "", whatsapp: "" };
 
-    // Load initial data from localStorage
+    // Load data from localStorage
     function loadData() {
         const storedProducts = localStorage.getItem("ofertasPoli_products");
         if(storedProducts) {
@@ -468,8 +529,17 @@
             logoBase64 = storedLogo;
             document.getElementById("siteLogo").src = logoBase64;
         } else {
-            document.getElementById("siteLogo").src = "https://placehold.co/300x80/fce4ec/e60073?text=Ofertas+Poli";
+            document.getElementById("siteLogo").src = "https://i.ibb.co/Fk3bdXRb/logo.png";
         }
+
+        // Carregar links sociais
+        const storedSocial = localStorage.getItem("ofertasPoli_social");
+        if(storedSocial) {
+            socialData = JSON.parse(storedSocial);
+        } else {
+            socialData = { instagram: "https://instagram.com/ofertasdapoli", whatsapp: "https://chat.whatsapp.com/example" };
+        }
+        renderSocialLinks();
     }
 
     function saveProducts() {
@@ -482,7 +552,28 @@
         document.getElementById("siteLogo").src = logoBase64;
     }
 
-    // Render cliente (grid + busca)
+    function saveSocialLinksToStorage() {
+        localStorage.setItem("ofertasPoli_social", JSON.stringify(socialData));
+        renderSocialLinks();
+    }
+
+    function renderSocialLinks() {
+        const headerDiv = document.getElementById("socialLinksHeader");
+        const footerDiv = document.getElementById("footerSocialLinks");
+        if(!headerDiv || !footerDiv) return;
+        let html = '';
+        if(socialData.instagram) {
+            html += `<a href="${socialData.instagram}" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>`;
+        }
+        if(socialData.whatsapp) {
+            html += `<a href="${socialData.whatsapp}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i></a>`;
+        }
+        if(!socialData.instagram && !socialData.whatsapp) html = '<span style="font-size:0.8rem;">Siga-nos</span>';
+        headerDiv.innerHTML = html;
+        footerDiv.innerHTML = html;
+    }
+
+    // Render cliente
     function renderCliente(searchTerm = "") {
         const grid = document.getElementById("produtosGrid");
         if(!grid) return;
@@ -491,7 +582,6 @@
             const term = searchTerm.toLowerCase();
             filtered = products.filter(p => p.title.toLowerCase().includes(term) || p.description.toLowerCase().includes(term));
         }
-        // ordenar novidades por data decrescente (opcional, colocar topo)
         filtered.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
         if(filtered.length === 0) {
             grid.innerHTML = `<div style="text-align:center; width:100%;">Nenhum produto encontrado 💔</div>`;
@@ -499,20 +589,18 @@
         }
         grid.innerHTML = filtered.map(prod => `
             <div class="product-card" data-id="${prod.id}">
-                <img class="card-img" src="${prod.imageUrl || 'https://placehold.co/400x300/fce4ec/e60073?text=Imagem+Produto'}" alt="${prod.title}" loading="lazy">
+                <img class="card-img" src="${prod.imageUrl || 'https://placehold.co/400x300/ca0223/white?text=Produto'}" alt="${escapeHtml(prod.title)}" loading="lazy">
                 <div class="card-info">
                     <div class="card-title">${escapeHtml(prod.title)}</div>
                     <div class="card-desc">${escapeHtml(prod.description.substring(0, 100))}${prod.description.length>100?'...':''}</div>
                     <div class="visit-counter"><i class="fas fa-eye"></i> ${prod.visitCount || 0} visitas</div>
-                    <button class="btn-buy" data-link="${prod.affiliateLink}"><i class="fas fa-shopping-bag"></i> Comprar agora</button>
+                    <button class="btn-buy" data-link="${escapeHtml(prod.affiliateLink)}"><i class="fas fa-shopping-bag"></i> Comprar agora</button>
                 </div>
             </div>
         `).join('');
 
-        // Eventos dos cards (abrir modal)
         document.querySelectorAll('.product-card').forEach(card => {
             card.addEventListener('click', (e) => {
-                // se clicou no botão comprar, não abrir modal (impedir propagação)
                 if(e.target.classList.contains('btn-buy') || e.target.closest('.btn-buy')) {
                     e.stopPropagation();
                     const linkBtn = e.target.closest('.btn-buy')?.getAttribute('data-link');
@@ -523,13 +611,11 @@
                 const product = products.find(p => p.id === prodId);
                 if(product) {
                     openModal(product);
-                    // Incrementa contagem de visitas
                     product.visitCount = (product.visitCount || 0) + 1;
                     saveProducts();
                     renderCliente(document.getElementById("searchInput")?.value || "");
                 }
             });
-            // Botão comprar dentro do card (evita modal)
             card.querySelector('.btn-buy')?.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const link = card.querySelector('.btn-buy').getAttribute('data-link');
@@ -540,11 +626,10 @@
 
     function openModal(prod) {
         const modal = document.getElementById("productModal");
-        document.getElementById("modalImg").src = prod.imageUrl || 'https://placehold.co/600x400/fce4ec/e60073?text=Produto';
+        document.getElementById("modalImg").src = prod.imageUrl || 'https://placehold.co/600x400/ca0223/white?text=Produto';
         document.getElementById("modalTitle").innerText = prod.title;
         document.getElementById("modalDescFull").innerHTML = `<strong>Descrição:</strong> ${escapeHtml(prod.description)}<br><br><i class="fas fa-chart-line"></i> ${prod.visitCount || 0} pessoas visualizaram este produto.`;
-        const buyLink = document.getElementById("modalBuyLink");
-        buyLink.href = prod.affiliateLink;
+        document.getElementById("modalBuyLink").href = prod.affiliateLink;
         modal.style.display = "flex";
     }
 
@@ -552,7 +637,7 @@
         document.getElementById("productModal").style.display = "none";
     }
 
-    // Busca automática via Microlink API
+    // Busca automática via Microlink
     async function autoFetchProductInfo(url) {
         const statusDiv = document.getElementById("fetchStatus");
         statusDiv.innerText = "Buscando dados do link... 🔎";
@@ -565,12 +650,12 @@
                 if(title) document.getElementById("prodTitle").value = title.substring(0, 100);
                 if(description) document.getElementById("prodDesc").value = description.substring(0, 500);
                 if(image && image.url) document.getElementById("prodImage").value = image.url;
-                statusDiv.innerHTML = "✅ Dados preenchidos automaticamente! Revise e salve.";
+                statusDiv.innerHTML = "✅ Dados preenchidos! Revise e salve.";
             } else {
-                statusDiv.innerHTML = "⚠️ Não foi possível extrair automaticamente. Preencha manualmente.";
+                statusDiv.innerHTML = "⚠️ Extração automática falhou. Preencha manual.";
             }
         } catch(err) {
-            statusDiv.innerHTML = "❌ Erro na busca automática. Insira manualmente imagem e título.";
+            statusDiv.innerHTML = "❌ Erro na busca. Insira manualmente.";
             console.error(err);
         }
     }
@@ -582,10 +667,10 @@
         const desc = document.getElementById("prodDesc").value.trim();
         let image = document.getElementById("prodImage").value.trim();
         if(!link || !title) {
-            alert("Preencha pelo menos o link de afiliado e o título!");
+            alert("Preencha link de afiliado e título!");
             return;
         }
-        if(!image) image = "https://placehold.co/400x300/fce4ec/e60073?text=Produto";
+        if(!image) image = "https://placehold.co/400x300/ca0223/white?text=Produto";
         const newProduct = {
             id: Date.now(),
             affiliateLink: link,
@@ -599,11 +684,7 @@
         saveProducts();
         renderAdminProductsList();
         clearProductForm();
-        if(!document.getElementById("adminView").classList.contains("hidden")){
-            // se está no admin, dá reload na lista
-        }
         alert("Produto adicionado com sucesso!");
-        // atualiza cliente se visível
         if(document.getElementById("clienteView") && !document.getElementById("clienteView").classList.contains("hidden")){
             renderCliente(document.getElementById("searchInput")?.value || "");
         }
@@ -638,7 +719,7 @@
         document.querySelectorAll(".delete-prod-btn").forEach(btn => {
             btn.addEventListener("click", (e) => {
                 const id = parseInt(btn.getAttribute("data-id"));
-                if(confirm("Remover produto permanentemente?")) {
+                if(confirm("Remover produto?")) {
                     products = products.filter(p => p.id !== id);
                     saveProducts();
                     renderAdminProductsList();
@@ -650,7 +731,7 @@
 
     function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
 
-    // Controle de views
+    // Inicialização e eventos
     function initEvents() {
         document.getElementById("btnClienteView").addEventListener("click", () => {
             document.getElementById("clienteView").classList.remove("hidden");
@@ -662,6 +743,8 @@
                 document.getElementById("clienteView").classList.add("hidden");
                 document.getElementById("adminView").classList.remove("hidden");
                 renderAdminProductsList();
+                document.getElementById("instagramLink").value = socialData.instagram;
+                document.getElementById("whatsappLink").value = socialData.whatsapp;
             } else {
                 document.getElementById("clienteView").classList.add("hidden");
                 document.getElementById("adminView").classList.remove("hidden");
@@ -677,6 +760,8 @@
                 document.getElementById("adminLoginArea").classList.add("hidden");
                 document.getElementById("adminDashboard").classList.remove("hidden");
                 renderAdminProductsList();
+                document.getElementById("instagramLink").value = socialData.instagram;
+                document.getElementById("whatsappLink").value = socialData.whatsapp;
             } else {
                 alert("Usuário ou senha incorretos!");
             }
@@ -699,7 +784,7 @@
             renderCliente(e.target.value);
         });
 
-        // Logo upload
+        // Logo
         document.getElementById("saveLogoBtn")?.addEventListener("click", () => {
             const urlLogo = document.getElementById("logoUrlInput").value.trim();
             const fileInput = document.getElementById("logoUploadInput");
@@ -711,24 +796,63 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     saveLogoToStorage(e.target.result);
-                    alert("Logo carregada com sucesso!");
+                    alert("Logo carregada!");
                 };
                 reader.readAsDataURL(file);
             } else {
                 alert("Selecione uma imagem ou informe uma URL.");
             }
         });
+
+        // Salvar redes sociais
+        document.getElementById("saveSocialLinks")?.addEventListener("click", () => {
+            const insta = document.getElementById("instagramLink").value.trim();
+            const zap = document.getElementById("whatsappLink").value.trim();
+            socialData = { instagram: insta, whatsapp: zap };
+            saveSocialLinksToStorage();
+            alert("Links sociais salvos!");
+        });
+
         // Modal close
         document.querySelectorAll(".close-modal, #modalCloseBtn").forEach(el => el.addEventListener("click", closeModal));
         window.onclick = (e) => { if(e.target === document.getElementById("productModal")) closeModal(); };
     }
 
-    // Inicialização
+    // PWA - Service Worker e Manifest dinâmico
+    function registerSW() {
+        if('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(err => console.log("SW error:", err));
+        }
+        // Criar manifest.json virtual
+        const manifest = {
+            name: "Ofertas da Poli",
+            short_name: "OfertasPoli",
+            start_url: ".",
+            display: "standalone",
+            theme_color: "#ca0223",
+            background_color: "#ffffff",
+            icons: [{ src: "https://i.ibb.co/Fk3bdXRb/logo.png", sizes: "192x192", type: "image/png" }]
+        };
+        const blob = new Blob([JSON.stringify(manifest)], {type: "application/json"});
+        const manifestURL = URL.createObjectURL(blob);
+        document.querySelector('link[rel="manifest"]').setAttribute('href', manifestURL);
+    }
+    registerSW();
+
     loadData();
     initEvents();
     renderCliente("");
-    // verifica se admin já logado
     if(isAdminLogged) renderAdminProductsList();
+</script>
+
+<!-- Service Worker básico -->
+<script>
+    if('serviceWorker' in navigator) {
+        const swCode = `self.addEventListener('fetch', event => { event.respondWith(fetch(event.request)); });`;
+        const blob = new Blob([swCode], {type: 'application/javascript'});
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl).then(reg => console.log("SW registrado", reg));
+    }
 </script>
 </body>
 </html>
