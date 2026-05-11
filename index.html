@@ -18,40 +18,42 @@
         .glass { background: rgba(255, 250, 245, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,245,0.5); border-radius: 32px; }
         .header { position: sticky; top: 0; z-index: 100; padding: 8px 16px; background: rgba(255, 250, 245, 0.82); backdrop-filter: blur(25px); border-radius: 0 0 28px 28px; margin-bottom: 8px; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
-        
-        /* Layout do topo: logo e nome à esquerda, redes sociais à direita */
         .top-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
         .logo-area { display: flex; align-items: center; gap: 10px; flex: 1; }
         .logo-img { height: 42px; width: auto; border-radius: 16px; background: rgba(255,240,245,0.5); padding: 3px; }
         .site-title { font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg, #ca0223, #10d3dd); background-clip: text; -webkit-background-clip: text; color: transparent; }
         .social-mini-header { display: flex; gap: 12px; font-size: 1.2rem; }
         .social-mini-header a { color: #ca0223; }
-        
-        /* Menu de navegação em linha única, compacto */
-        .nav-links { display: flex; gap: 6px; background: rgba(255,240,245,0.5); padding: 4px 8px; border-radius: 60px; backdrop-filter: blur(8px); margin-top: 8px; justify-content: center; }
+        .nav-links { display: flex; gap: 6px; background: rgba(255,240,245,0.5); padding: 4px 8px; border-radius: 60px; backdrop-filter: blur(8px); margin-top: 8px; justify-content: center; flex-wrap: wrap; }
         .nav-btn { background: transparent; border: none; font-weight: 600; font-size: 0.8rem; padding: 6px 12px; border-radius: 40px; cursor: pointer; transition: 0.2s; color: #ca0223; white-space: nowrap; }
         .nav-btn.special { background: #ca0223; color: white; box-shadow: 0 2px 8px rgba(202,2,35,0.3); }
-        
-        /* Busca compacta */
         .search-box { display: flex; align-items: center; gap: 8px; padding: 6px 16px; margin: 10px 0 8px; background: rgba(255,255,245,0.75); backdrop-filter: blur(16px); border-radius: 60px; }
         .search-box i { font-size: 0.9rem; color: #ca0223; }
         .search-box input { flex: 1; background: transparent; border: none; padding: 8px 0; font-size: 0.85rem; outline: none; }
         .news-badge { display: inline-block; background: linear-gradient(95deg, #10d3dd, #0647b7); padding: 4px 16px; border-radius: 60px; color: white; font-weight: 600; font-size: 0.7rem; margin-bottom: 12px; }
         
-        /* Grid responsivo: mobile 2 colunas, tablet 3 colunas, desktop 3 colunas */
-        .products-grid {
-            display: grid;
-            gap: 16px;
-            margin: 20px 0 40px;
-        }
-        /* Mobile (celular): 2 colunas */
-        @media (max-width: 640px) {
-            .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        }
-        /* Tablet e desktop: 3 colunas */
-        @media (min-width: 641px) {
-            .products-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        }
+        /* Filtros horizontais com scroll */
+        .filters-section { margin: 12px 0 16px; overflow-x: auto; white-space: nowrap; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+        .filters-container { display: inline-flex; gap: 12px; padding: 4px 2px; }
+        .filter-chip { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; background: rgba(255,255,245,0.7); backdrop-filter: blur(12px); border-radius: 60px; padding: 8px 16px; cursor: pointer; transition: 0.2s; border: 1px solid rgba(202,2,35,0.15); }
+        .filter-chip i { font-size: 1.2rem; color: #ca0223; }
+        .filter-chip span { font-size: 0.65rem; font-weight: 500; color: #4a2c3a; }
+        .filter-chip.active { background: #ca0223; border-color: #ca0223; }
+        .filter-chip.active i, .filter-chip.active span { color: white; }
+        .filter-chip:hover { transform: translateY(-2px); background: rgba(202,2,35,0.1); }
+        
+        /* Produtos vistos recentemente */
+        .recent-section { margin: 20px 0 12px; }
+        .recent-title { font-size: 0.85rem; font-weight: 600; color: #ca0223; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .recent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .recent-card { background: rgba(255,255,245,0.7); backdrop-filter: blur(12px); border-radius: 16px; padding: 8px; cursor: pointer; transition: 0.2s; text-align: center; }
+        .recent-card img { width: 100%; height: 80px; object-fit: cover; border-radius: 12px; margin-bottom: 6px; }
+        .recent-card .title { font-size: 0.7rem; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 1; overflow: hidden; }
+        
+        /* Grid responsivo */
+        .products-grid { display: grid; gap: 16px; margin: 20px 0 40px; }
+        @media (max-width: 640px) { .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
+        @media (min-width: 641px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
         
         .product-card { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(18px); border-radius: 24px; overflow: hidden; transition: 0.2s ease; cursor: pointer; border: 1px solid rgba(255,255,240,0.7); }
         .product-card:hover { transform: translateY(-4px); background: rgba(255,255,250,0.92); box-shadow: 0 12px 24px -12px rgba(202,2,35,0.25); }
@@ -62,7 +64,6 @@
         .btn-buy { background: #ca0223; color: white; border: none; padding: 6px 0; border-radius: 40px; font-weight: 600; width: 100%; margin-top: 8px; font-size: 0.65rem; cursor: pointer; }
         .visit-counter { font-size: 0.6rem; background: rgba(202,2,35,0.1); display: inline-block; padding: 2px 8px; border-radius: 20px; margin-top: 4px; }
         
-        /* Drawer flutuante */
         .floating-drawer { display: none; position: fixed; bottom: 90px; right: 20px; width: 320px; max-width: calc(100vw - 40px); background: rgba(255, 250, 245, 0.96); backdrop-filter: blur(35px); border-radius: 32px; flex-direction: column; z-index: 200; border: 1px solid rgba(255,245,230,0.8); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
         .drawer-header { padding: 14px 18px; font-weight: bold; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 0.9rem; }
         .drawer-tabs { display: flex; gap: 4px; padding: 8px 12px; }
@@ -71,29 +72,16 @@
         .drawer-content { padding: 12px; max-height: 380px; overflow-y: auto; font-size: 0.8rem; }
         .fab-trigger { position: fixed; bottom: 20px; right: 20px; background: #ca0223; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(202,2,35,0.4); cursor: pointer; color: white; font-size: 24px; z-index: 150; backdrop-filter: blur(12px); }
         .tooltip-fab { position: absolute; bottom: 68px; right: 0; background: #0647b7; color: white; padding: 4px 12px; border-radius: 60px; font-size: 0.7rem; white-space: nowrap; backdrop-filter: blur(8px); }
-        
-        /* Modal Produto */
         .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: rgba(255, 248, 245, 0.96); backdrop-filter: blur(35px); border-radius: 40px; max-width: 480px; width: 90%; padding: 20px; text-align: center; }
-        .modal-img { max-height: 220px; }
-        
-        /* Admin Panel - sem alterações funcionais */
         .admin-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border-radius: 40px; padding: 24px; margin: 20px 0; }
         input, textarea, select, button { border-radius: 60px; border: 1px solid rgba(202,2,35,0.2); padding: 10px 16px; background: rgba(255,250,245,0.9); width: 100%; margin: 6px 0; font-size: 0.9rem; }
-        button { background: #ca0223; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        button { background: #ca0223; color: white; font-weight: 600; cursor: pointer; }
         .admin-item { background: rgba(255,240,245,0.7); border-radius: 60px; padding: 10px 16px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; font-size: 0.85rem; }
         .hidden { display: none; }
         footer { text-align: center; padding: 20px; font-size: 0.65rem; color: #6b4c5c; }
         .social-mini-footer { display: flex; gap: 12px; justify-content: center; margin-bottom: 8px; }
-        .social-mini-footer a { color: #ca0223; font-size: 1.2rem; }
-        
-        @media (max-width: 480px) {
-            .card-img { height: 140px; }
-            .card-title { font-size: 0.75rem; }
-            .nav-btn { padding: 4px 8px; font-size: 0.7rem; }
-            .logo-img { height: 34px; }
-            .site-title { font-size: 1rem; }
-        }
+        @media (max-width: 480px) { .card-img { height: 140px; } .card-title { font-size: 0.75rem; } .nav-btn { padding: 4px 8px; font-size: 0.7rem; } }
     </style>
 </head>
 <body>
@@ -122,6 +110,18 @@
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="Buscar produtos...">
         </div>
+        
+        <!-- Filtros horizontais -->
+        <div class="filters-section">
+            <div class="filters-container" id="filtersContainer"></div>
+        </div>
+        
+        <!-- Produtos Vistos Recentemente -->
+        <div class="recent-section" id="recentSection" style="display:none;">
+            <div class="recent-title"><i class="fas fa-history"></i> Vistos Recentemente</div>
+            <div class="recent-grid" id="recentGrid"></div>
+        </div>
+        
         <div class="news-badge"><i class="fas fa-gem"></i> NOVIDADES + OFERTAS RELÂMPAGO</div>
         <div id="produtosGrid" class="products-grid"></div>
     </div>
@@ -135,7 +135,7 @@
                 <h2>✨ Painel da Poli</h2>
                 <div><h4>🖼️ Logo do Site (URL)</h4><input type="text" id="logoUrlInput" placeholder="URL da logo"><button id="saveLogoBtn">Salvar Logo</button></div>
                 <div><h4>📱 Redes Sociais</h4><input id="instaInput" placeholder="Instagram URL"><input id="whatsInput" placeholder="WhatsApp Grupo Link"><button id="saveSocialBtn">Salvar</button></div>
-                <div><h3>➕ Adicionar Produto</h3><input id="prodLink" placeholder="Link Afiliado"><button id="autoFetchBtn">🔍 Buscar dados automaticamente</button><div id="fetchStatus" style="font-size:0.7rem; margin:4px;"></div><input id="prodTitle" placeholder="Título *"><textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea><input id="prodImage" placeholder="URL da imagem"><button id="saveProductBtn">Salvar Produto</button></div>
+                <div><h3>➕ Adicionar Produto</h3><input id="prodLink" placeholder="Link Afiliado"><button id="autoFetchBtn">🔍 Buscar dados automaticamente</button><div id="fetchStatus" style="font-size:0.7rem; margin:4px;"></div><input id="prodTitle" placeholder="Título *"><textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea><input id="prodImage" placeholder="URL da imagem"><select id="prodCategory"><option value="">Selecionar Categoria (opcional)</option></select><button id="saveProductBtn">Salvar Produto</button></div>
                 <div><h3>⚡ Gerenciar Ofertas Relâmpago</h3><div id="adminOffersList"></div><select id="offerSelect"></select><input id="offerDiscount" placeholder="Ex: 30% OFF + Frete Grátis"><button id="addOfferBtn">Adicionar Oferta</button></div>
                 <div><h3>🎫 Cupons de Desconto</h3><div id="adminCouponsList"></div><input id="couponCode" placeholder="Código (ex: POLI10)"><input id="couponDesc" placeholder="Descrição (10% off)"><button id="addCouponBtn">Adicionar Cupom</button></div>
                 <div><h3>📦 Produtos Cadastrados</h3><div id="adminProductsList"></div></div>
@@ -145,10 +145,7 @@
     </div>
 </main>
 
-<footer>
-    <div class="social-mini-footer" id="footerSocial"></div>
-    <p>✨ Ofertas da Poli – Beleza, estilo & economia ✨</p>
-</footer>
+<footer><div class="social-mini-footer" id="footerSocial"></div><p>✨ Ofertas da Poli – Beleza, estilo & economia ✨</p></footer>
 
 <div id="floatingDrawer" class="floating-drawer">
     <div class="drawer-header"><span>⚡ Ofertas & Cupons</span><span id="closeDrawer" style="cursor:pointer;">✕</span></div>
@@ -176,7 +173,6 @@
 </div>
 
 <script>
-    // Configuração Firebase
     const firebaseConfig = {
         apiKey: "AIzaSyDNsPEpaYJ_RfMTXQqPxb3A-wu1sb5UClc",
         authDomain: "ofertasdapoliana.firebaseapp.com",
@@ -189,18 +185,98 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Estado
     let products = [];
     let offers = [];
     let coupons = [];
     let social = { instagram: "", whatsapp: "" };
     let logoUrl = "https://i.ibb.co/Fk3bdXRb/logo.png";
     let isAdmin = false;
+    let recentProducts = JSON.parse(localStorage.getItem("recentProducts") || "[]");
+    let currentFilter = "";
+
+    const categories = [
+        { name: "Eletronicos", icon: "fas fa-laptop", keyword: "eletrônico|eletronico|notebook|pc|computador" },
+        { name: "Smartphones", icon: "fas fa-mobile-alt", keyword: "smartphone|celular|iphone|samsung|xiaomi" },
+        { name: "Ar e Ventilação", icon: "fas fa-wind", keyword: "ar condicionado|ventilador|climatizador" },
+        { name: "Jogos e Video Game", icon: "fas fa-gamepad", keyword: "jogo|playstation|xbox|nintendo|pc gamer" },
+        { name: "Moda e Acessórios", icon: "fas fa-tshirt", keyword: "vestido|bolsa|sapato|moda|roupa" },
+        { name: "Casa e Decoração", icon: "fas fa-home", keyword: "casa|decoração|decoraçao|móvel|moveis" },
+        { name: "Móveis", icon: "fas fa-couch", keyword: "mesa|cadeira|sofa|armário|estante" },
+        { name: "Saúde e Beleza", icon: "fas fa-heartbeat", keyword: "saúde|beleza|perfume|maquiagem" },
+        { name: "Livros e E-books", icon: "fas fa-book", keyword: "livro|ebook|leitura" },
+        { name: "Esportes e Fitness", icon: "fas fa-dumbbell", keyword: "esporte|fitness|academia" },
+        { name: "Brinquedos e Jogos", icon: "fas fa-puzzle-piece", keyword: "brinquedo|boneca|carrinho" },
+        { name: "Bebê", icon: "fas fa-baby-carriage", keyword: "bebê|bebe|mamãe" },
+        { name: "Produtos de Limpeza", icon: "fas fa-broom", keyword: "limpeza|detergente|sabão" },
+        { name: "Tecnologia", icon: "fas fa-microchip", keyword: "tecnologia|gadget|drone" },
+        { name: "Papelaria", icon: "fas fa-pen", keyword: "papel|caneta|caderno" },
+        { name: "Utilidades Domésticas", icon: "fas fa-utensils", keyword: "cozinha|panela|talher" },
+        { name: "Eletrodomésticos", icon: "fas fa-blender", keyword: "geladeira|fogão|microondas" },
+        { name: "Ferramentas", icon: "fas fa-tools", keyword: "ferramenta|parafusadeira" }
+    ];
+
+    function detectCategory(title, description) {
+        const text = (title + " " + description).toLowerCase();
+        for (let cat of categories) {
+            const keywords = cat.keyword.split("|");
+            for (let kw of keywords) {
+                if (text.includes(kw)) return cat.name;
+            }
+        }
+        return "";
+    }
 
     function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
 
+    function addToRecent(product) {
+        recentProducts = recentProducts.filter(p => p.id !== product.id);
+        recentProducts.unshift(product);
+        if (recentProducts.length > 10) recentProducts.pop();
+        localStorage.setItem("recentProducts", JSON.stringify(recentProducts));
+        renderRecentSection();
+    }
+
+    function renderRecentSection() {
+        const section = document.getElementById("recentSection");
+        const grid = document.getElementById("recentGrid");
+        if (recentProducts.length === 0) { section.style.display = "none"; return; }
+        section.style.display = "block";
+        grid.innerHTML = recentProducts.map(prod => `
+            <div class="recent-card" data-id="${prod.id}">
+                <img src="${prod.imageUrl || 'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'">
+                <div class="title">${escapeHtml(prod.title.substring(0, 25))}</div>
+            </div>
+        `).join('');
+        document.querySelectorAll('.recent-card').forEach(card => {
+            card.addEventListener('click', async () => {
+                const id = card.dataset.id;
+                const prod = products.find(p => p.id === id);
+                if (prod) openModal(prod);
+            });
+        });
+    }
+
+    function renderFilters() {
+        const container = document.getElementById("filtersContainer");
+        container.innerHTML = `<div class="filter-chip ${currentFilter === '' ? 'active' : ''}" data-filter=""><i class="fas fa-th-large"></i><span>Todos</span></div>`;
+        categories.forEach(cat => {
+            container.innerHTML += `<div class="filter-chip ${currentFilter === cat.name ? 'active' : ''}" data-filter="${cat.name}"><i class="${cat.icon}"></i><span>${cat.name}</span></div>`;
+        });
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                currentFilter = chip.dataset.filter;
+                renderFilters();
+                renderCliente(document.getElementById("searchInput").value);
+            });
+        });
+    }
+
     async function renderCliente(search = "") {
-        const filtered = products.filter(p => p.title.toLowerCase().includes(search.toLowerCase()));
+        let filtered = products.filter(p => p.title.toLowerCase().includes(search.toLowerCase()));
+        if (currentFilter) {
+            filtered = filtered.filter(p => p.category === currentFilter);
+        }
+        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         const grid = document.getElementById("produtosGrid");
         if (!filtered.length) { grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>Nenhum produto encontrado 💔</div>"; return; }
         grid.innerHTML = filtered.map(prod => `
@@ -229,6 +305,7 @@
                     const newCount = (prod.visitCount || 0) + 1;
                     await db.collection("products").doc(prod.id).update({ visitCount: newCount });
                     prod.visitCount = newCount;
+                    addToRecent(prod);
                     openModal(prod);
                     renderCliente(document.getElementById("searchInput").value);
                 }
@@ -291,11 +368,17 @@
         const prodList = document.getElementById("adminProductsList");
         prodList.innerHTML = products.map(p => `<div class="admin-item">${p.title} (${p.visitCount} vis) <button data-id="${p.id}" class="del-prod" style="background:#d44c6e;">Excluir</button></div>`).join('');
         document.querySelectorAll('.del-prod').forEach(btn => btn.addEventListener('click', async () => { await db.collection("products").doc(btn.dataset.id).delete(); await loadAllData(); }));
+        
+        const categorySelect = document.getElementById("prodCategory");
+        if(categorySelect) {
+            categorySelect.innerHTML = '<option value="">Selecionar Categoria (opcional)</option>' + 
+                categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        }
     }
 
     async function loadAllData() {
         try {
-            const productsSnap = await db.collection("products").get();
+            const productsSnap = await db.collection("products").orderBy("createdAt", "desc").get();
             products = productsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
             const offersSnap = await db.collection("offers").get();
             offers = offersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -316,19 +399,25 @@
             const socialHtml = `<a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a><a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a>`;
             document.getElementById("socialMiniHeader").innerHTML = socialHtml;
             document.getElementById("footerSocial").innerHTML = socialHtml;
+            renderFilters();
+            renderRecentSection();
             renderCliente(document.getElementById("searchInput")?.value || "");
             renderAdminLists();
             updateDrawerContent(document.querySelector(".drawer-tab.active")?.dataset.tab || "offers");
         } catch(err) { console.error(err); alert("Erro ao carregar dados."); }
     }
 
-    async function addProduct(link, title, desc, img) {
-        await db.collection("products").add({ affiliateLink: link, title, description: desc, imageUrl: img || "https://placehold.co/400x250/ca0223/white", visitCount: 0, createdAt: new Date().toISOString() });
+    async function addProduct(link, title, desc, img, category) {
+        await db.collection("products").add({ 
+            affiliateLink: link, title, description: desc, imageUrl: img || "https://placehold.co/400x250/ca0223/white", 
+            visitCount: 0, createdAt: new Date().toISOString(), category: category || "" 
+        });
         await loadAllData();
     }
     async function addOffer(productId, discount) { await db.collection("offers").add({ productId, discountText: discount }); await loadAllData(); }
     async function addCoupon(code, desc) { await db.collection("coupons").add({ code, description: desc }); await loadAllData(); }
     async function updateConfig(logo, insta, wa) { await db.collection("config").doc("site").set({ logoUrl: logo, instagram: insta, whatsapp: wa }); await loadAllData(); }
+    
     async function autoFetch(link) {
         const statusDiv = document.getElementById("fetchStatus");
         statusDiv.innerText = "🔍 buscando...";
@@ -339,7 +428,21 @@
                 if (data.data.title) document.getElementById("prodTitle").value = data.data.title;
                 if (data.data.description) document.getElementById("prodDesc").value = data.data.description;
                 if (data.data.image?.url) document.getElementById("prodImage").value = data.data.image.url;
-                statusDiv.innerText = "✅ Dados obtidos!";
+                const title = document.getElementById("prodTitle").value;
+                const desc = document.getElementById("prodDesc").value;
+                const detectedCat = detectCategory(title, desc);
+                if (detectedCat) {
+                    const select = document.getElementById("prodCategory");
+                    for(let i=0; i<select.options.length; i++) {
+                        if(select.options[i].value === detectedCat) {
+                            select.selectedIndex = i;
+                            break;
+                        }
+                    }
+                    statusDiv.innerText = `✅ Dados obtidos! Categoria detectada: ${detectedCat}`;
+                } else {
+                    statusDiv.innerText = "✅ Dados obtidos!";
+                }
             } else statusDiv.innerText = "⚠️ Não foi possível extrair";
         } catch(e) { statusDiv.innerText = "Erro na busca"; }
     }
@@ -349,7 +452,13 @@
         document.getElementById("btnAdminNav").onclick = () => { if(isAdmin) { document.getElementById("clienteView").classList.add("hidden"); document.getElementById("adminView").classList.remove("hidden"); } else { document.getElementById("clienteView").classList.add("hidden"); document.getElementById("adminView").classList.remove("hidden"); document.getElementById("adminLoginArea").classList.remove("hidden"); document.getElementById("adminDashboard").classList.add("hidden"); } };
         document.getElementById("doLogin").onclick = () => { const u = document.getElementById("adminUser").value, p = document.getElementById("adminPass").value; if(u === "poli" && p === "ofertas2024") { isAdmin = true; document.getElementById("adminLoginArea").classList.add("hidden"); document.getElementById("adminDashboard").classList.remove("hidden"); renderAdminLists(); } else alert("Acesso negado"); };
         document.getElementById("logoutAdmin").onclick = () => { isAdmin = false; document.getElementById("adminDashboard").classList.add("hidden"); document.getElementById("adminLoginArea").classList.remove("hidden"); document.getElementById("clienteView").classList.remove("hidden"); document.getElementById("adminView").classList.add("hidden"); renderCliente(document.getElementById("searchInput").value); };
-        document.getElementById("saveProductBtn").onclick = async () => { const link = document.getElementById("prodLink").value.trim(), title = document.getElementById("prodTitle").value.trim(), desc = document.getElementById("prodDesc").value.trim(), img = document.getElementById("prodImage").value.trim(); if(!link || !title) { alert("Preencha link e título"); return; } await addProduct(link, title, desc, img); document.getElementById("prodLink").value = ""; document.getElementById("prodTitle").value = ""; document.getElementById("prodDesc").value = ""; document.getElementById("prodImage").value = ""; alert("Produto adicionado!"); };
+        document.getElementById("saveProductBtn").onclick = async () => { 
+            const link = document.getElementById("prodLink").value.trim(), title = document.getElementById("prodTitle").value.trim(), desc = document.getElementById("prodDesc").value.trim(), img = document.getElementById("prodImage").value.trim(), category = document.getElementById("prodCategory").value;
+            if(!link || !title) { alert("Preencha link e título"); return; } 
+            await addProduct(link, title, desc, img, category); 
+            document.getElementById("prodLink").value = ""; document.getElementById("prodTitle").value = ""; document.getElementById("prodDesc").value = ""; document.getElementById("prodImage").value = ""; document.getElementById("prodCategory").value = "";
+            alert("Produto adicionado!"); 
+        };
         document.getElementById("addOfferBtn").onclick = async () => { const pid = document.getElementById("offerSelect").value, disc = document.getElementById("offerDiscount").value.trim(); if(!disc) { alert("Digite o desconto"); return; } await addOffer(pid, disc); document.getElementById("offerDiscount").value = ""; alert("Oferta adicionada!"); };
         document.getElementById("addCouponBtn").onclick = async () => { const code = document.getElementById("couponCode").value.trim(), desc = document.getElementById("couponDesc").value.trim(); if(!code) { alert("Digite o código"); return; } await addCoupon(code, desc); document.getElementById("couponCode").value = ""; document.getElementById("couponDesc").value = ""; alert("Cupom adicionado!"); };
         document.getElementById("saveLogoBtn").onclick = async () => { const url = document.getElementById("logoUrlInput").value.trim(); if(url) await updateConfig(url, social.instagram, social.whatsapp); else alert("Insira URL"); };
