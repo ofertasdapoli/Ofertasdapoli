@@ -369,7 +369,12 @@
             border: none;
         }
 
-        button:hover {
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
             background: #a8011c;
         }
 
@@ -416,6 +421,28 @@
             padding: 40px;
             font-size: 1.2rem;
             color: #ca0223;
+        }
+
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            animation: fadeInOut 3s ease forwards;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
 
         @media (max-width: 680px) {
@@ -488,12 +515,12 @@
                 </div>
                 <div>
                     <h3>➕ Adicionar Produto</h3>
-                    <input id="prodLink" placeholder="Link Afiliado">
+                    <input id="prodLink" placeholder="Link Afiliado *">
                     <button id="autoFetchBtn">🔍 Buscar dados automaticamente</button>
                     <div id="fetchStatus" style="font-size:0.75rem; margin:6px;"></div>
                     <input id="prodTitle" placeholder="Título *">
                     <textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea>
-                    <input id="prodImage" placeholder="URL da imagem">
+                    <input id="prodImage" placeholder="URL da imagem (opcional)">
                     <button id="saveProductBtn">Salvar Produto</button>
                 </div>
                 <div>
@@ -557,7 +584,7 @@
 </div>
 
 <script>
-    // CONFIGURAÇÃO FIREBASE
+    // Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyDNsPEpaYJ_RfMTXQqPxb3A-wu1sb5UClc",
         authDomain: "ofertasdapoliana.firebaseapp.com",
@@ -571,7 +598,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     
-    // ESTADO GLOBAL
+    // Global State
     let products = [];
     let offers = [];
     let coupons = [];
@@ -579,7 +606,16 @@
     let logoUrl = "https://i.ibb.co/Fk3bdXRb/logo.png";
     let isAdmin = false;
     
-    // HELPERS
+    // Helper: Show toast message
+    function showToast(message, isError = false) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.style.backgroundColor = isError ? 'rgba(202, 2, 35, 0.9)' : 'rgba(0,0,0,0.8)';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
     function escapeHtml(str) {
         if (!str) return '';
         return String(str).replace(/[&<>]/g, function(m) {
@@ -592,12 +628,12 @@
     
     function showLoading(containerId, isLoading) {
         const grid = document.getElementById(containerId);
-        if (isLoading) {
+        if (isLoading && grid) {
             grid.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-pulse"></i> Carregando...</div>';
         }
     }
     
-    // RENDERIZA OS CARDS PARA O CLIENTE (FUNCIONALIDADE PRINCIPAL)
+    // Render client products
     async function renderCliente(searchTerm = "") {
         const grid = document.getElementById("produtosGrid");
         if (!grid) return;
@@ -624,7 +660,7 @@
             </div>
         `).join('');
         
-        // Eventos dos cards
+        // Attach events
         document.querySelectorAll('.product-card').forEach(card => {
             const buyBtn = card.querySelector('.btn-buy');
             buyBtn?.addEventListener('click', async (e) => {
@@ -668,7 +704,7 @@
         if (modal) modal.style.display = "none";
     }
     
-    // ATUALIZA O DRAWER FLUTUANTE
+    // Update floating drawer
     function updateDrawerContent(tab) {
         const container = document.getElementById("drawerContent");
         if (!container) return;
@@ -730,7 +766,7 @@
         }
     }
     
-    // ADMIN: RENDERIZA LISTAS
+    // Admin lists render
     function renderAdminLists() {
         if (!isAdmin) return;
         
@@ -747,6 +783,7 @@
                     const id = btn.dataset.id;
                     if (id) await db.collection("offers").doc(id).delete();
                     await loadAllData();
+                    showToast("Oferta removida");
                 });
             });
         }
@@ -764,6 +801,7 @@
                     const id = btn.dataset.id;
                     if (id) await db.collection("coupons").doc(id).delete();
                     await loadAllData();
+                    showToast("Cupom removido");
                 });
             });
         }
@@ -786,82 +824,43 @@
                     if (confirm("Excluir produto permanentemente?")) {
                         await db.collection("products").doc(btn.dataset.id).delete();
                         await loadAllData();
+                        showToast("Produto excluído");
                     }
                 });
             });
         }
     }
     
-    // CARREGA TODOS OS DADOS DO FIRESTORE
-    async function loadAllData() {
-        try {
-            showLoading("produtosGrid", true);
-            
-            // Carregar produtos
-            const productsSnap = await db.collection("products").get();
-            products = productsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
-            // Carregar ofertas
-            const offersSnap = await db.collection("offers").get();
-            offers = offersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
-            // Carregar cupons
-            const couponsSnap = await db.collection("coupons").get();
-            coupons = couponsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            
-            // Carregar configurações
-            const configDoc = await db.collection("config").doc("site").get();
-            if (configDoc.exists) {
-                const data = configDoc.data();
-                logoUrl = data.logoUrl || logoUrl;
-                social = { instagram: data.instagram || "", whatsapp: data.whatsapp || "" };
-            } else {
-                await db.collection("config").doc("site").set({ logoUrl, instagram: "", whatsapp: "" });
-            }
-            
-            // Aplicar configurações na UI
-            document.getElementById("siteLogo").src = logoUrl;
-            document.getElementById("logoUrlInput").value = logoUrl;
-            document.getElementById("instaInput").value = social.instagram;
-            document.getElementById("whatsInput").value = social.whatsapp;
-            
-            const socialHtml = `
-                <a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a>
-            `;
-            const socialHeader = document.getElementById("socialMiniHeader");
-            const socialFooter = document.getElementById("footerSocial");
-            if (socialHeader) socialHeader.innerHTML = socialHtml;
-            if (socialFooter) socialFooter.innerHTML = socialHtml;
-            
-            // Renderizar cliente e admin
-            const searchValue = document.getElementById("searchInput")?.value || "";
-            await renderCliente(searchValue);
-            renderAdminLists();
-            
-            const activeTab = document.querySelector(".drawer-tab.active")?.dataset.tab || "offers";
-            updateDrawerContent(activeTab);
-            
-        } catch (error) {
-            console.error("Erro ao carregar dados:", error);
-            document.getElementById("produtosGrid").innerHTML = "<div style='text-align:center;padding:40px;color:red;'>Erro ao carregar produtos. Tente recarregar a página.</div>";
-        } finally {
-            showLoading("produtosGrid", false);
-        }
-    }
-    
-    // FUNÇÕES CRUD
+    // CRUD: Add Product with robust error handling
     async function addProduct(link, title, desc, img) {
         if (!link || !title) throw new Error("Link e título são obrigatórios");
-        await db.collection("products").add({
+        
+        const imageUrl = img && img.trim() !== "" ? img : "https://placehold.co/400x250/ca0223/white";
+        
+        const productData = {
             affiliateLink: link,
-            title: title,
-            description: desc || "",
-            imageUrl: img || "https://placehold.co/400x250/ca0223/white",
+            title: title.trim(),
+            description: desc ? desc.trim() : "",
+            imageUrl: imageUrl,
             visitCount: 0,
-            createdAt: new Date().toISOString()
-        });
-        await loadAllData();
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        try {
+            const docRef = await db.collection("products").add(productData);
+            console.log("Produto salvo com ID:", docRef.id);
+            await loadAllData();
+            return docRef.id;
+        } catch (error) {
+            console.error("Erro detalhado ao salvar produto:", error);
+            if (error.code === "permission-denied") {
+                throw new Error("Sem permissão para escrever no banco. Verifique as regras do Firestore.");
+            } else if (error.code === "unavailable") {
+                throw new Error("Serviço indisponível. Verifique sua conexão.");
+            } else {
+                throw new Error(`Erro ao salvar: ${error.message}`);
+            }
+        }
     }
     
     async function addOffer(productId, discount) {
@@ -901,9 +900,62 @@
         }
     }
     
-    // INICIALIZA OS EVENTOS DA UI
+    // Load all data from Firestore
+    async function loadAllData() {
+        try {
+            showLoading("produtosGrid", true);
+            
+            const productsSnap = await db.collection("products").get();
+            products = productsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            const offersSnap = await db.collection("offers").get();
+            offers = offersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            const couponsSnap = await db.collection("coupons").get();
+            coupons = couponsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            const configDoc = await db.collection("config").doc("site").get();
+            if (configDoc.exists) {
+                const data = configDoc.data();
+                logoUrl = data.logoUrl || logoUrl;
+                social = { instagram: data.instagram || "", whatsapp: data.whatsapp || "" };
+            } else {
+                await db.collection("config").doc("site").set({ logoUrl, instagram: "", whatsapp: "" });
+            }
+            
+            document.getElementById("siteLogo").src = logoUrl;
+            document.getElementById("logoUrlInput").value = logoUrl;
+            document.getElementById("instaInput").value = social.instagram;
+            document.getElementById("whatsInput").value = social.whatsapp;
+            
+            const socialHtml = `
+                <a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            `;
+            const socialHeader = document.getElementById("socialMiniHeader");
+            const socialFooter = document.getElementById("footerSocial");
+            if (socialHeader) socialHeader.innerHTML = socialHtml;
+            if (socialFooter) socialFooter.innerHTML = socialHtml;
+            
+            const searchValue = document.getElementById("searchInput")?.value || "";
+            await renderCliente(searchValue);
+            renderAdminLists();
+            
+            const activeTab = document.querySelector(".drawer-tab.active")?.dataset.tab || "offers";
+            updateDrawerContent(activeTab);
+            
+        } catch (error) {
+            console.error("Erro ao carregar dados:", error);
+            document.getElementById("produtosGrid").innerHTML = "<div style='text-align:center;padding:40px;color:red;'>Erro ao carregar produtos. Tente recarregar a página.</div>";
+            showToast("Erro ao conectar com o banco de dados", true);
+        } finally {
+            showLoading("produtosGrid", false);
+        }
+    }
+    
+    // Initialize UI events
     function initUI() {
-        // Navegação
+        // Navigation
         document.getElementById("btnClienteNav").onclick = () => {
             document.getElementById("clienteView").classList.remove("hidden");
             document.getElementById("adminView").classList.add("hidden");
@@ -923,7 +975,7 @@
             }
         };
         
-        // Login Admin
+        // Admin Login
         document.getElementById("doLogin").onclick = () => {
             const user = document.getElementById("adminUser").value;
             const pass = document.getElementById("adminPass").value;
@@ -932,8 +984,9 @@
                 document.getElementById("adminLoginArea").classList.add("hidden");
                 document.getElementById("adminDashboard").classList.remove("hidden");
                 renderAdminLists();
+                showToast("Login realizado como Admin");
             } else {
-                alert("Acesso negado! Credenciais incorretas.");
+                showToast("Acesso negado! Credenciais incorretas.", true);
             }
         };
         
@@ -944,75 +997,120 @@
             document.getElementById("clienteView").classList.remove("hidden");
             document.getElementById("adminView").classList.add("hidden");
             renderCliente(document.getElementById("searchInput").value);
+            showToast("Logout realizado");
         };
         
-        // CRUD Produto
+        // Save Product with validation and loading state
         document.getElementById("saveProductBtn").onclick = async () => {
             const link = document.getElementById("prodLink").value.trim();
             const title = document.getElementById("prodTitle").value.trim();
             const desc = document.getElementById("prodDesc").value.trim();
             const img = document.getElementById("prodImage").value.trim();
-            if (!link || !title) {
-                alert("Preencha pelo menos o link do produto e o título!");
+            
+            if (!link) {
+                showToast("❌ O link do produto é obrigatório!", true);
+                document.getElementById("prodLink").focus();
                 return;
             }
-            await addProduct(link, title, desc, img);
-            document.getElementById("prodLink").value = "";
-            document.getElementById("prodTitle").value = "";
-            document.getElementById("prodDesc").value = "";
-            document.getElementById("prodImage").value = "";
-            alert("Produto adicionado com sucesso!");
+            if (!title) {
+                showToast("❌ O título do produto é obrigatório!", true);
+                document.getElementById("prodTitle").focus();
+                return;
+            }
+            
+            const saveBtn = document.getElementById("saveProductBtn");
+            const originalText = saveBtn.innerText;
+            saveBtn.disabled = true;
+            saveBtn.innerText = "Salvando...";
+            
+            try {
+                await addProduct(link, title, desc, img);
+                showToast("✅ Produto salvo com sucesso!");
+                document.getElementById("prodLink").value = "";
+                document.getElementById("prodTitle").value = "";
+                document.getElementById("prodDesc").value = "";
+                document.getElementById("prodImage").value = "";
+                document.getElementById("fetchStatus").innerText = "";
+            } catch (error) {
+                showToast(`❌ Falha ao salvar: ${error.message}`, true);
+                console.error(error);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = originalText;
+            }
         };
         
         document.getElementById("addOfferBtn").onclick = async () => {
             const pid = document.getElementById("offerSelect").value;
             const discount = document.getElementById("offerDiscount").value.trim();
             if (!discount) {
-                alert("Digite o texto da oferta!");
+                showToast("Digite o texto da oferta!", true);
                 return;
             }
-            await addOffer(pid, discount);
-            document.getElementById("offerDiscount").value = "";
-            alert("Oferta adicionada!");
+            try {
+                await addOffer(pid, discount);
+                document.getElementById("offerDiscount").value = "";
+                showToast("Oferta adicionada!");
+            } catch (error) {
+                showToast(error.message, true);
+            }
         };
         
         document.getElementById("addCouponBtn").onclick = async () => {
             const code = document.getElementById("couponCode").value.trim();
             const desc = document.getElementById("couponDesc").value.trim();
             if (!code) {
-                alert("Digite o código do cupom!");
+                showToast("Digite o código do cupom!", true);
                 return;
             }
-            await addCoupon(code, desc);
-            document.getElementById("couponCode").value = "";
-            document.getElementById("couponDesc").value = "";
-            alert("Cupom adicionado!");
+            try {
+                await addCoupon(code, desc);
+                document.getElementById("couponCode").value = "";
+                document.getElementById("couponDesc").value = "";
+                showToast("Cupom adicionado!");
+            } catch (error) {
+                showToast(error.message, true);
+            }
         };
         
         document.getElementById("saveLogoBtn").onclick = async () => {
             const url = document.getElementById("logoUrlInput").value.trim();
             if (url) await updateConfig(url, social.instagram, social.whatsapp);
-            else alert("Insira uma URL válida para a logo");
+            else showToast("Insira uma URL válida para a logo", true);
         };
         
         document.getElementById("saveSocialBtn").onclick = async () => {
             const insta = document.getElementById("instaInput").value.trim();
             const wa = document.getElementById("whatsInput").value.trim();
             await updateConfig(logoUrl, insta, wa);
-            alert("Redes sociais salvas!");
+            showToast("Redes sociais salvas!");
         };
         
-        document.getElementById("autoFetchBtn").onclick = () => {
+        document.getElementById("autoFetchBtn").onclick = async () => {
             const link = document.getElementById("prodLink").value.trim();
-            if (link) autoFetch(link);
-            else alert("Cole um link de produto primeiro!");
+            if (!link) {
+                showToast("Cole um link de produto primeiro!", true);
+                return;
+            }
+            const fetchBtn = document.getElementById("autoFetchBtn");
+            const originalText = fetchBtn.innerText;
+            fetchBtn.disabled = true;
+            fetchBtn.innerText = "Buscando...";
+            try {
+                await autoFetch(link);
+            } catch (e) {
+                document.getElementById("fetchStatus").innerText = "Erro na busca";
+            } finally {
+                fetchBtn.disabled = false;
+                fetchBtn.innerText = originalText;
+            }
         };
         
         document.getElementById("searchInput").addEventListener("input", (e) => {
             renderCliente(e.target.value);
         });
         
-        // Drawer e FAB
+        // Drawer and FAB
         const drawer = document.getElementById("floatingDrawer");
         document.getElementById("fabTrigger").onclick = () => {
             const isVisible = drawer.style.display === "flex";
@@ -1041,7 +1139,6 @@
             updateDrawerContent("coupons");
         };
         
-        // Fechar tooltip se já foi fechado antes
         if (localStorage.getItem("fabTooltipClosed")) {
             const tooltip = document.getElementById("fabTooltip");
             if (tooltip) tooltip.style.display = "none";
@@ -1052,7 +1149,7 @@
             localStorage.setItem("fabTooltipClosed", "true");
         };
         
-        // Modal
+        // Modal close
         document.getElementById("closeModalBtn").onclick = closeModal;
         document.getElementById("modalCloseBtn").onclick = closeModal;
         window.onclick = (e) => {
@@ -1060,10 +1157,10 @@
         };
     }
     
-    // INICIAR APLICAÇÃO
+    // Start app
     loadAllData().then(() => initUI()).catch(err => {
         console.error("Falha na inicialização:", err);
-        alert("Erro ao conectar com o banco de dados. Verifique sua internet e tente novamente.");
+        showToast("Erro ao conectar com o banco de dados. Verifique sua internet.", true);
     });
 </script>
 </body>
