@@ -14,15 +14,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
-        /* Previne zoom via CSS adicional */
-        * {
-            touch-action: pan-x pan-y; /* Impede pinça zoom, mas permite rolagem */
-        }
-        body {
-            background: radial-gradient(circle at 20% 30%, rgba(202,2,35,0.05), rgba(16,211,221,0.02));
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
+        * { touch-action: pan-x pan-y; }
+        body { background: radial-gradient(circle at 20% 30%, rgba(202,2,35,0.05), rgba(16,211,221,0.02)); min-height: 100vh; padding-bottom: 80px; }
         .glass { background: rgba(255, 250, 245, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,245,0.5); border-radius: 32px; }
         .header { position: sticky; top: 0; z-index: 100; padding: 8px 16px; background: rgba(255, 250, 245, 0.82); backdrop-filter: blur(25px); border-radius: 0 0 28px 28px; margin-bottom: 8px; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
@@ -243,14 +236,14 @@
         return "";
     }
 
-    // Função para converter string de preço (ex: "40,59" ou "40.59" ou "40") para número com 2 decimais
+    // Converte string de preço (ex: "40,59") para número decimal com duas casas, sem arredondamento indevido
     function parsePriceToNumber(priceStr) {
-        if (!priceStr || priceStr.trim() === "") return null;
-        let cleaned = priceStr.toString().trim().replace(/[^\d,.-]/g, ''); // remove tudo exceto digitos, vírgula, ponto e hífen
-        cleaned = cleaned.replace(',', '.'); // substitui vírgula decimal por ponto
+        if (priceStr === null || priceStr === undefined || priceStr === "") return null;
+        let cleaned = priceStr.toString().trim().replace(/[^\d,.-]/g, '');
+        cleaned = cleaned.replace(',', '.');
         let num = parseFloat(cleaned);
         if (isNaN(num)) return null;
-        // Arredondar para 2 casas decimais sem perder precisão
+        // Mantém exatamente duas casas decimais, sem arredondamento forçado para inteiro
         return Math.round(num * 100) / 100;
     }
 
@@ -315,59 +308,67 @@
     }
 
     async function renderCliente(search = "") {
-        let filtered = products.filter(p => p.title.toLowerCase().includes(search.toLowerCase()));
-        if (currentFilter) filtered = filtered.filter(p => p.category === currentFilter);
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        const grid = document.getElementById("produtosGrid");
-        if (!filtered.length) { grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>Nenhum produto encontrado 💔</div>"; return; }
-        grid.innerHTML = filtered.map(prod => {
-            let discountPercent = null;
-            if (prod.oldPrice && prod.currentPrice) discountPercent = getDiscountPercent(prod.oldPrice, prod.currentPrice);
-            let oldPriceDisplay = prod.oldPrice ? formatPriceForDisplay(prod.oldPrice) : null;
-            let currentPriceDisplay = prod.currentPrice ? formatPriceForDisplay(prod.currentPrice) : null;
-            return `
-            <div class="product-card" data-id="${prod.id}">
-                ${discountPercent ? `<div class="price-badge">-${discountPercent}%</div>` : ''}
-                <img class="card-img" src="${prod.imageUrl || 'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'">
-                <div class="card-info">
-                    <div class="card-title">${escapeHtml(prod.title)}</div>
-                    <div class="price-info">
-                        ${oldPriceDisplay ? `<span class="old-price">R$ ${oldPriceDisplay}</span>` : ''}
-                        ${currentPriceDisplay ? `<span class="current-price">R$ ${currentPriceDisplay}</span>` : ''}
-                        ${discountPercent ? `<span class="discount-percent">Economize ${discountPercent}%</span>` : ''}
+        try {
+            let filtered = products.filter(p => p.title && p.title.toLowerCase().includes(search.toLowerCase()));
+            if (currentFilter) filtered = filtered.filter(p => p.category === currentFilter);
+            filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            const grid = document.getElementById("produtosGrid");
+            if (!filtered.length) {
+                grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>Nenhum produto encontrado 💔</div>";
+                return;
+            }
+            grid.innerHTML = filtered.map(prod => {
+                let discountPercent = null;
+                if (prod.oldPrice && prod.currentPrice) discountPercent = getDiscountPercent(prod.oldPrice, prod.currentPrice);
+                let oldPriceDisplay = prod.oldPrice ? formatPriceForDisplay(prod.oldPrice) : null;
+                let currentPriceDisplay = prod.currentPrice ? formatPriceForDisplay(prod.currentPrice) : null;
+                return `
+                <div class="product-card" data-id="${prod.id}">
+                    ${discountPercent ? `<div class="price-badge">-${discountPercent}%</div>` : ''}
+                    <img class="card-img" src="${prod.imageUrl || 'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'">
+                    <div class="card-info">
+                        <div class="card-title">${escapeHtml(prod.title)}</div>
+                        <div class="price-info">
+                            ${oldPriceDisplay ? `<span class="old-price">R$ ${oldPriceDisplay}</span>` : ''}
+                            ${currentPriceDisplay ? `<span class="current-price">R$ ${currentPriceDisplay}</span>` : ''}
+                            ${discountPercent ? `<span class="discount-percent">Economize ${discountPercent}%</span>` : ''}
+                        </div>
+                        <div class="card-desc">${escapeHtml((prod.description || '').substring(0,80))}</div>
+                        <div class="visit-counter"><i class="fas fa-eye"></i> ${prod.visitCount || 0}</div>
+                        <button class="btn-buy" data-link="${prod.affiliateLink}"><i class="fas fa-shopping-bag"></i> Comprar</button>
                     </div>
-                    <div class="card-desc">${escapeHtml(prod.description?.substring(0,80) || '')}</div>
-                    <div class="visit-counter"><i class="fas fa-eye"></i> ${prod.visitCount || 0}</div>
-                    <button class="btn-buy" data-link="${prod.affiliateLink}"><i class="fas fa-shopping-bag"></i> Comprar</button>
                 </div>
-            </div>
-        `}).join('');
+            `}).join('');
 
-        document.querySelectorAll('.product-card').forEach(card => {
-            card.addEventListener('click', async (e) => {
-                if (e.target.classList.contains('btn-buy')) {
-                    const link = e.target.getAttribute('data-link');
-                    if (link) window.open(link, '_blank');
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.addEventListener('click', async (e) => {
+                    if (e.target.classList.contains('btn-buy')) {
+                        const link = e.target.getAttribute('data-link');
+                        if (link) window.open(link, '_blank');
+                        e.stopPropagation();
+                        return;
+                    }
+                    const id = card.dataset.id;
+                    const prod = products.find(p => p.id === id);
+                    if (prod) {
+                        const newCount = (prod.visitCount || 0) + 1;
+                        await db.collection("products").doc(prod.id).update({ visitCount: newCount });
+                        prod.visitCount = newCount;
+                        addToRecent(prod);
+                        openModal(prod);
+                        renderCliente(document.getElementById("searchInput").value);
+                    }
+                });
+                card.querySelector('.btn-buy')?.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    return;
-                }
-                const id = card.dataset.id;
-                const prod = products.find(p => p.id === id);
-                if (prod) {
-                    const newCount = (prod.visitCount || 0) + 1;
-                    await db.collection("products").doc(prod.id).update({ visitCount: newCount });
-                    prod.visitCount = newCount;
-                    addToRecent(prod);
-                    openModal(prod);
-                    renderCliente(document.getElementById("searchInput").value);
-                }
+                    const link = card.querySelector('.btn-buy').dataset.link;
+                    if (link) window.open(link, '_blank');
+                });
             });
-            card.querySelector('.btn-buy')?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const link = card.querySelector('.btn-buy').dataset.link;
-                if (link) window.open(link, '_blank');
-            });
-        });
+        } catch(error) {
+            console.error("Erro ao renderizar cliente:", error);
+            document.getElementById("produtosGrid").innerHTML = "<div style='grid-column:1/-1; text-align:center;color:red;'>Erro ao carregar produtos. Verifique o console.</div>";
+        }
     }
 
     function openModal(prod) {
@@ -474,7 +475,7 @@
                         ${oldPriceDisplay ? `<span class="old-price">R$ ${oldPriceDisplay}</span>` : ''}
                         ${currentPriceDisplay ? `<span class="current-price" style="font-size:0.8rem;">R$ ${currentPriceDisplay}</span>` : ''}
                     </div>
-                    <div class="card-desc">${escapeHtml(prod.description?.substring(0,60) || '')}</div>
+                    <div class="card-desc">${escapeHtml((prod.description || '').substring(0,60))}</div>
                     <div class="visit-counter"><i class="fas fa-eye"></i> ${prod.visitCount || 0} visitas</div>
                     <div class="admin-card-buttons">
                         <button class="admin-card-btn edit" data-id="${prod.id}"><i class="fas fa-edit"></i> Editar</button>
@@ -514,7 +515,6 @@
         if(categorySelect) categorySelect.innerHTML = '<option value="">Selecionar Categoria (opcional)</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     }
 
-    // Extrair preço da página do produto via Microlink + regex
     async function extractPriceFromUrl(url) {
         try {
             const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
@@ -597,10 +597,10 @@
             document.getElementById("footerSocial").innerHTML = socialHtml;
             renderFilters();
             renderRecentSection();
-            renderCliente(document.getElementById("searchInput")?.value || "");
+            await renderCliente(document.getElementById("searchInput")?.value || "");
             renderAdminLists();
             updateDrawerContent(document.querySelector(".drawer-tab.active")?.dataset.tab || "offers");
-        } catch(err) { console.error(err); alert("Erro ao carregar dados."); }
+        } catch(err) { console.error("loadAllData error:", err); alert("Erro ao carregar dados. Verifique console e conexão."); }
     }
 
     async function addProduct(link, title, desc, img, category, oldPriceRaw, currentPriceRaw) {
@@ -651,11 +651,8 @@
         document.getElementById("cancelEditBtn").onclick = closeEditModal;
         document.getElementById("saveEditBtn").onclick = saveEdit;
         
-        // Prevenir zoom com gestos de pinça adicionando event listener passivo
         document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
-        document.addEventListener('touchmove', function(e) {
-            if (e.scale && e.scale !== 1) e.preventDefault();
-        }, { passive: false });
+        document.addEventListener('touchmove', function(e) { if (e.scale && e.scale !== 1) e.preventDefault(); }, { passive: false });
     }
 
     loadAllData().then(() => initUI());
