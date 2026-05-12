@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Ofertas da Poli | Elegância & Ofertas</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ca0223">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="apple-touch-icon" href="https://i.ibb.co/Fk3bdXRb/logo.png">
     <!-- Open Graph para compartilhamento -->
     <meta property="og:title" content="Ofertas da Poli">
@@ -50,7 +50,7 @@
         .recent-card { flex: 0 0 auto; width: 120px; background: rgba(255,255,245,0.7); backdrop-filter: blur(12px); border-radius: 18px; padding: 8px; cursor: pointer; transition: 0.2s; text-align: center; }
         .recent-card img { width: 100%; height: 90px; object-fit: cover; border-radius: 12px; margin-bottom: 6px; }
         .recent-card .title { font-size: 0.75rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        /* Desktop: 5 cards por linha, cards maiores */
+        /* ALTERAÇÃO: 5 cards por linha no desktop e cards maiores */
         .products-grid { display: grid; gap: 24px; margin: 20px 0 40px; }
         @media (max-width: 640px) { .products-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
         @media (min-width: 641px) and (max-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
@@ -156,6 +156,23 @@
 
 <div id="productModal" class="modal"><div class="modal-content"><span style="float:right; font-size:28px; cursor:pointer;" id="closeModalBtn">&times;</span><img id="modalImg" style="width:100%; border-radius:28px; max-height:250px; object-fit:contain;"><h3 id="modalTitle" style="margin-top:12px;"></h3><p id="modalDescFull" style="margin:12px 0;"></p><div id="modalPriceInfo"></div><div style="display:flex; gap:10px; margin-top:15px;"><button id="modalShareBtn" class="share-btn" style="background:#25D366;"><i class="fab fa-whatsapp"></i> Compartilhar</button><a id="modalBuyLink" href="#" target="_blank" style="background:#ca0223; color:white; text-decoration:none; padding:10px; border-radius:60px; flex:1; text-align:center; font-weight:bold;">Comprar</a></div><button id="modalCloseBtn" style="margin-top:12px;">Fechar</button></div></div>
 
+<!-- Modal de Edição -->
+<div id="editProductModal" class="modal edit-modal">
+    <div class="modal-content">
+        <span style="float:right; font-size:28px; cursor:pointer;" id="closeEditModalBtn">&times;</span>
+        <h3>✏️ Editar Produto</h3>
+        <input type="text" id="editProdId" style="display:none;">
+        <input id="editTitle" placeholder="Título">
+        <textarea id="editDesc" rows="2" placeholder="Descrição"></textarea>
+        <input id="editImage" placeholder="URL da imagem">
+        <input id="editLink" placeholder="Link afiliado">
+        <div style="display:flex; gap:8px;"><input id="editOldPrice" placeholder="Preço original"><input id="editCurrentPrice" placeholder="Preço atual"></div>
+        <select id="editCategory"></select>
+        <button id="saveEditBtn">Salvar</button>
+        <button id="cancelEditBtn" style="background:#aaa;">Cancelar</button>
+    </div>
+</div>
+
 <script>
     const firebaseConfig = { apiKey: "AIzaSyDNsPEpaYJ_RfMTXQqPxb3A-wu1sb5UClc", authDomain: "ofertasdapoliana.firebaseapp.com", projectId: "ofertasdapoliana", storageBucket: "ofertasdapoliana.firebasestorage.app", messagingSenderId: "688903682077", appId: "1:688903682077:web:259c751cd41b28529d6ef4" };
     firebase.initializeApp(firebaseConfig);
@@ -165,14 +182,13 @@
     function parsePriceToNumber(p) { if(!p) return null; let n=parseFloat(p.toString().replace(',','.')); return isNaN(n)?null:Math.round(n*100)/100; }
     function formatPrice(v) { if(v===null||v==="") return null; let n=typeof v==='number'?v:parsePriceToNumber(v); return n===null?null:n.toFixed(2).replace('.',','); }
     function escapeHtml(s) { return String(s).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-    function getSlug(title) { return title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
     
+    // Função para atualizar metatags para compartilhamento
     function updateMetaTags(product) {
         if(product) {
             document.querySelector('meta[property="og:title"]').setAttribute('content', product.title);
-            document.querySelector('meta[property="og:description"]').setAttribute('content', product.description?.substring(0,150) || 'Oferta imperdível!');
+            document.querySelector('meta[property="og:description"]').setAttribute('content', (product.description || '').substring(0,150));
             document.querySelector('meta[property="og:image"]').setAttribute('content', product.imageUrl || logoUrl);
-            document.querySelector('meta[property="og:url"]').setAttribute('content', window.location.href);
             document.title = `${product.title} - Ofertas da Poli`;
         } else {
             document.querySelector('meta[property="og:title"]').setAttribute('content', 'Ofertas da Poli');
@@ -182,6 +198,7 @@
         }
     }
     
+    // Carregar produto via URL única
     async function loadProductFromURL() {
         const path = window.location.pathname;
         const match = path.match(/\/produto\/(.+)/);
@@ -207,7 +224,22 @@
         document.querySelectorAll('.product-card').forEach(c=>{ c.addEventListener('click',async(e)=>{ if(e.target.classList.contains('btn-buy')){ const l=e.target.getAttribute('data-link'); if(l) window.open(l,'_blank'); e.stopPropagation(); return; } const id=c.dataset.id, prod=products.find(p=>p.id===id); if(prod){ const nc=(prod.visitCount||0)+1; await db.collection("products").doc(prod.id).update({visitCount:nc}); prod.visitCount=nc; addToRecent(prod); openModal(prod); renderCliente(document.getElementById("searchInput").value); } }); c.querySelector('.btn-buy')?.addEventListener('click',(e)=>{ e.stopPropagation(); window.open(c.querySelector('.btn-buy').dataset.link,'_blank'); }); });
         } catch(e){ console.error(e); document.getElementById("produtosGrid").innerHTML="<div style='grid-column:1/-1;text-align:center;color:red;'>Erro ao carregar.</div>"; } }
     
-    function openModal(prod) { const m=document.getElementById("productModal"); document.getElementById("modalImg").src=prod.imageUrl||logoUrl; document.getElementById("modalTitle").innerText=prod.title; let disc=null; if(prod.oldPrice&&prod.currentPrice){let o=parsePriceToNumber(prod.oldPrice),c=parsePriceToNumber(prod.currentPrice); if(o&&c) disc=Math.round(((o-c)/o)*100);} let oldF=formatPrice(prod.oldPrice),curF=formatPrice(prod.currentPrice); let pHtml=''; if(oldF||curF) pHtml=`<div style="margin:12px 0;">${oldF?`<span style="text-decoration:line-through;color:#888;margin-right:10px;">R$ ${oldF}</span>`:''}${curF?`<span style="font-size:1.3rem;font-weight:bold;color:#ca0223;">R$ ${curF}</span>`:''}${disc?`<span style="background:#10d3dd;padding:2px 10px;border-radius:20px;margin-left:10px;">${disc}% OFF</span>`:''}</div>`; document.getElementById("modalDescFull").innerHTML=`<strong>Descrição:</strong> ${prod.description}<br><br>👀 ${prod.visitCount||0} visu`; document.getElementById("modalPriceInfo").innerHTML=pHtml; document.getElementById("modalBuyLink").href=prod.affiliateLink; const shareUrl=`${window.location.origin}/produto/${prod.id}`; document.getElementById("modalShareBtn").onclick=()=>{ window.open(`https://wa.me/?text=${encodeURIComponent(prod.title} - ${shareUrl}`,'_blank'); }; m.style.display="flex"; updateMetaTags(prod); history.pushState(null,'',`/produto/${prod.id}`); }
+    function openModal(prod) { 
+        const m=document.getElementById("productModal"); 
+        document.getElementById("modalImg").src=prod.imageUrl||logoUrl; 
+        document.getElementById("modalTitle").innerText=prod.title; 
+        let disc=null; if(prod.oldPrice&&prod.currentPrice){let o=parsePriceToNumber(prod.oldPrice),c=parsePriceToNumber(prod.currentPrice); if(o&&c) disc=Math.round(((o-c)/o)*100);} 
+        let oldF=formatPrice(prod.oldPrice),curF=formatPrice(prod.currentPrice); 
+        let pHtml=''; if(oldF||curF) pHtml=`<div style="margin:12px 0;">${oldF?`<span style="text-decoration:line-through;color:#888;margin-right:10px;">R$ ${oldF}</span>`:''}${curF?`<span style="font-size:1.3rem;font-weight:bold;color:#ca0223;">R$ ${curF}</span>`:''}${disc?`<span style="background:#10d3dd;padding:2px 10px;border-radius:20px;margin-left:10px;">${disc}% OFF</span>`:''}</div>`; 
+        document.getElementById("modalDescFull").innerHTML=`<strong>Descrição:</strong> ${prod.description}<br><br>👀 ${prod.visitCount||0} visu`; 
+        document.getElementById("modalPriceInfo").innerHTML=pHtml; 
+        document.getElementById("modalBuyLink").href=prod.affiliateLink; 
+        const shareUrl=`${window.location.origin}/produto/${prod.id}`; 
+        document.getElementById("modalShareBtn").onclick=()=>{ window.open(`https://wa.me/?text=${encodeURIComponent(prod.title + " - " + shareUrl)}`,'_blank'); }; 
+        m.style.display="flex"; 
+        updateMetaTags(prod); 
+        history.pushState(null,'',`/produto/${prod.id}`); 
+    }
     function closeModal(){ document.getElementById("productModal").style.display="none"; updateMetaTags(null); history.pushState(null,'',window.location.pathname.split('/produto/')[0]||'/'); }
     
     function updateDrawerContent(tab){ const c=document.getElementById("drawerContent"); if(tab==="offers"){ let h=`<div style="font-weight:bold;">🔥 Ofertas</div>`; offers.forEach(off=>{ const p=products.find(p=>p.id===off.productId); if(p) h+=`<div style="background:rgba(255,240,245,0.8);border-radius:20px;padding:10px;margin-bottom:10px;display:flex;gap:10px;"><img src="${p.imageUrl}" style="width:55px;height:55px;border-radius:16px;"><div><b>${p.title}</b><br>${off.discountText}<br><button class="offer-buy" data-link="${p.affiliateLink}" style="background:#ca0223;border:none;border-radius:40px;padding:4px 12px;">Comprar</button></div></div>`; }); if(!offers.length) h+="<p>Nenhuma oferta.</p>"; c.innerHTML=h; document.querySelectorAll('.offer-buy').forEach(b=>b.addEventListener('click',()=>window.open(b.dataset.link,'_blank'))); } else if(tab==="coupons"){ let h=`<div style="font-weight:bold;">🎟️ Cupons</div>`; coupons.forEach(cp=>h+=`<div style="background:white;border-radius:16px;padding:10px;margin:8px 0;"><span style="background:#0647b7;color:white;padding:4px 12px;border-radius:50px;">${cp.code}</span><br><small>${cp.description}</small></div>`); if(!coupons.length) h+="<p>Nenhum cupom.</p>"; c.innerHTML=h; } else { c.innerHTML=`<div style="text-align:center;"><p>Siga nossas redes:</p><div style="display:flex; gap:25px; justify-content:center; font-size:2rem;"><a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a><a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a></div></div>`; } }
@@ -251,9 +283,6 @@
         document.getElementById("closeModalBtn").onclick=closeModal; document.getElementById("modalCloseBtn").onclick=closeModal; window.onclick=(e)=>{ if(e.target===document.getElementById("productModal")) closeModal(); if(e.target===document.getElementById("editProductModal")) closeEditModal(); };
         document.getElementById("closeEditModalBtn").onclick=closeEditModal; document.getElementById("cancelEditBtn").onclick=closeEditModal; document.getElementById("saveEditBtn").onclick=saveEdit;
         document.addEventListener('gesturestart', e=>e.preventDefault()); document.addEventListener('touchmove', e=>{ if(e.scale && e.scale!==1) e.preventDefault(); }, {passive:false});
-        const editModalDiv = document.createElement('div'); editModalDiv.id = "editProductModal"; editModalDiv.className = "modal edit-modal"; editModalDiv.innerHTML = `<div class="modal-content"><span style="float:right;font-size:28px;cursor:pointer;" id="closeEditModalBtn">&times;</span><h3>✏️ Editar Produto</h3><input type="text" id="editProdId" style="display:none;"><input id="editTitle" placeholder="Título"><textarea id="editDesc" rows="2" placeholder="Descrição"></textarea><input id="editImage" placeholder="URL da imagem"><input id="editLink" placeholder="Link afiliado"><div style="display:flex;gap:8px;"><input id="editOldPrice" placeholder="Preço original"><input id="editCurrentPrice" placeholder="Preço atual"></div><select id="editCategory"></select><button id="saveEditBtn">Salvar</button><button id="cancelEditBtn" style="background:#aaa;">Cancelar</button></div>`;
-        if(!document.getElementById("editProductModal")) document.body.appendChild(editModalDiv);
-        document.getElementById("closeEditModalBtn").onclick=closeEditModal; document.getElementById("cancelEditBtn").onclick=closeEditModal; document.getElementById("saveEditBtn").onclick=saveEdit;
     }
     
     loadAllData().then(()=>{ initUI(); if(!loadProductFromURL()) updateMetaTags(null); });
