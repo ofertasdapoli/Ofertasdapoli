@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -9,102 +8,91 @@
     <meta name="theme-color" content="#ca0223">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="apple-touch-icon" href="https://i.ibb.co/Fk3bdXRb/logo.png">
+    <!-- Open Graph para compartilhamento -->
+    <meta property="og:title" content="Ofertas da Poli">
+    <meta property="og:description" content="As melhores ofertas em moda, eletrônicos e muito mais!">
+    <meta property="og:image" content="https://i.ibb.co/Fk3bdXRb/logo.png">
+    <meta property="og:url" content="">
+    <meta property="og:type" content="website">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
-        /* Mantém todos os estilos originais, com a única alteração na seção de produtos recentes */
         * { touch-action: pan-x pan-y; }
         body { background: radial-gradient(circle at 20% 30%, rgba(202,2,35,0.05), rgba(16,211,221,0.02)); min-height: 100vh; padding-bottom: 80px; }
         .glass { background: rgba(255, 250, 245, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,245,0.5); border-radius: 32px; }
         .header { position: sticky; top: 0; z-index: 100; padding: 8px 16px; background: rgba(255, 250, 245, 0.82); backdrop-filter: blur(25px); border-radius: 0 0 28px 28px; margin-bottom: 8px; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 0 16px; }
         .top-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
         .logo-area { display: flex; align-items: center; gap: 10px; flex: 1; }
-        .logo-img { height: 42px; width: auto; border-radius: 16px; background: rgba(255,240,245,0.5); padding: 3px; }
-        .site-title { font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg, #ca0223, #10d3dd); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        .logo-img { height: 48px; width: auto; border-radius: 16px; background: rgba(255,240,245,0.5); padding: 3px; }
+        .site-title { font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #ca0223, #10d3dd); background-clip: text; -webkit-background-clip: text; color: transparent; }
         .social-mini-header { display: flex; gap: 12px; font-size: 1.2rem; }
         .social-mini-header a { color: #ca0223; }
         .nav-links { display: flex; gap: 6px; background: rgba(255,240,245,0.5); padding: 4px 8px; border-radius: 60px; backdrop-filter: blur(8px); margin-top: 8px; justify-content: center; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
-        .nav-btn { background: transparent; border: none; font-weight: 600; font-size: 0.8rem; padding: 6px 12px; border-radius: 40px; cursor: pointer; transition: 0.2s; color: #ca0223; display: inline-block; }
+        .nav-btn { background: transparent; border: none; font-weight: 600; font-size: 0.85rem; padding: 8px 16px; border-radius: 40px; cursor: pointer; transition: 0.2s; color: #ca0223; display: inline-block; }
         .nav-btn.special { background: #ca0223; color: white; box-shadow: 0 2px 8px rgba(202,2,35,0.3); }
-        .search-box { display: flex; align-items: center; gap: 8px; padding: 6px 16px; margin: 10px 0 8px; background: rgba(255,255,245,0.75); backdrop-filter: blur(16px); border-radius: 60px; }
-        .search-box i { font-size: 0.9rem; color: #ca0223; }
-        .search-box input { flex: 1; background: transparent; border: none; padding: 8px 0; font-size: 0.85rem; outline: none; }
-        .news-badge { display: inline-block; background: linear-gradient(95deg, #10d3dd, #0647b7); padding: 4px 16px; border-radius: 60px; color: white; font-weight: 600; font-size: 0.7rem; margin-bottom: 12px; }
+        .search-box { display: flex; align-items: center; gap: 8px; padding: 8px 20px; margin: 10px 0 8px; background: rgba(255,255,245,0.75); backdrop-filter: blur(16px); border-radius: 60px; }
+        .search-box i { font-size: 1rem; color: #ca0223; }
+        .search-box input { flex: 1; background: transparent; border: none; padding: 10px 0; font-size: 0.9rem; outline: none; }
+        .news-badge { display: inline-block; background: linear-gradient(95deg, #10d3dd, #0647b7); padding: 5px 20px; border-radius: 60px; color: white; font-weight: 600; font-size: 0.75rem; margin-bottom: 12px; }
         .filters-section { margin: 12px 0 16px; overflow-x: auto; white-space: nowrap; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
         .filters-container { display: inline-flex; gap: 12px; padding: 4px 2px; }
-        .filter-chip { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; background: rgba(255,255,245,0.7); backdrop-filter: blur(12px); border-radius: 60px; padding: 8px 16px; cursor: pointer; transition: 0.2s; border: 1px solid rgba(202,2,35,0.15); }
+        .filter-chip { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; background: rgba(255,255,245,0.7); backdrop-filter: blur(12px); border-radius: 60px; padding: 8px 18px; cursor: pointer; transition: 0.2s; border: 1px solid rgba(202,2,35,0.15); }
         .filter-chip i { font-size: 1.2rem; color: #ca0223; }
-        .filter-chip span { font-size: 0.65rem; font-weight: 500; color: #4a2c3a; }
+        .filter-chip span { font-size: 0.7rem; font-weight: 500; color: #4a2c3a; }
         .filter-chip.active { background: #ca0223; border-color: #ca0223; }
         .filter-chip.active i, .filter-chip.active span { color: white; }
         .recent-section { margin: 20px 0 12px; }
-        .recent-title { font-size: 0.85rem; font-weight: 600; color: #ca0223; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        /* ALTERAÇÃO: Produtos recentes em uma única linha deslizável (igual aos filtros) */
-        .recent-grid {
-            display: flex;
-            overflow-x: auto;
-            gap: 12px;
-            padding: 4px 2px 8px 2px;
-            scrollbar-width: thin;
-            -webkit-overflow-scrolling: touch;
-        }
-        .recent-card {
-            flex: 0 0 auto;
-            width: 110px;
-            background: rgba(255,255,245,0.7);
-            backdrop-filter: blur(12px);
-            border-radius: 16px;
-            padding: 8px;
-            cursor: pointer;
-            transition: 0.2s;
-            text-align: center;
-        }
-        .recent-card img { width: 100%; height: 80px; object-fit: cover; border-radius: 12px; margin-bottom: 6px; }
-        .recent-card .title { font-size: 0.7rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        /* Fim da alteração */
-        .products-grid { display: grid; gap: 16px; margin: 20px 0 40px; }
-        @media (max-width: 640px) { .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
-        @media (min-width: 641px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
-        .product-card { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(18px); border-radius: 24px; overflow: hidden; transition: 0.2s ease; cursor: pointer; border: 1px solid rgba(255,255,240,0.7); position: relative; }
-        .product-card:hover { transform: translateY(-4px); background: rgba(255,255,250,0.92); box-shadow: 0 12px 24px -12px rgba(202,2,35,0.25); }
-        .card-img { width: 100%; height: 160px; object-fit: cover; background: #faf0f3; }
-        .price-badge { position: absolute; top: 10px; right: 10px; background: #ca0223; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; z-index: 2; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .price-info { margin: 4px 0; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-        .old-price { font-size: 0.65rem; color: #888; text-decoration: line-through; }
-        .current-price { font-size: 0.9rem; font-weight: 700; color: #ca0223; }
-        .discount-percent { background: #10d3dd; color: white; padding: 2px 6px; border-radius: 12px; font-size: 0.6rem; font-weight: 600; }
-        .card-info { padding: 10px; }
-        .card-title { font-weight: 700; font-size: 0.85rem; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .card-desc { font-size: 0.65rem; color: #4a2c3a; opacity: 0.8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
-        .btn-buy { background: #ca0223; color: white; border: none; padding: 6px 0; border-radius: 40px; font-weight: 600; width: 100%; margin-top: 8px; font-size: 0.65rem; cursor: pointer; }
-        .visit-counter { font-size: 0.6rem; background: rgba(202,2,35,0.1); display: inline-block; padding: 2px 8px; border-radius: 20px; margin-top: 4px; }
-        .admin-card-buttons { display: flex; gap: 8px; margin-top: 8px; }
-        .admin-card-btn { flex: 1; padding: 6px 0; border-radius: 40px; font-size: 0.65rem; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
+        .recent-title { font-size: 0.9rem; font-weight: 600; color: #ca0223; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .recent-grid { display: flex; overflow-x: auto; gap: 12px; padding: 4px 2px 8px 2px; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+        .recent-card { flex: 0 0 auto; width: 120px; background: rgba(255,255,245,0.7); backdrop-filter: blur(12px); border-radius: 18px; padding: 8px; cursor: pointer; transition: 0.2s; text-align: center; }
+        .recent-card img { width: 100%; height: 90px; object-fit: cover; border-radius: 12px; margin-bottom: 6px; }
+        .recent-card .title { font-size: 0.75rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        /* Desktop: 5 cards por linha, cards maiores */
+        .products-grid { display: grid; gap: 24px; margin: 20px 0 40px; }
+        @media (max-width: 640px) { .products-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+        @media (min-width: 641px) and (max-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+        @media (min-width: 1025px) { .products-grid { grid-template-columns: repeat(5, 1fr); gap: 24px; } }
+        .product-card { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(18px); border-radius: 28px; overflow: hidden; transition: 0.25s ease; cursor: pointer; border: 1px solid rgba(255,255,240,0.7); position: relative; }
+        .product-card:hover { transform: translateY(-6px); background: rgba(255,255,250,0.92); box-shadow: 0 20px 32px -12px rgba(202,2,35,0.25); }
+        .card-img { width: 100%; height: 200px; object-fit: cover; background: #faf0f3; }
+        .price-badge { position: absolute; top: 12px; right: 12px; background: #ca0223; color: white; padding: 5px 12px; border-radius: 25px; font-size: 0.75rem; font-weight: bold; z-index: 2; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .price-info { margin: 6px 0; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+        .old-price { font-size: 0.7rem; color: #888; text-decoration: line-through; }
+        .current-price { font-size: 1rem; font-weight: 700; color: #ca0223; }
+        .discount-percent { background: #10d3dd; color: white; padding: 2px 8px; border-radius: 15px; font-size: 0.65rem; font-weight: 600; }
+        .card-info { padding: 14px; }
+        .card-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .card-desc { font-size: 0.7rem; color: #4a2c3a; opacity: 0.8; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px; }
+        .btn-buy { background: #ca0223; color: white; border: none; padding: 8px 0; border-radius: 40px; font-weight: 600; width: 100%; margin-top: 10px; font-size: 0.7rem; cursor: pointer; }
+        .visit-counter { font-size: 0.65rem; background: rgba(202,2,35,0.1); display: inline-block; padding: 3px 10px; border-radius: 20px; margin-top: 6px; }
+        .admin-card-buttons { display: flex; gap: 8px; margin-top: 10px; }
+        .admin-card-btn { flex: 1; padding: 6px 0; border-radius: 40px; font-size: 0.7rem; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
         .admin-card-btn.edit { background: #0647b7; color: white; }
         .admin-card-btn.delete { background: #d44c6e; color: white; }
-        .floating-drawer { display: none; position: fixed; bottom: 90px; right: 20px; width: 320px; max-width: calc(100vw - 40px); background: rgba(255, 250, 245, 0.96); backdrop-filter: blur(35px); border-radius: 32px; flex-direction: column; z-index: 200; border: 1px solid rgba(255,245,230,0.8); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+        .floating-drawer { display: none; position: fixed; bottom: 90px; right: 20px; width: 340px; max-width: calc(100vw - 40px); background: rgba(255, 250, 245, 0.96); backdrop-filter: blur(35px); border-radius: 36px; flex-direction: column; z-index: 200; border: 1px solid rgba(255,245,230,0.8); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
         .drawer-header { padding: 14px 18px; font-weight: bold; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 0.9rem; }
         .drawer-tabs { display: flex; gap: 4px; padding: 8px 12px; }
-        .drawer-tab { flex: 1; text-align: center; padding: 6px; border-radius: 40px; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
+        .drawer-tab { flex: 1; text-align: center; padding: 8px; border-radius: 40px; cursor: pointer; font-weight: 500; font-size: 0.8rem; }
         .drawer-tab.active { background: #ca0223; color: white; }
-        .drawer-content { padding: 12px; max-height: 380px; overflow-y: auto; font-size: 0.8rem; }
-        .fab-trigger { position: fixed; bottom: 20px; right: 20px; background: #ca0223; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(202,2,35,0.4); cursor: pointer; color: white; font-size: 24px; z-index: 150; backdrop-filter: blur(12px); }
-        .tooltip-fab { position: absolute; bottom: 68px; right: 0; background: #0647b7; color: white; padding: 4px 12px; border-radius: 60px; font-size: 0.7rem; white-space: nowrap; backdrop-filter: blur(8px); }
+        .drawer-content { padding: 14px; max-height: 400px; overflow-y: auto; font-size: 0.85rem; }
+        .fab-trigger { position: fixed; bottom: 24px; right: 24px; background: #ca0223; width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(202,2,35,0.4); cursor: pointer; color: white; font-size: 26px; z-index: 150; backdrop-filter: blur(12px); }
+        .tooltip-fab { position: absolute; bottom: 72px; right: 0; background: #0647b7; color: white; padding: 5px 14px; border-radius: 60px; font-size: 0.75rem; white-space: nowrap; backdrop-filter: blur(8px); }
         .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: rgba(255, 248, 245, 0.96); backdrop-filter: blur(35px); border-radius: 40px; max-width: 480px; width: 90%; padding: 20px; text-align: center; }
-        .admin-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border-radius: 40px; padding: 24px; margin: 20px 0; }
-        input, textarea, select, button { border-radius: 60px; border: 1px solid rgba(202,2,35,0.2); padding: 10px 16px; background: rgba(255,250,245,0.9); width: 100%; margin: 6px 0; font-size: 0.9rem; }
-        button { background: #ca0223; color: white; font-weight: 600; cursor: pointer; }
-        .admin-products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-top: 20px; }
+        .modal-content { background: rgba(255, 248, 245, 0.96); backdrop-filter: blur(35px); border-radius: 48px; max-width: 520px; width: 90%; padding: 24px; text-align: center; }
+        .admin-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border-radius: 48px; padding: 28px; margin: 20px 0; }
+        input, textarea, select, button { border-radius: 60px; border: 1px solid rgba(202,2,35,0.2); padding: 12px 18px; background: rgba(255,250,245,0.9); width: 100%; margin: 8px 0; font-size: 0.9rem; }
+        button { background: #ca0223; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .admin-products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
         @media (max-width: 640px) { .admin-products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
         .hidden { display: none; }
-        footer { text-align: center; padding: 20px; font-size: 0.65rem; color: #6b4c5c; }
-        .social-mini-footer { display: flex; gap: 12px; justify-content: center; margin-bottom: 8px; }
-        .edit-modal .modal-content { max-width: 500px; }
-        @media (max-width: 480px) { .card-img { height: 140px; } .card-title { font-size: 0.75rem; } .nav-btn { padding: 4px 8px; font-size: 0.7rem; } }
+        footer { text-align: center; padding: 25px; font-size: 0.7rem; color: #6b4c5c; }
+        .social-mini-footer { display: flex; gap: 12px; justify-content: center; margin-bottom: 10px; }
+        .edit-modal .modal-content { max-width: 550px; }
+        .share-btn { background: #25D366; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        @media (max-width: 480px) { .card-img { height: 160px; } .card-title { font-size: 0.85rem; } .nav-btn { padding: 5px 10px; font-size: 0.7rem; } }
     </style>
 </head>
 <body>
@@ -151,11 +139,11 @@
                 <h2>✨ Painel da Poli</h2>
                 <div><h4>🖼️ Logo do Site (URL)</h4><input type="text" id="logoUrlInput" placeholder="URL da logo"><button id="saveLogoBtn">Salvar Logo</button></div>
                 <div><h4>📱 Redes Sociais</h4><input id="instaInput" placeholder="Instagram URL"><input id="whatsInput" placeholder="WhatsApp Grupo Link"><button id="saveSocialBtn">Salvar</button></div>
-                <div><h3>➕ Adicionar Produto</h3><input id="prodLink" placeholder="Link Afiliado"><button id="autoFetchBtn">🔍 Buscar dados automaticamente (inclui preço)</button><div id="fetchStatus" style="font-size:0.7rem; margin:4px;"></div><input id="prodTitle" placeholder="Título *"><textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea><input id="prodImage" placeholder="URL da imagem"><div style="display:flex; gap:8px; flex-wrap:wrap;"><input id="prodOldPrice" placeholder="Preço original (ex: 59,90)" style="flex:1;"><input id="prodCurrentPrice" placeholder="Preço atual (ex: 29,90)" style="flex:1;"></div><select id="prodCategory"><option value="">Selecionar Categoria (opcional)</option></select><button id="saveProductBtn">Salvar Produto</button></div>
-                <div><h3>⚡ Gerenciar Ofertas Relâmpago</h3><div id="adminOffersList"></div><select id="offerSelect"></select><input id="offerDiscount" placeholder="Ex: 30% OFF + Frete Grátis"><button id="addOfferBtn">Adicionar Oferta</button></div>
-                <div><h3>🎫 Cupons de Desconto</h3><div id="adminCouponsList"></div><input id="couponCode" placeholder="Código (ex: POLI10)"><input id="couponDesc" placeholder="Descrição (10% off)"><button id="addCouponBtn">Adicionar Cupom</button></div>
-                <div><h3>📦 Produtos Cadastrados</h3><div id="adminProductsGrid" class="admin-products-grid"></div></div>
-                <button id="logoutAdmin">Sair do Admin</button>
+                <div><h3>➕ Adicionar Produto</h3><input id="prodLink" placeholder="Link Afiliado"><button id="autoFetchBtn">🔍 Buscar dados automaticamente</button><div id="fetchStatus" style="font-size:0.7rem; margin:4px;"></div><input id="prodTitle" placeholder="Título *"><textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea><input id="prodImage" placeholder="URL da imagem"><div style="display:flex; gap:8px;"><input id="prodOldPrice" placeholder="Preço original" style="flex:1;"><input id="prodCurrentPrice" placeholder="Preço atual" style="flex:1;"></div><select id="prodCategory"><option value="">Categoria</option></select><button id="saveProductBtn">Salvar Produto</button></div>
+                <div><h3>⚡ Ofertas</h3><div id="adminOffersList"></div><select id="offerSelect"></select><input id="offerDiscount" placeholder="Ex: 30% OFF"><button id="addOfferBtn">Adicionar Oferta</button></div>
+                <div><h3>🎫 Cupons</h3><div id="adminCouponsList"></div><input id="couponCode" placeholder="Código"><input id="couponDesc" placeholder="Descrição"><button id="addCouponBtn">Adicionar Cupom</button></div>
+                <div><h3>📦 Produtos</h3><div id="adminProductsGrid" class="admin-products-grid"></div></div>
+                <button id="logoutAdmin">Sair</button>
             </div>
         </div>
     </div>
@@ -163,518 +151,112 @@
 
 <footer><div class="social-mini-footer" id="footerSocial"></div><p>✨ Ofertas da Poli – Beleza, estilo & economia ✨</p></footer>
 
-<div id="floatingDrawer" class="floating-drawer">
-    <div class="drawer-header"><span>⚡ Ofertas & Cupons</span><span id="closeDrawer" style="cursor:pointer;">✕</span></div>
-    <div class="drawer-tabs"><div class="drawer-tab active" data-tab="offers">Ofertas</div><div class="drawer-tab" data-tab="coupons">Cupons</div><div class="drawer-tab" data-tab="social">Redes</div></div>
-    <div class="drawer-content" id="drawerContent"></div>
-</div>
+<div id="floatingDrawer" class="floating-drawer"><div class="drawer-header"><span>⚡ Ofertas & Cupons</span><span id="closeDrawer" style="cursor:pointer;">✕</span></div><div class="drawer-tabs"><div class="drawer-tab active" data-tab="offers">Ofertas</div><div class="drawer-tab" data-tab="coupons">Cupons</div><div class="drawer-tab" data-tab="social">Redes</div></div><div class="drawer-content" id="drawerContent"></div></div>
+<div class="fab-trigger" id="fabTrigger"><i class="fas fa-tag"></i><div class="tooltip-fab" id="fabTooltip">🎁 Cupons! <span id="closeTooltip" style="margin-left:8px; cursor:pointer;">✕</span></div></div>
 
-<div class="fab-trigger" id="fabTrigger"><i class="fas fa-tag"></i><div class="tooltip-fab" id="fabTooltip">🎁 Cupons e ofertas! <span id="closeTooltip" style="margin-left:8px; cursor:pointer;">✕</span></div></div>
-
-<!-- Modal de Edição de Produto -->
-<div id="editProductModal" class="modal edit-modal">
-    <div class="modal-content">
-        <span style="float:right; font-size:28px; cursor:pointer;" id="closeEditModalBtn">&times;</span>
-        <h3 style="margin-bottom:16px;">✏️ Editar Produto</h3>
-        <input type="text" id="editProdId" style="display:none;">
-        <input type="text" id="editTitle" placeholder="Título">
-        <textarea id="editDesc" rows="2" placeholder="Descrição"></textarea>
-        <input type="text" id="editImage" placeholder="URL da imagem">
-        <input type="text" id="editLink" placeholder="Link de afiliado">
-        <div style="display:flex; gap:8px; flex-wrap:wrap;"><input id="editOldPrice" placeholder="Preço original (ex: 99,90)" style="flex:1;"><input id="editCurrentPrice" placeholder="Preço atual (ex: 49,90)" style="flex:1;"></div>
-        <select id="editCategory"><option value="">Selecionar Categoria</option></select>
-        <button id="saveEditBtn">Salvar alterações</button>
-        <button id="cancelEditBtn" style="background:#aaa;">Cancelar</button>
-    </div>
-</div>
-
-<div id="productModal" class="modal">
-    <div class="modal-content">
-        <span style="float:right; font-size:28px; cursor:pointer;" id="closeModalBtn">&times;</span>
-        <img id="modalImg" style="width:100%; border-radius:24px; max-height:220px; object-fit:contain;">
-        <h3 id="modalTitle" style="margin-top:12px; font-size:1.2rem;"></h3>
-        <p id="modalDescFull" style="margin:12px 0; font-size:0.85rem;"></p>
-        <div id="modalPriceInfo" style="margin:10px 0;"></div>
-        <div style="background:#10d3dd; padding:10px; border-radius:60px; margin:16px 0;">
-            <a id="modalBuyLink" href="#" target="_blank" style="color:white; text-decoration:none; font-weight:bold;">🛍️ COMPRAR AGORA</a>
-        </div>
-        <button id="modalCloseBtn" style="background:#ca0223;">Fechar</button>
-    </div>
-</div>
+<div id="productModal" class="modal"><div class="modal-content"><span style="float:right; font-size:28px; cursor:pointer;" id="closeModalBtn">&times;</span><img id="modalImg" style="width:100%; border-radius:28px; max-height:250px; object-fit:contain;"><h3 id="modalTitle" style="margin-top:12px;"></h3><p id="modalDescFull" style="margin:12px 0;"></p><div id="modalPriceInfo"></div><div style="display:flex; gap:10px; margin-top:15px;"><button id="modalShareBtn" class="share-btn" style="background:#25D366;"><i class="fab fa-whatsapp"></i> Compartilhar</button><a id="modalBuyLink" href="#" target="_blank" style="background:#ca0223; color:white; text-decoration:none; padding:10px; border-radius:60px; flex:1; text-align:center; font-weight:bold;">Comprar</a></div><button id="modalCloseBtn" style="margin-top:12px;">Fechar</button></div></div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDNsPEpaYJ_RfMTXQqPxb3A-wu1sb5UClc",
-        authDomain: "ofertasdapoliana.firebaseapp.com",
-        projectId: "ofertasdapoliana",
-        storageBucket: "ofertasdapoliana.firebasestorage.app",
-        messagingSenderId: "688903682077",
-        appId: "1:688903682077:web:259c751cd41b28529d6ef4",
-        measurementId: "G-29GH65XLXX"
-    };
+    const firebaseConfig = { apiKey: "AIzaSyDNsPEpaYJ_RfMTXQqPxb3A-wu1sb5UClc", authDomain: "ofertasdapoliana.firebaseapp.com", projectId: "ofertasdapoliana", storageBucket: "ofertasdapoliana.firebasestorage.app", messagingSenderId: "688903682077", appId: "1:688903682077:web:259c751cd41b28529d6ef4" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-
-    let products = [];
-    let offers = [];
-    let coupons = [];
-    let social = { instagram: "", whatsapp: "" };
-    let logoUrl = "https://i.ibb.co/Fk3bdXRb/logo.png";
-    let isAdmin = false;
-    let recentProducts = JSON.parse(localStorage.getItem("recentProducts") || "[]");
-    let currentFilter = "";
-
-    const categories = [
-        { name: "Eletronicos", icon: "fas fa-laptop", keyword: "eletrônico|eletronico|notebook|pc|computador" },
-        { name: "Smartphones", icon: "fas fa-mobile-alt", keyword: "smartphone|celular|iphone|samsung|xiaomi" },
-        { name: "Ar e Ventilação", icon: "fas fa-wind", keyword: "ar condicionado|ventilador|climatizador" },
-        { name: "Jogos e Video Game", icon: "fas fa-gamepad", keyword: "jogo|playstation|xbox|nintendo|pc gamer" },
-        { name: "Moda e Acessórios", icon: "fas fa-tshirt", keyword: "vestido|bolsa|sapato|moda|roupa" },
-        { name: "Casa e Decoração", icon: "fas fa-home", keyword: "casa|decoração|decoraçao|móvel|moveis" },
-        { name: "Móveis", icon: "fas fa-couch", keyword: "mesa|cadeira|sofa|armário|estante" },
-        { name: "Saúde e Beleza", icon: "fas fa-heartbeat", keyword: "saúde|beleza|perfume|maquiagem" },
-        { name: "Livros e E-books", icon: "fas fa-book", keyword: "livro|ebook|leitura" },
-        { name: "Esportes e Fitness", icon: "fas fa-dumbbell", keyword: "esporte|fitness|academia" },
-        { name: "Brinquedos e Jogos", icon: "fas fa-puzzle-piece", keyword: "brinquedo|boneca|carrinho" },
-        { name: "Bebê", icon: "fas fa-baby-carriage", keyword: "bebê|bebe|mamãe" },
-        { name: "Produtos de Limpeza", icon: "fas fa-broom", keyword: "limpeza|detergente|sabão" },
-        { name: "Tecnologia", icon: "fas fa-microchip", keyword: "tecnologia|gadget|drone" },
-        { name: "Papelaria", icon: "fas fa-pen", keyword: "papel|caneta|caderno" },
-        { name: "Utilidades Domésticas", icon: "fas fa-utensils", keyword: "cozinha|panela|talher" },
-        { name: "Eletrodomésticos", icon: "fas fa-blender", keyword: "geladeira|fogão|microondas" },
-        { name: "Ferramentas", icon: "fas fa-tools", keyword: "ferramenta|parafusadeira" }
-    ];
-
-    function detectCategory(title, description) {
-        const text = (title + " " + description).toLowerCase();
-        for (let cat of categories) {
-            const keywords = cat.keyword.split("|");
-            for (let kw of keywords) {
-                if (text.includes(kw)) return cat.name;
-            }
-        }
-        return "";
-    }
-
-    function parsePriceToNumber(priceStr) {
-        if (priceStr === null || priceStr === undefined || priceStr === "") return null;
-        let cleaned = priceStr.toString().trim().replace(/[^\d,.-]/g, '');
-        cleaned = cleaned.replace(',', '.');
-        let num = parseFloat(cleaned);
-        if (isNaN(num)) return null;
-        return Math.round(num * 100) / 100;
-    }
-
-    function formatPriceForDisplay(value) {
-        if (value === null || value === undefined || value === "") return null;
-        let num = typeof value === 'number' ? value : parsePriceToNumber(value);
-        if (num === null) return null;
-        return num.toFixed(2).replace('.', ',');
-    }
-
-    function getDiscountPercent(oldPrice, currentPrice) {
-        let oldNum = parsePriceToNumber(oldPrice);
-        let currNum = parsePriceToNumber(currentPrice);
-        if (oldNum === null || currNum === null || oldNum <= 0 || currNum <= 0) return null;
-        let discount = ((oldNum - currNum) / oldNum) * 100;
-        return Math.round(discount);
-    }
-
-    function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-
-    function addToRecent(product) {
-        recentProducts = recentProducts.filter(p => p.id !== product.id);
-        recentProducts.unshift(product);
-        if (recentProducts.length > 10) recentProducts.pop();
-        localStorage.setItem("recentProducts", JSON.stringify(recentProducts));
-        renderRecentSection();
-    }
-
-    function renderRecentSection() {
-        const section = document.getElementById("recentSection");
-        const grid = document.getElementById("recentGrid");
-        if (recentProducts.length === 0) { section.style.display = "none"; return; }
-        section.style.display = "block";
-        // Mantém a estrutura, mas o CSS fará os cards ficarem em linha horizontal
-        grid.innerHTML = recentProducts.map(prod => `
-            <div class="recent-card" data-id="${prod.id}">
-                <img src="${prod.imageUrl || 'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'">
-                <div class="title">${escapeHtml(prod.title.substring(0, 25))}</div>
-            </div>
-        `).join('');
-        document.querySelectorAll('.recent-card').forEach(card => {
-            card.addEventListener('click', async () => {
-                const id = card.dataset.id;
-                const prod = products.find(p => p.id === id);
-                if (prod) openModal(prod);
-            });
-        });
-    }
-
-    function renderFilters() {
-        const container = document.getElementById("filtersContainer");
-        container.innerHTML = `<div class="filter-chip ${currentFilter === '' ? 'active' : ''}" data-filter=""><i class="fas fa-th-large"></i><span>Todos</span></div>`;
-        categories.forEach(cat => {
-            container.innerHTML += `<div class="filter-chip ${currentFilter === cat.name ? 'active' : ''}" data-filter="${cat.name}"><i class="${cat.icon}"></i><span>${cat.name}</span></div>`;
-        });
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                currentFilter = chip.dataset.filter;
-                renderFilters();
-                renderCliente(document.getElementById("searchInput").value);
-            });
-        });
-    }
-
-    async function renderCliente(search = "") {
-        try {
-            let filtered = products.filter(p => p.title && p.title.toLowerCase().includes(search.toLowerCase()));
-            if (currentFilter) filtered = filtered.filter(p => p.category === currentFilter);
-            filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            const grid = document.getElementById("produtosGrid");
-            if (!filtered.length) {
-                grid.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>Nenhum produto encontrado 💔</div>";
-                return;
-            }
-            grid.innerHTML = filtered.map(prod => {
-                let discountPercent = null;
-                if (prod.oldPrice && prod.currentPrice) discountPercent = getDiscountPercent(prod.oldPrice, prod.currentPrice);
-                let oldPriceDisplay = prod.oldPrice ? formatPriceForDisplay(prod.oldPrice) : null;
-                let currentPriceDisplay = prod.currentPrice ? formatPriceForDisplay(prod.currentPrice) : null;
-                return `
-                <div class="product-card" data-id="${prod.id}">
-                    ${discountPercent ? `<div class="price-badge">-${discountPercent}%</div>` : ''}
-                    <img class="card-img" src="${prod.imageUrl || 'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'">
-                    <div class="card-info">
-                        <div class="card-title">${escapeHtml(prod.title)}</div>
-                        <div class="price-info">
-                            ${oldPriceDisplay ? `<span class="old-price">R$ ${oldPriceDisplay}</span>` : ''}
-                            ${currentPriceDisplay ? `<span class="current-price">R$ ${currentPriceDisplay}</span>` : ''}
-                            ${discountPercent ? `<span class="discount-percent">Economize ${discountPercent}%</span>` : ''}
-                        </div>
-                        <div class="card-desc">${escapeHtml((prod.description || '').substring(0,80))}</div>
-                        <div class="visit-counter"><i class="fas fa-eye"></i> ${prod.visitCount || 0}</div>
-                        <button class="btn-buy" data-link="${prod.affiliateLink}"><i class="fas fa-shopping-bag"></i> Comprar</button>
-                    </div>
-                </div>
-            `}).join('');
-
-            document.querySelectorAll('.product-card').forEach(card => {
-                card.addEventListener('click', async (e) => {
-                    if (e.target.classList.contains('btn-buy')) {
-                        const link = e.target.getAttribute('data-link');
-                        if (link) window.open(link, '_blank');
-                        e.stopPropagation();
-                        return;
-                    }
-                    const id = card.dataset.id;
-                    const prod = products.find(p => p.id === id);
-                    if (prod) {
-                        const newCount = (prod.visitCount || 0) + 1;
-                        await db.collection("products").doc(prod.id).update({ visitCount: newCount });
-                        prod.visitCount = newCount;
-                        addToRecent(prod);
-                        openModal(prod);
-                        renderCliente(document.getElementById("searchInput").value);
-                    }
-                });
-                card.querySelector('.btn-buy')?.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const link = card.querySelector('.btn-buy').dataset.link;
-                    if (link) window.open(link, '_blank');
-                });
-            });
-        } catch(error) {
-            console.error("Erro ao renderizar cliente:", error);
-            document.getElementById("produtosGrid").innerHTML = "<div style='grid-column:1/-1; text-align:center;color:red;'>Erro ao carregar produtos. Verifique o console.</div>";
-        }
-    }
-
-    function openModal(prod) {
-        const modal = document.getElementById("productModal");
-        document.getElementById("modalImg").src = prod.imageUrl || 'https://placehold.co/400x250/ca0223/white';
-        document.getElementById("modalTitle").innerText = prod.title;
-        let discountPercent = null;
-        if (prod.oldPrice && prod.currentPrice) discountPercent = getDiscountPercent(prod.oldPrice, prod.currentPrice);
-        let oldPriceDisplay = prod.oldPrice ? formatPriceForDisplay(prod.oldPrice) : null;
-        let currentPriceDisplay = prod.currentPrice ? formatPriceForDisplay(prod.currentPrice) : null;
-        let priceHtml = '';
-        if (oldPriceDisplay || currentPriceDisplay) {
-            priceHtml = `<div style="margin:10px 0;">
-                ${oldPriceDisplay ? `<span style="text-decoration:line-through; color:#888; margin-right:10px;">R$ ${oldPriceDisplay}</span>` : ''}
-                ${currentPriceDisplay ? `<span style="font-size:1.3rem; font-weight:bold; color:#ca0223;">R$ ${currentPriceDisplay}</span>` : ''}
-                ${discountPercent ? `<span style="background:#10d3dd; padding:2px 10px; border-radius:20px; margin-left:10px;">${discountPercent}% OFF</span>` : ''}
-            </div>`;
-        }
-        document.getElementById("modalDescFull").innerHTML = `<strong>Descrição:</strong> ${prod.description}<br><br>👀 ${prod.visitCount} visualizações`;
-        document.getElementById("modalPriceInfo").innerHTML = priceHtml;
-        document.getElementById("modalBuyLink").href = prod.affiliateLink;
-        modal.style.display = "flex";
-    }
-    function closeModal() { document.getElementById("productModal").style.display = "none"; }
-
-    function updateDrawerContent(tab) {
-        const container = document.getElementById("drawerContent");
-        if (tab === "offers") {
-            let html = `<div style="font-weight:bold; margin-bottom:10px;">🔥 Ofertas Relâmpago</div>`;
-            offers.forEach(off => {
-                const prod = products.find(p => p.id === off.productId);
-                if (prod) {
-                    html += `<div style="background:rgba(255,240,245,0.8); border-radius:20px; padding:10px; margin-bottom:10px; display:flex; gap:10px; align-items:center;">
-                        <img src="${prod.imageUrl}" style="width:50px; height:50px; border-radius:16px; object-fit:cover;">
-                        <div><b>${prod.title}</b><br>${off.discountText}<br><button class="offer-buy-btn" data-link="${prod.affiliateLink}" style="background:#ca0223; border:none; border-radius:40px; padding:3px 10px; margin-top:4px; font-size:0.7rem;">Comprar</button></div>
-                    </div>`;
-                }
-            });
-            if (!offers.length) html += "<p>Nenhuma oferta ativa.</p>";
-            container.innerHTML = html;
-            document.querySelectorAll('.offer-buy-btn').forEach(btn => btn.addEventListener('click', () => window.open(btn.dataset.link, '_blank')));
-        } else if (tab === "coupons") {
-            let html = `<div style="font-weight:bold;">🎟️ Cupons Exclusivos</div>`;
-            coupons.forEach(c => {
-                html += `<div style="background:white; border-radius:16px; padding:8px; margin:8px 0;"><span style="background:#0647b7; color:white; padding:4px 12px; border-radius:50px; font-size:0.75rem;">${c.code}</span><br><small>${c.description}</small></div>`;
-            });
-            if (!coupons.length) html += "<p>Nenhum cupom cadastrado.</p>";
-            container.innerHTML = html;
+    let products = [], offers = [], coupons = [], social = { instagram: "", whatsapp: "" }, logoUrl = "https://i.ibb.co/Fk3bdXRb/logo.png", isAdmin = false, recentProducts = JSON.parse(localStorage.getItem("recentProducts") || "[]"), currentFilter = "";
+    const categories = [{ name: "Eletronicos", icon: "fas fa-laptop", keyword: "eletrônico|eletronico|notebook|pc" }, { name: "Smartphones", icon: "fas fa-mobile-alt", keyword: "smartphone|celular|iphone" }, { name: "Moda e Acessórios", icon: "fas fa-tshirt", keyword: "vestido|bolsa|sapato|moda" }, { name: "Casa e Decoração", icon: "fas fa-home", keyword: "casa|decoração|móvel" }, { name: "Eletrodomésticos", icon: "fas fa-blender", keyword: "geladeira|fogão|microondas" }, { name: "Saúde e Beleza", icon: "fas fa-heartbeat", keyword: "saúde|beleza|perfume" }];
+    function parsePriceToNumber(p) { if(!p) return null; let n=parseFloat(p.toString().replace(',','.')); return isNaN(n)?null:Math.round(n*100)/100; }
+    function formatPrice(v) { if(v===null||v==="") return null; let n=typeof v==='number'?v:parsePriceToNumber(v); return n===null?null:n.toFixed(2).replace('.',','); }
+    function escapeHtml(s) { return String(s).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    function getSlug(title) { return title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
+    
+    function updateMetaTags(product) {
+        if(product) {
+            document.querySelector('meta[property="og:title"]').setAttribute('content', product.title);
+            document.querySelector('meta[property="og:description"]').setAttribute('content', product.description?.substring(0,150) || 'Oferta imperdível!');
+            document.querySelector('meta[property="og:image"]').setAttribute('content', product.imageUrl || logoUrl);
+            document.querySelector('meta[property="og:url"]').setAttribute('content', window.location.href);
+            document.title = `${product.title} - Ofertas da Poli`;
         } else {
-            container.innerHTML = `<div style="text-align:center;"><p>Siga nossas redes:</p><div style="display:flex; gap:20px; justify-content:center; font-size:1.8rem; margin:12px;"><a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a><a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a></div><p>Ofertas e cupons semanais!</p></div>`;
+            document.querySelector('meta[property="og:title"]').setAttribute('content', 'Ofertas da Poli');
+            document.querySelector('meta[property="og:description"]').setAttribute('content', 'As melhores ofertas em moda, eletrônicos e muito mais!');
+            document.querySelector('meta[property="og:image"]').setAttribute('content', logoUrl);
+            document.title = 'Ofertas da Poli';
         }
     }
-
-    let currentEditId = null;
-    function openEditModal(product) {
-        currentEditId = product.id;
-        document.getElementById("editTitle").value = product.title || "";
-        document.getElementById("editDesc").value = product.description || "";
-        document.getElementById("editImage").value = product.imageUrl || "";
-        document.getElementById("editLink").value = product.affiliateLink || "";
-        document.getElementById("editOldPrice").value = product.oldPrice ? formatPriceForDisplay(product.oldPrice) : "";
-        document.getElementById("editCurrentPrice").value = product.currentPrice ? formatPriceForDisplay(product.currentPrice) : "";
-        const catSelect = document.getElementById("editCategory");
-        catSelect.innerHTML = '<option value="">Selecionar Categoria</option>' + categories.map(c => `<option value="${c.name}" ${product.category === c.name ? 'selected' : ''}>${c.name}</option>`).join('');
-        document.getElementById("editProductModal").style.display = "flex";
-    }
-    async function saveEdit() {
-        if (!currentEditId) return;
-        const oldPriceRaw = document.getElementById("editOldPrice").value.trim();
-        const currentPriceRaw = document.getElementById("editCurrentPrice").value.trim();
-        const updatedData = {
-            title: document.getElementById("editTitle").value.trim(),
-            description: document.getElementById("editDesc").value.trim(),
-            imageUrl: document.getElementById("editImage").value.trim(),
-            affiliateLink: document.getElementById("editLink").value.trim(),
-            oldPrice: oldPriceRaw ? parsePriceToNumber(oldPriceRaw) : "",
-            currentPrice: currentPriceRaw ? parsePriceToNumber(currentPriceRaw) : "",
-            category: document.getElementById("editCategory").value
-        };
-        if (!updatedData.title) { alert("O título é obrigatório"); return; }
-        await db.collection("products").doc(currentEditId).update(updatedData);
-        await loadAllData();
-        document.getElementById("editProductModal").style.display = "none";
-        alert("Produto atualizado com sucesso!");
-    }
-    function closeEditModal() { document.getElementById("editProductModal").style.display = "none"; currentEditId = null; }
-
-    function renderAdminProductsGrid() {
-        const container = document.getElementById("adminProductsGrid");
-        if (!container) return;
-        if (products.length === 0) {
-            container.innerHTML = "<div style='grid-column:1/-1; text-align:center;'>Nenhum produto cadastrado</div>";
-            return;
+    
+    async function loadProductFromURL() {
+        const path = window.location.pathname;
+        const match = path.match(/\/produto\/(.+)/);
+        if(match && match[1]) {
+            const productId = match[1];
+            const doc = await db.collection("products").doc(productId).get();
+            if(doc.exists) {
+                const prod = { id: doc.id, ...doc.data() };
+                document.getElementById("clienteView").classList.remove("hidden");
+                document.getElementById("adminView").classList.add("hidden");
+                updateMetaTags(prod);
+                openModal(prod);
+                return true;
+            }
         }
-        container.innerHTML = products.map(prod => {
-            let oldPriceDisplay = prod.oldPrice ? formatPriceForDisplay(prod.oldPrice) : "";
-            let currentPriceDisplay = prod.currentPrice ? formatPriceForDisplay(prod.currentPrice) : "";
-            return `
-            <div class="product-card" style="cursor:default;">
-                <img class="card-img" src="${prod.imageUrl || 'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'">
-                <div class="card-info">
-                    <div class="card-title">${escapeHtml(prod.title)}</div>
-                    <div class="price-info" style="font-size:0.7rem;">
-                        ${oldPriceDisplay ? `<span class="old-price">R$ ${oldPriceDisplay}</span>` : ''}
-                        ${currentPriceDisplay ? `<span class="current-price" style="font-size:0.8rem;">R$ ${currentPriceDisplay}</span>` : ''}
-                    </div>
-                    <div class="card-desc">${escapeHtml((prod.description || '').substring(0,60))}</div>
-                    <div class="visit-counter"><i class="fas fa-eye"></i> ${prod.visitCount || 0} visitas</div>
-                    <div class="admin-card-buttons">
-                        <button class="admin-card-btn edit" data-id="${prod.id}"><i class="fas fa-edit"></i> Editar</button>
-                        <button class="admin-card-btn delete" data-id="${prod.id}"><i class="fas fa-trash"></i> Excluir</button>
-                    </div>
-                </div>
-            </div>
-        `}).join('');
-        
-        document.querySelectorAll('.admin-card-btn.edit').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const prod = products.find(p => p.id === btn.dataset.id);
-                if (prod) openEditModal(prod);
-            });
-        });
-        document.querySelectorAll('.admin-card-btn.delete').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if (confirm("Excluir produto permanentemente?")) {
-                    await db.collection("products").doc(btn.dataset.id).delete();
-                    await loadAllData();
-                }
-            });
-        });
+        return false;
     }
-
-    function renderAdminLists() {
-        const offersDiv = document.getElementById("adminOffersList");
-        offersDiv.innerHTML = offers.map((off, idx) => `<div class="admin-item">${products.find(p=>p.id===off.productId)?.title || '?'} - ${off.discountText}<div class="admin-item-actions"><button data-idx="${idx}" class="del-offer" style="background:#d44c6e;">🗑️</button></div></div>`).join('');
-        document.querySelectorAll('.del-offer').forEach(btn => btn.addEventListener('click', async () => { const idx = btn.dataset.idx; const offToDel = offers[idx]; if(offToDel.id) await db.collection("offers").doc(offToDel.id).delete(); await loadAllData(); }));
-        const couponsDiv = document.getElementById("adminCouponsList");
-        couponsDiv.innerHTML = coupons.map((c, idx) => `<div class="admin-item">${c.code} - ${c.description}<div class="admin-item-actions"><button data-idx="${idx}" class="del-coupon" style="background:#d44c6e;">🗑️</button></div></div>`).join('');
-        document.querySelectorAll('.del-coupon').forEach(btn => btn.addEventListener('click', async () => { const idx = btn.dataset.idx; const coupDel = coupons[idx]; if(coupDel.id) await db.collection("coupons").doc(coupDel.id).delete(); await loadAllData(); }));
-        const select = document.getElementById("offerSelect");
-        if(select) select.innerHTML = products.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
-        renderAdminProductsGrid();
-        const categorySelect = document.getElementById("prodCategory");
-        if(categorySelect) categorySelect.innerHTML = '<option value="">Selecionar Categoria (opcional)</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    
+    function addToRecent(p) { recentProducts = recentProducts.filter(x=>x.id!==p.id); recentProducts.unshift(p); if(recentProducts.length>10) recentProducts.pop(); localStorage.setItem("recentProducts",JSON.stringify(recentProducts)); renderRecentSection(); }
+    function renderRecentSection() { const s=document.getElementById("recentSection"), g=document.getElementById("recentGrid"); if(recentProducts.length===0){s.style.display="none";return;} s.style.display="block"; g.innerHTML=recentProducts.map(p=>`<div class="recent-card" data-id="${p.id}"><img src="${p.imageUrl||'https://placehold.co/400x250/ca0223/white'}"><div class="title">${escapeHtml(p.title.substring(0,25))}</div></div>`).join(''); document.querySelectorAll('.recent-card').forEach(c=>c.addEventListener('click',()=>{const prod=products.find(p=>p.id===c.dataset.id);if(prod)openModal(prod);})); }
+    function renderFilters() { const c=document.getElementById("filtersContainer"); c.innerHTML=`<div class="filter-chip ${currentFilter===''?'active':''}" data-filter=""><i class="fas fa-th-large"></i><span>Todos</span></div>`+categories.map(cat=>`<div class="filter-chip ${currentFilter===cat.name?'active':''}" data-filter="${cat.name}"><i class="${cat.icon}"></i><span>${cat.name}</span></div>`).join(''); document.querySelectorAll('.filter-chip').forEach(ch=>ch.addEventListener('click',()=>{currentFilter=ch.dataset.filter;renderFilters();renderCliente(document.getElementById("searchInput").value);})); }
+    async function renderCliente(search=""){ try{ let f=products.filter(p=>p.title.toLowerCase().includes(search.toLowerCase())); if(currentFilter) f=f.filter(p=>p.category===currentFilter); f.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)); const g=document.getElementById("produtosGrid"); if(!f.length){g.innerHTML="<div style='grid-column:1/-1;text-align:center;'>Nenhum produto encontrado 💔</div>";return;} g.innerHTML=f.map(p=>{ let disc=null; if(p.oldPrice&&p.currentPrice){let o=parsePriceToNumber(p.oldPrice),c=parsePriceToNumber(p.currentPrice);if(o&&c) disc=Math.round(((o-c)/o)*100);} let oldF=formatPrice(p.oldPrice),curF=formatPrice(p.currentPrice); return `<div class="product-card" data-id="${p.id}">${disc?`<div class="price-badge">-${disc}%</div>`:''}<img class="card-img" src="${p.imageUrl||'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'"><div class="card-info"><div class="card-title">${escapeHtml(p.title)}</div><div class="price-info">${oldF?`<span class="old-price">R$ ${oldF}</span>`:''}${curF?`<span class="current-price">R$ ${curF}</span>`:''}${disc?`<span class="discount-percent">-${disc}%</span>`:''}</div><div class="card-desc">${escapeHtml((p.description||'').substring(0,80))}</div><div class="visit-counter"><i class="fas fa-eye"></i> ${p.visitCount||0}</div><button class="btn-buy" data-link="${p.affiliateLink}"><i class="fas fa-shopping-bag"></i> Comprar</button></div></div>`;}).join('');
+        document.querySelectorAll('.product-card').forEach(c=>{ c.addEventListener('click',async(e)=>{ if(e.target.classList.contains('btn-buy')){ const l=e.target.getAttribute('data-link'); if(l) window.open(l,'_blank'); e.stopPropagation(); return; } const id=c.dataset.id, prod=products.find(p=>p.id===id); if(prod){ const nc=(prod.visitCount||0)+1; await db.collection("products").doc(prod.id).update({visitCount:nc}); prod.visitCount=nc; addToRecent(prod); openModal(prod); renderCliente(document.getElementById("searchInput").value); } }); c.querySelector('.btn-buy')?.addEventListener('click',(e)=>{ e.stopPropagation(); window.open(c.querySelector('.btn-buy').dataset.link,'_blank'); }); });
+        } catch(e){ console.error(e); document.getElementById("produtosGrid").innerHTML="<div style='grid-column:1/-1;text-align:center;color:red;'>Erro ao carregar.</div>"; } }
+    
+    function openModal(prod) { const m=document.getElementById("productModal"); document.getElementById("modalImg").src=prod.imageUrl||logoUrl; document.getElementById("modalTitle").innerText=prod.title; let disc=null; if(prod.oldPrice&&prod.currentPrice){let o=parsePriceToNumber(prod.oldPrice),c=parsePriceToNumber(prod.currentPrice); if(o&&c) disc=Math.round(((o-c)/o)*100);} let oldF=formatPrice(prod.oldPrice),curF=formatPrice(prod.currentPrice); let pHtml=''; if(oldF||curF) pHtml=`<div style="margin:12px 0;">${oldF?`<span style="text-decoration:line-through;color:#888;margin-right:10px;">R$ ${oldF}</span>`:''}${curF?`<span style="font-size:1.3rem;font-weight:bold;color:#ca0223;">R$ ${curF}</span>`:''}${disc?`<span style="background:#10d3dd;padding:2px 10px;border-radius:20px;margin-left:10px;">${disc}% OFF</span>`:''}</div>`; document.getElementById("modalDescFull").innerHTML=`<strong>Descrição:</strong> ${prod.description}<br><br>👀 ${prod.visitCount||0} visu`; document.getElementById("modalPriceInfo").innerHTML=pHtml; document.getElementById("modalBuyLink").href=prod.affiliateLink; const shareUrl=`${window.location.origin}/produto/${prod.id}`; document.getElementById("modalShareBtn").onclick=()=>{ window.open(`https://wa.me/?text=${encodeURIComponent(prod.title} - ${shareUrl}`,'_blank'); }; m.style.display="flex"; updateMetaTags(prod); history.pushState(null,'',`/produto/${prod.id}`); }
+    function closeModal(){ document.getElementById("productModal").style.display="none"; updateMetaTags(null); history.pushState(null,'',window.location.pathname.split('/produto/')[0]||'/'); }
+    
+    function updateDrawerContent(tab){ const c=document.getElementById("drawerContent"); if(tab==="offers"){ let h=`<div style="font-weight:bold;">🔥 Ofertas</div>`; offers.forEach(off=>{ const p=products.find(p=>p.id===off.productId); if(p) h+=`<div style="background:rgba(255,240,245,0.8);border-radius:20px;padding:10px;margin-bottom:10px;display:flex;gap:10px;"><img src="${p.imageUrl}" style="width:55px;height:55px;border-radius:16px;"><div><b>${p.title}</b><br>${off.discountText}<br><button class="offer-buy" data-link="${p.affiliateLink}" style="background:#ca0223;border:none;border-radius:40px;padding:4px 12px;">Comprar</button></div></div>`; }); if(!offers.length) h+="<p>Nenhuma oferta.</p>"; c.innerHTML=h; document.querySelectorAll('.offer-buy').forEach(b=>b.addEventListener('click',()=>window.open(b.dataset.link,'_blank'))); } else if(tab==="coupons"){ let h=`<div style="font-weight:bold;">🎟️ Cupons</div>`; coupons.forEach(cp=>h+=`<div style="background:white;border-radius:16px;padding:10px;margin:8px 0;"><span style="background:#0647b7;color:white;padding:4px 12px;border-radius:50px;">${cp.code}</span><br><small>${cp.description}</small></div>`); if(!coupons.length) h+="<p>Nenhum cupom.</p>"; c.innerHTML=h; } else { c.innerHTML=`<div style="text-align:center;"><p>Siga nossas redes:</p><div style="display:flex; gap:25px; justify-content:center; font-size:2rem;"><a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a><a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a></div></div>`; } }
+    
+    let currentEditId=null;
+    function openEditModal(p){ currentEditId=p.id; document.getElementById("editTitle").value=p.title||""; document.getElementById("editDesc").value=p.description||""; document.getElementById("editImage").value=p.imageUrl||""; document.getElementById("editLink").value=p.affiliateLink||""; document.getElementById("editOldPrice").value=formatPrice(p.oldPrice)||""; document.getElementById("editCurrentPrice").value=formatPrice(p.currentPrice)||""; const catSel=document.getElementById("editCategory"); catSel.innerHTML='<option value="">Selecionar</option>'+categories.map(c=>`<option value="${c.name}" ${p.category===c.name?'selected':''}>${c.name}</option>`).join(''); document.getElementById("editProductModal").style.display="flex"; }
+    async function saveEdit(){ if(!currentEditId) return; const up={ title:document.getElementById("editTitle").value.trim(), description:document.getElementById("editDesc").value.trim(), imageUrl:document.getElementById("editImage").value.trim(), affiliateLink:document.getElementById("editLink").value.trim(), oldPrice:parsePriceToNumber(document.getElementById("editOldPrice").value.trim())||"", currentPrice:parsePriceToNumber(document.getElementById("editCurrentPrice").value.trim())||"", category:document.getElementById("editCategory").value }; if(!up.title){alert("Título obrigatório"); return;} await db.collection("products").doc(currentEditId).update(up); await loadAllData(); closeEditModal(); alert("Produto atualizado!"); }
+    function closeEditModal(){ document.getElementById("editProductModal").style.display="none"; currentEditId=null; }
+    
+    function renderAdminProductsGrid(){ const c=document.getElementById("adminProductsGrid"); if(!c) return; if(!products.length){c.innerHTML="<div>Nenhum produto</div>";return;} c.innerHTML=products.map(p=>`<div class="product-card" style="cursor:default;"><img class="card-img" src="${p.imageUrl||'https://placehold.co/400x250/ca0223/white'}"><div class="card-info"><div class="card-title">${escapeHtml(p.title)}</div><div class="price-info">${formatPrice(p.oldPrice)?`<span class="old-price">R$ ${formatPrice(p.oldPrice)}</span>`:''}${formatPrice(p.currentPrice)?`<span class="current-price">R$ ${formatPrice(p.currentPrice)}</span>`:''}</div><div class="card-desc">${escapeHtml((p.description||'').substring(0,60))}</div><div class="visit-counter"><i class="fas fa-eye"></i> ${p.visitCount||0}</div><div class="admin-card-buttons"><button class="admin-card-btn edit" data-id="${p.id}">✏️ Editar</button><button class="admin-card-btn delete" data-id="${p.id}">🗑️ Excluir</button></div></div></div>`).join(''); document.querySelectorAll('.admin-card-btn.edit').forEach(b=>b.addEventListener('click',()=>{ const prod=products.find(p=>p.id===b.dataset.id); if(prod) openEditModal(prod); })); document.querySelectorAll('.admin-card-btn.delete').forEach(b=>b.addEventListener('click',async()=>{ if(confirm("Excluir?")){ await db.collection("products").doc(b.dataset.id).delete(); await loadAllData(); } })); }
+    
+    function renderAdminLists(){ const offDiv=document.getElementById("adminOffersList"); offDiv.innerHTML=offers.map((off,i)=>`<div class="admin-item">${products.find(p=>p.id===off.productId)?.title||'?'} - ${off.discountText}<button data-idx="${i}" class="del-offer">🗑️</button></div>`).join(''); document.querySelectorAll('.del-offer').forEach(b=>b.addEventListener('click',async()=>{ const off=offers[b.dataset.idx]; if(off.id) await db.collection("offers").doc(off.id).delete(); await loadAllData(); })); const couDiv=document.getElementById("adminCouponsList"); couDiv.innerHTML=coupons.map((c,i)=>`<div class="admin-item">${c.code} - ${c.description}<button data-idx="${i}" class="del-coupon">🗑️</button></div>`).join(''); document.querySelectorAll('.del-coupon').forEach(b=>b.addEventListener('click',async()=>{ const cp=coupons[b.dataset.idx]; if(cp.id) await db.collection("coupons").doc(cp.id).delete(); await loadAllData(); })); const sel=document.getElementById("offerSelect"); if(sel) sel.innerHTML=products.map(p=>`<option value="${p.id}">${p.title}</option>`).join(''); renderAdminProductsGrid(); const catSel=document.getElementById("prodCategory"); if(catSel) catSel.innerHTML='<option value="">Categoria</option>'+categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join(''); }
+    
+    async function autoFetch(link){ const s=document.getElementById("fetchStatus"); s.innerText="🔍 buscando..."; try{ const res=await fetch(`https://api.microlink.io?url=${encodeURIComponent(link)}`); const data=await res.json(); if(data.data){ if(data.data.title) document.getElementById("prodTitle").value=data.data.title; if(data.data.description) document.getElementById("prodDesc").value=data.data.description; if(data.data.image?.url) document.getElementById("prodImage").value=data.data.image.url; const title=document.getElementById("prodTitle").value, desc=document.getElementById("prodDesc").value; for(let cat of categories){ if((title+desc).toLowerCase().includes(cat.keyword)){ const sel=document.getElementById("prodCategory"); for(let i=0;i<sel.options.length;i++) if(sel.options[i].value===cat.name){sel.selectedIndex=i;break;} break;} } s.innerText="✅ Dados obtidos!"; } else s.innerText="⚠️ Falha"; } catch(e){ s.innerText="Erro"; } }
+    
+    async function loadAllData(){ try{ const ps=await db.collection("products").orderBy("createdAt","desc").get(); products=ps.docs.map(d=>({id:d.id,...d.data()})); const os=await db.collection("offers").get(); offers=os.docs.map(d=>({id:d.id,...d.data()})); const cs=await db.collection("coupons").get(); coupons=cs.docs.map(d=>({id:d.id,...d.data()})); const cfg=await db.collection("config").doc("site").get(); if(cfg.exists){ const d=cfg.data(); logoUrl=d.logoUrl||logoUrl; social={instagram:d.instagram||"",whatsapp:d.whatsapp||""}; } else{ await db.collection("config").doc("site").set({logoUrl,instagram:"",whatsapp:""}); } document.getElementById("siteLogo").src=logoUrl; document.getElementById("logoUrlInput").value=logoUrl; document.getElementById("instaInput").value=social.instagram; document.getElementById("whatsInput").value=social.whatsapp; const sh=`<a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a><a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a>`; document.getElementById("socialMiniHeader").innerHTML=sh; document.getElementById("footerSocial").innerHTML=sh; renderFilters(); renderRecentSection(); await renderCliente(document.getElementById("searchInput")?.value||""); renderAdminLists(); updateDrawerContent(document.querySelector(".drawer-tab.active")?.dataset.tab||"offers"); }catch(e){console.error(e); alert("Erro ao carregar dados.");} }
+    
+    async function addProduct(link,title,desc,img,cat,oldP,curP){ await db.collection("products").add({ affiliateLink:link, title, description:desc, imageUrl:img||"https://placehold.co/400x250/ca0223/white", visitCount:0, createdAt:new Date().toISOString(), category:cat||"", oldPrice:parsePriceToNumber(oldP)||"", currentPrice:parsePriceToNumber(curP)||"" }); await loadAllData(); }
+    async function addOffer(pid, disc){ await db.collection("offers").add({ productId:pid, discountText:disc }); await loadAllData(); }
+    async function addCoupon(code, desc){ await db.collection("coupons").add({ code, description:desc }); await loadAllData(); }
+    async function updateConfig(logo, insta, wa){ await db.collection("config").doc("site").set({ logoUrl:logo, instagram:insta, whatsapp:wa }); await loadAllData(); }
+    
+    function initUI(){
+        document.getElementById("btnClienteNav").onclick=()=>{ document.getElementById("clienteView").classList.remove("hidden"); document.getElementById("adminView").classList.add("hidden"); renderCliente(document.getElementById("searchInput").value); updateMetaTags(null); history.pushState(null,'','/'); };
+        document.getElementById("btnAdminNav").onclick=()=>{ if(isAdmin){ document.getElementById("clienteView").classList.add("hidden"); document.getElementById("adminView").classList.remove("hidden"); } else{ document.getElementById("clienteView").classList.add("hidden"); document.getElementById("adminView").classList.remove("hidden"); document.getElementById("adminLoginArea").classList.remove("hidden"); document.getElementById("adminDashboard").classList.add("hidden"); } };
+        document.getElementById("doLogin").onclick=()=>{ const u=document.getElementById("adminUser").value, p=document.getElementById("adminPass").value; if(u==="poli" && p==="ofertas2024"){ isAdmin=true; document.getElementById("adminLoginArea").classList.add("hidden"); document.getElementById("adminDashboard").classList.remove("hidden"); renderAdminLists(); } else alert("Acesso negado"); };
+        document.getElementById("logoutAdmin").onclick=()=>{ isAdmin=false; document.getElementById("adminDashboard").classList.add("hidden"); document.getElementById("adminLoginArea").classList.remove("hidden"); document.getElementById("clienteView").classList.remove("hidden"); document.getElementById("adminView").classList.add("hidden"); renderCliente(document.getElementById("searchInput").value); };
+        document.getElementById("saveProductBtn").onclick=async()=>{ const l=document.getElementById("prodLink").value.trim(), t=document.getElementById("prodTitle").value.trim(), d=document.getElementById("prodDesc").value.trim(), i=document.getElementById("prodImage").value.trim(), c=document.getElementById("prodCategory").value, op=document.getElementById("prodOldPrice").value.trim(), cp=document.getElementById("prodCurrentPrice").value.trim(); if(!l||!t){alert("Preencha link e título"); return;} await addProduct(l,t,d,i,c,op,cp); document.getElementById("prodLink").value=""; document.getElementById("prodTitle").value=""; document.getElementById("prodDesc").value=""; document.getElementById("prodImage").value=""; document.getElementById("prodOldPrice").value=""; document.getElementById("prodCurrentPrice").value=""; alert("Produto adicionado!"); };
+        document.getElementById("addOfferBtn").onclick=async()=>{ const pid=document.getElementById("offerSelect").value, disc=document.getElementById("offerDiscount").value.trim(); if(!disc){alert("Digite o desconto");return;} await addOffer(pid,disc); document.getElementById("offerDiscount").value=""; alert("Oferta adicionada!"); };
+        document.getElementById("addCouponBtn").onclick=async()=>{ const c=document.getElementById("couponCode").value.trim(), d=document.getElementById("couponDesc").value.trim(); if(!c){alert("Digite o código");return;} await addCoupon(c,d); document.getElementById("couponCode").value=""; document.getElementById("couponDesc").value=""; alert("Cupom adicionado!"); };
+        document.getElementById("saveLogoBtn").onclick=async()=>{ const url=document.getElementById("logoUrlInput").value.trim(); if(url) await updateConfig(url,social.instagram,social.whatsapp); else alert("Insira URL"); };
+        document.getElementById("saveSocialBtn").onclick=async()=>{ const i=document.getElementById("instaInput").value.trim(), w=document.getElementById("whatsInput").value.trim(); await updateConfig(logoUrl,i,w); alert("Redes salvas!"); };
+        document.getElementById("autoFetchBtn").onclick=()=>{ const l=document.getElementById("prodLink").value.trim(); if(l) autoFetch(l); else alert("Cole um link"); };
+        document.getElementById("searchInput").addEventListener("input",e=>renderCliente(e.target.value));
+        const drawer=document.getElementById("floatingDrawer"); document.getElementById("fabTrigger").onclick=()=>{ drawer.style.display=drawer.style.display==="flex"?"none":"flex"; if(drawer.style.display==="flex") updateDrawerContent(document.querySelector(".drawer-tab.active")?.dataset.tab); }; document.getElementById("closeDrawer").onclick=()=>drawer.style.display="none";
+        document.querySelectorAll(".drawer-tab").forEach(t=>t.addEventListener("click",()=>{ document.querySelectorAll(".drawer-tab").forEach(tt=>tt.classList.remove("active")); t.classList.add("active"); updateDrawerContent(t.dataset.tab); }));
+        document.getElementById("btnOfertasNav").onclick=()=>{ drawer.style.display="flex"; updateDrawerContent("offers"); };
+        document.getElementById("btnCupomNav").onclick=()=>{ drawer.style.display="flex"; updateDrawerContent("coupons"); };
+        document.getElementById("closeTooltip").onclick=()=>{ document.getElementById("fabTooltip").style.display="none"; localStorage.setItem("fabTooltipClosed","true"); };
+        if(localStorage.getItem("fabTooltipClosed")) document.getElementById("fabTooltip").style.display="none";
+        document.getElementById("closeModalBtn").onclick=closeModal; document.getElementById("modalCloseBtn").onclick=closeModal; window.onclick=(e)=>{ if(e.target===document.getElementById("productModal")) closeModal(); if(e.target===document.getElementById("editProductModal")) closeEditModal(); };
+        document.getElementById("closeEditModalBtn").onclick=closeEditModal; document.getElementById("cancelEditBtn").onclick=closeEditModal; document.getElementById("saveEditBtn").onclick=saveEdit;
+        document.addEventListener('gesturestart', e=>e.preventDefault()); document.addEventListener('touchmove', e=>{ if(e.scale && e.scale!==1) e.preventDefault(); }, {passive:false});
+        const editModalDiv = document.createElement('div'); editModalDiv.id = "editProductModal"; editModalDiv.className = "modal edit-modal"; editModalDiv.innerHTML = `<div class="modal-content"><span style="float:right;font-size:28px;cursor:pointer;" id="closeEditModalBtn">&times;</span><h3>✏️ Editar Produto</h3><input type="text" id="editProdId" style="display:none;"><input id="editTitle" placeholder="Título"><textarea id="editDesc" rows="2" placeholder="Descrição"></textarea><input id="editImage" placeholder="URL da imagem"><input id="editLink" placeholder="Link afiliado"><div style="display:flex;gap:8px;"><input id="editOldPrice" placeholder="Preço original"><input id="editCurrentPrice" placeholder="Preço atual"></div><select id="editCategory"></select><button id="saveEditBtn">Salvar</button><button id="cancelEditBtn" style="background:#aaa;">Cancelar</button></div>`;
+        if(!document.getElementById("editProductModal")) document.body.appendChild(editModalDiv);
+        document.getElementById("closeEditModalBtn").onclick=closeEditModal; document.getElementById("cancelEditBtn").onclick=closeEditModal; document.getElementById("saveEditBtn").onclick=saveEdit;
     }
-
-    async function extractPriceFromUrl(url) {
-        try {
-            const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
-            const data = await res.json();
-            if (data.data) {
-                const html = data.data.html || "";
-                const text = (data.data.title + " " + data.data.description + " " + html).toLowerCase();
-                const priceRegex = /(?:R\$|preço|por|apenas|de:?)\s*([0-9]{1,3}(?:[.:][0-9]{2})?)/i;
-                const match = text.match(priceRegex);
-                if (match) {
-                    let priceStr = match[1].replace('.', '').replace(',', '.');
-                    let numPrice = parseFloat(priceStr);
-                    if (!isNaN(numPrice)) return numPrice.toFixed(2);
-                }
-                const numberRegex = /([0-9]{1,3}[.,][0-9]{2})/g;
-                let numbers = text.match(numberRegex);
-                if (numbers && numbers.length) {
-                    for (let n of numbers) {
-                        let num = parseFloat(n.replace(',', '.'));
-                        if (!isNaN(num) && num > 1 && num < 10000) return num.toFixed(2);
-                    }
-                }
-            }
-            return null;
-        } catch(e) { return null; }
-    }
-
-    async function autoFetch(link) {
-        const statusDiv = document.getElementById("fetchStatus");
-        statusDiv.innerText = "🔍 buscando dados e preço...";
-        try {
-            const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(link)}`);
-            const data = await res.json();
-            if (data.data) {
-                if (data.data.title) document.getElementById("prodTitle").value = data.data.title;
-                if (data.data.description) document.getElementById("prodDesc").value = data.data.description;
-                if (data.data.image?.url) document.getElementById("prodImage").value = data.data.image.url;
-                const title = document.getElementById("prodTitle").value;
-                const desc = document.getElementById("prodDesc").value;
-                const detectedCat = detectCategory(title, desc);
-                if (detectedCat) {
-                    const select = document.getElementById("prodCategory");
-                    for(let i=0; i<select.options.length; i++) {
-                        if(select.options[i].value === detectedCat) { select.selectedIndex = i; break; }
-                    }
-                }
-                const price = await extractPriceFromUrl(link);
-                if (price) {
-                    document.getElementById("prodCurrentPrice").value = price;
-                    statusDiv.innerText = `✅ Dados obtidos! Categoria: ${detectedCat || 'não detectada'} | Preço detectado: R$ ${price}`;
-                } else {
-                    statusDiv.innerText = `✅ Dados obtidos! Categoria: ${detectedCat || 'não detectada'} | Preço não detectado automaticamente`;
-                }
-            } else statusDiv.innerText = "⚠️ Não foi possível extrair";
-        } catch(e) { statusDiv.innerText = "Erro na busca"; }
-    }
-
-    async function loadAllData() {
-        try {
-            const productsSnap = await db.collection("products").orderBy("createdAt", "desc").get();
-            products = productsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-            const offersSnap = await db.collection("offers").get();
-            offers = offersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-            const couponsSnap = await db.collection("coupons").get();
-            coupons = couponsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-            const configDoc = await db.collection("config").doc("site").get();
-            if (configDoc.exists) {
-                const data = configDoc.data();
-                logoUrl = data.logoUrl || logoUrl;
-                social = { instagram: data.instagram || "", whatsapp: data.whatsapp || "" };
-            } else {
-                await db.collection("config").doc("site").set({ logoUrl, instagram: "", whatsapp: "" });
-            }
-            document.getElementById("siteLogo").src = logoUrl;
-            document.getElementById("logoUrlInput").value = logoUrl;
-            document.getElementById("instaInput").value = social.instagram;
-            document.getElementById("whatsInput").value = social.whatsapp;
-            const socialHtml = `<a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a><a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a>`;
-            document.getElementById("socialMiniHeader").innerHTML = socialHtml;
-            document.getElementById("footerSocial").innerHTML = socialHtml;
-            renderFilters();
-            renderRecentSection();
-            await renderCliente(document.getElementById("searchInput")?.value || "");
-            renderAdminLists();
-            updateDrawerContent(document.querySelector(".drawer-tab.active")?.dataset.tab || "offers");
-        } catch(err) { console.error("loadAllData error:", err); alert("Erro ao carregar dados. Verifique console e conexão."); }
-    }
-
-    async function addProduct(link, title, desc, img, category, oldPriceRaw, currentPriceRaw) {
-        let oldPrice = oldPriceRaw ? parsePriceToNumber(oldPriceRaw) : "";
-        let currentPrice = currentPriceRaw ? parsePriceToNumber(currentPriceRaw) : "";
-        await db.collection("products").add({ 
-            affiliateLink: link, title, description: desc, imageUrl: img || "https://placehold.co/400x250/ca0223/white", 
-            visitCount: 0, createdAt: new Date().toISOString(), category: category || "",
-            oldPrice: oldPrice, currentPrice: currentPrice
-        });
-        await loadAllData();
-    }
-    async function addOffer(productId, discount) { await db.collection("offers").add({ productId, discountText: discount }); await loadAllData(); }
-    async function addCoupon(code, desc) { await db.collection("coupons").add({ code, description: desc }); await loadAllData(); }
-    async function updateConfig(logo, insta, wa) { await db.collection("config").doc("site").set({ logoUrl: logo, instagram: insta, whatsapp: wa }); await loadAllData(); }
-
-    function initUI() {
-        document.getElementById("btnClienteNav").onclick = () => { document.getElementById("clienteView").classList.remove("hidden"); document.getElementById("adminView").classList.add("hidden"); renderCliente(document.getElementById("searchInput").value); };
-        document.getElementById("btnAdminNav").onclick = () => { if(isAdmin) { document.getElementById("clienteView").classList.add("hidden"); document.getElementById("adminView").classList.remove("hidden"); } else { document.getElementById("clienteView").classList.add("hidden"); document.getElementById("adminView").classList.remove("hidden"); document.getElementById("adminLoginArea").classList.remove("hidden"); document.getElementById("adminDashboard").classList.add("hidden"); } };
-        document.getElementById("doLogin").onclick = () => { const u = document.getElementById("adminUser").value, p = document.getElementById("adminPass").value; if(u === "poli" && p === "ofertas2024") { isAdmin = true; document.getElementById("adminLoginArea").classList.add("hidden"); document.getElementById("adminDashboard").classList.remove("hidden"); renderAdminLists(); } else alert("Acesso negado"); };
-        document.getElementById("logoutAdmin").onclick = () => { isAdmin = false; document.getElementById("adminDashboard").classList.add("hidden"); document.getElementById("adminLoginArea").classList.remove("hidden"); document.getElementById("clienteView").classList.remove("hidden"); document.getElementById("adminView").classList.add("hidden"); renderCliente(document.getElementById("searchInput").value); };
-        document.getElementById("saveProductBtn").onclick = async () => { 
-            const link = document.getElementById("prodLink").value.trim(), title = document.getElementById("prodTitle").value.trim(), desc = document.getElementById("prodDesc").value.trim(), img = document.getElementById("prodImage").value.trim(), category = document.getElementById("prodCategory").value, oldPrice = document.getElementById("prodOldPrice").value.trim(), currentPrice = document.getElementById("prodCurrentPrice").value.trim();
-            if(!link || !title) { alert("Preencha link e título"); return; } 
-            await addProduct(link, title, desc, img, category, oldPrice, currentPrice); 
-            document.getElementById("prodLink").value = ""; document.getElementById("prodTitle").value = ""; document.getElementById("prodDesc").value = ""; document.getElementById("prodImage").value = ""; document.getElementById("prodCategory").value = ""; document.getElementById("prodOldPrice").value = ""; document.getElementById("prodCurrentPrice").value = "";
-            alert("Produto adicionado!"); 
-        };
-        document.getElementById("addOfferBtn").onclick = async () => { const pid = document.getElementById("offerSelect").value, disc = document.getElementById("offerDiscount").value.trim(); if(!disc) { alert("Digite o desconto"); return; } await addOffer(pid, disc); document.getElementById("offerDiscount").value = ""; alert("Oferta adicionada!"); };
-        document.getElementById("addCouponBtn").onclick = async () => { const code = document.getElementById("couponCode").value.trim(), desc = document.getElementById("couponDesc").value.trim(); if(!code) { alert("Digite o código"); return; } await addCoupon(code, desc); document.getElementById("couponCode").value = ""; document.getElementById("couponDesc").value = ""; alert("Cupom adicionado!"); };
-        document.getElementById("saveLogoBtn").onclick = async () => { const url = document.getElementById("logoUrlInput").value.trim(); if(url) await updateConfig(url, social.instagram, social.whatsapp); else alert("Insira URL"); };
-        document.getElementById("saveSocialBtn").onclick = async () => { const insta = document.getElementById("instaInput").value.trim(), wa = document.getElementById("whatsInput").value.trim(); await updateConfig(logoUrl, insta, wa); alert("Redes sociais salvas!"); };
-        document.getElementById("autoFetchBtn").onclick = () => { const link = document.getElementById("prodLink").value.trim(); if(link) autoFetch(link); else alert("Cole um link"); };
-        document.getElementById("searchInput").addEventListener("input", e => renderCliente(e.target.value));
-
-        const drawer = document.getElementById("floatingDrawer");
-        document.getElementById("fabTrigger").onclick = () => { drawer.style.display = drawer.style.display === "flex" ? "none" : "flex"; if(drawer.style.display === "flex") updateDrawerContent(document.querySelector(".drawer-tab.active")?.dataset.tab); };
-        document.getElementById("closeDrawer").onclick = () => drawer.style.display = "none";
-        document.querySelectorAll(".drawer-tab").forEach(tab => { tab.addEventListener("click", () => { document.querySelectorAll(".drawer-tab").forEach(t => t.classList.remove("active")); tab.classList.add("active"); updateDrawerContent(tab.dataset.tab); }); });
-        document.getElementById("btnOfertasNav").onclick = () => { drawer.style.display = "flex"; updateDrawerContent("offers"); };
-        document.getElementById("btnCupomNav").onclick = () => { drawer.style.display = "flex"; updateDrawerContent("coupons"); };
-        document.getElementById("closeTooltip").onclick = () => { document.getElementById("fabTooltip").style.display = "none"; localStorage.setItem("fabTooltipClosed", "true"); };
-        if(localStorage.getItem("fabTooltipClosed")) document.getElementById("fabTooltip").style.display = "none";
-        document.getElementById("closeModalBtn").onclick = closeModal;
-        document.getElementById("modalCloseBtn").onclick = closeModal;
-        window.onclick = (e) => { if(e.target === document.getElementById("productModal")) closeModal(); if(e.target === document.getElementById("editProductModal")) closeEditModal(); };
-        document.getElementById("closeEditModalBtn").onclick = closeEditModal;
-        document.getElementById("cancelEditBtn").onclick = closeEditModal;
-        document.getElementById("saveEditBtn").onclick = saveEdit;
-        
-        document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
-        document.addEventListener('touchmove', function(e) { if (e.scale && e.scale !== 1) e.preventDefault(); }, { passive: false });
-    }
-
-    loadAllData().then(() => initUI());
+    
+    loadAllData().then(()=>{ initUI(); if(!loadProductFromURL()) updateMetaTags(null); });
 </script>
 </body>
 </html>
