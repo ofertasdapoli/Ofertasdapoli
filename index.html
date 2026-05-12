@@ -50,7 +50,7 @@
         .recent-card { flex: 0 0 auto; width: 120px; background: rgba(255,255,245,0.7); backdrop-filter: blur(12px); border-radius: 18px; padding: 8px; cursor: pointer; transition: 0.2s; text-align: center; }
         .recent-card img { width: 100%; height: 90px; object-fit: cover; border-radius: 12px; margin-bottom: 6px; }
         .recent-card .title { font-size: 0.75rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        /* ALTERAÇÃO: 5 cards por linha no desktop e cards maiores */
+        /* Desktop: 5 cards por linha */
         .products-grid { display: grid; gap: 24px; margin: 20px 0 40px; }
         @media (max-width: 640px) { .products-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
         @media (min-width: 641px) and (max-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
@@ -198,14 +198,14 @@
         }
     }
     
-    // Carregar produto via URL única
+    // CORREÇÃO: Carregar produto via parâmetro ?produto=ID (funciona com subpasta /Ofertasdapoli/)
     async function loadProductFromURL() {
-        const path = window.location.pathname;
-        const match = path.match(/\/produto\/(.+)/);
-        if(match && match[1]) {
-            const productId = match[1];
+        const urlParams = new URLSearchParams(window.location.search);
+        let productId = urlParams.get('produto');
+        
+        if (productId) {
             const doc = await db.collection("products").doc(productId).get();
-            if(doc.exists) {
+            if (doc.exists) {
                 const prod = { id: doc.id, ...doc.data() };
                 document.getElementById("clienteView").classList.remove("hidden");
                 document.getElementById("adminView").classList.add("hidden");
@@ -224,6 +224,7 @@
         document.querySelectorAll('.product-card').forEach(c=>{ c.addEventListener('click',async(e)=>{ if(e.target.classList.contains('btn-buy')){ const l=e.target.getAttribute('data-link'); if(l) window.open(l,'_blank'); e.stopPropagation(); return; } const id=c.dataset.id, prod=products.find(p=>p.id===id); if(prod){ const nc=(prod.visitCount||0)+1; await db.collection("products").doc(prod.id).update({visitCount:nc}); prod.visitCount=nc; addToRecent(prod); openModal(prod); renderCliente(document.getElementById("searchInput").value); } }); c.querySelector('.btn-buy')?.addEventListener('click',(e)=>{ e.stopPropagation(); window.open(c.querySelector('.btn-buy').dataset.link,'_blank'); }); });
         } catch(e){ console.error(e); document.getElementById("produtosGrid").innerHTML="<div style='grid-column:1/-1;text-align:center;color:red;'>Erro ao carregar.</div>"; } }
     
+    // CORREÇÃO: URL de compartilhamento agora aponta para o diretório correto com parâmetro
     function openModal(prod) { 
         const m=document.getElementById("productModal"); 
         document.getElementById("modalImg").src=prod.imageUrl||logoUrl; 
@@ -234,13 +235,14 @@
         document.getElementById("modalDescFull").innerHTML=`<strong>Descrição:</strong> ${prod.description}<br><br>👀 ${prod.visitCount||0} visu`; 
         document.getElementById("modalPriceInfo").innerHTML=pHtml; 
         document.getElementById("modalBuyLink").href=prod.affiliateLink; 
-        const shareUrl=`${window.location.origin}/produto/${prod.id}`; 
+        // CORREÇÃO: Link de compartilhamento com subpasta /Ofertasdapoli/ e parâmetro produto
+        const shareUrl = `${window.location.origin}/Ofertasdapoli/?produto=${prod.id}`;
         document.getElementById("modalShareBtn").onclick=()=>{ window.open(`https://wa.me/?text=${encodeURIComponent(prod.title + " - " + shareUrl)}`,'_blank'); }; 
         m.style.display="flex"; 
         updateMetaTags(prod); 
-        history.pushState(null,'',`/produto/${prod.id}`); 
+        history.pushState(null,'',`/Ofertasdapoli/?produto=${prod.id}`); 
     }
-    function closeModal(){ document.getElementById("productModal").style.display="none"; updateMetaTags(null); history.pushState(null,'',window.location.pathname.split('/produto/')[0]||'/'); }
+    function closeModal(){ document.getElementById("productModal").style.display="none"; updateMetaTags(null); history.pushState(null,'','/Ofertasdapoli/'); }
     
     function updateDrawerContent(tab){ const c=document.getElementById("drawerContent"); if(tab==="offers"){ let h=`<div style="font-weight:bold;">🔥 Ofertas</div>`; offers.forEach(off=>{ const p=products.find(p=>p.id===off.productId); if(p) h+=`<div style="background:rgba(255,240,245,0.8);border-radius:20px;padding:10px;margin-bottom:10px;display:flex;gap:10px;"><img src="${p.imageUrl}" style="width:55px;height:55px;border-radius:16px;"><div><b>${p.title}</b><br>${off.discountText}<br><button class="offer-buy" data-link="${p.affiliateLink}" style="background:#ca0223;border:none;border-radius:40px;padding:4px 12px;">Comprar</button></div></div>`; }); if(!offers.length) h+="<p>Nenhuma oferta.</p>"; c.innerHTML=h; document.querySelectorAll('.offer-buy').forEach(b=>b.addEventListener('click',()=>window.open(b.dataset.link,'_blank'))); } else if(tab==="coupons"){ let h=`<div style="font-weight:bold;">🎟️ Cupons</div>`; coupons.forEach(cp=>h+=`<div style="background:white;border-radius:16px;padding:10px;margin:8px 0;"><span style="background:#0647b7;color:white;padding:4px 12px;border-radius:50px;">${cp.code}</span><br><small>${cp.description}</small></div>`); if(!coupons.length) h+="<p>Nenhum cupom.</p>"; c.innerHTML=h; } else { c.innerHTML=`<div style="text-align:center;"><p>Siga nossas redes:</p><div style="display:flex; gap:25px; justify-content:center; font-size:2rem;"><a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a><a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a></div></div>`; } }
     
@@ -263,7 +265,7 @@
     async function updateConfig(logo, insta, wa){ await db.collection("config").doc("site").set({ logoUrl:logo, instagram:insta, whatsapp:wa }); await loadAllData(); }
     
     function initUI(){
-        document.getElementById("btnClienteNav").onclick=()=>{ document.getElementById("clienteView").classList.remove("hidden"); document.getElementById("adminView").classList.add("hidden"); renderCliente(document.getElementById("searchInput").value); updateMetaTags(null); history.pushState(null,'','/'); };
+        document.getElementById("btnClienteNav").onclick=()=>{ document.getElementById("clienteView").classList.remove("hidden"); document.getElementById("adminView").classList.add("hidden"); renderCliente(document.getElementById("searchInput").value); updateMetaTags(null); history.pushState(null,'','/Ofertasdapoli/'); };
         document.getElementById("btnAdminNav").onclick=()=>{ if(isAdmin){ document.getElementById("clienteView").classList.add("hidden"); document.getElementById("adminView").classList.remove("hidden"); } else{ document.getElementById("clienteView").classList.add("hidden"); document.getElementById("adminView").classList.remove("hidden"); document.getElementById("adminLoginArea").classList.remove("hidden"); document.getElementById("adminDashboard").classList.add("hidden"); } };
         document.getElementById("doLogin").onclick=()=>{ const u=document.getElementById("adminUser").value, p=document.getElementById("adminPass").value; if(u==="poli" && p==="ofertas2024"){ isAdmin=true; document.getElementById("adminLoginArea").classList.add("hidden"); document.getElementById("adminDashboard").classList.remove("hidden"); renderAdminLists(); } else alert("Acesso negado"); };
         document.getElementById("logoutAdmin").onclick=()=>{ isAdmin=false; document.getElementById("adminDashboard").classList.add("hidden"); document.getElementById("adminLoginArea").classList.remove("hidden"); document.getElementById("clienteView").classList.remove("hidden"); document.getElementById("adminView").classList.add("hidden"); renderCliente(document.getElementById("searchInput").value); };
