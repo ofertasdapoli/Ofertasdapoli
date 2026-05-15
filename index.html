@@ -9,7 +9,6 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ca0223">
     <link rel="apple-touch-icon" href="https://i.ibb.co/Fk3bdXRb/logo.png">
-    <!-- Open Graph -->
     <meta property="og:title" content="Dicas da Poli">
     <meta property="og:description" content="As melhores ofertas em moda, eletrônicos e muito mais!">
     <meta property="og:image" content="https://i.ibb.co/Fk3bdXRb/logo.png">
@@ -103,17 +102,11 @@
         <div id="adminLoginArea"><input type="text" id="adminUser" placeholder="Usuário"><input type="password" id="adminPass" placeholder="Senha"><button id="doLogin">Entrar</button></div>
         <div id="adminDashboard" class="hidden">
             <div class="admin-tabs" id="adminTabsContainer"></div>
-            <!-- Aba Informações -->
             <div id="tabInfo" class="tab-pane"><h3>🖼️ Logo & Redes</h3><input type="text" id="logoUrlInput" placeholder="URL da logo"><button id="saveLogoBtn">Salvar Logo</button><h4>📱 Redes Sociais</h4><input id="instaInput" placeholder="Instagram URL"><input id="whatsInput" placeholder="WhatsApp Link"><button id="saveSocialBtn">Salvar</button></div>
-            <!-- Aba Categorias -->
             <div id="tabCategorias" class="tab-pane"><h3>📂 Gerenciar Categorias</h3><button id="novaCategoriaBtn">+ Nova Categoria</button><div id="categoriasList"></div></div>
-            <!-- Aba Adicionar Produto -->
             <div id="tabAddProduto" class="tab-pane"><h3>➕ Adicionar Produto</h3><input id="prodLink" placeholder="Link Afiliado"><button id="autoFetchBtn">🔍 Buscar dados automáticos</button><div id="fetchStatus"></div><input id="prodTitle" placeholder="Título *"><textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea><input id="prodImage" placeholder="URL da imagem"><div style="display:flex;gap:8px;"><input id="prodOldPrice" placeholder="Preço original"><input id="prodCurrentPrice" placeholder="Preço atual"></div><select id="prodCategory"></select><button id="saveProductBtn">Salvar Produto</button></div>
-            <!-- Aba Adicionar Cupons -->
             <div id="tabAddCupom" class="tab-pane"><h3>🎫 Gerenciar Cupons</h3><div id="adminCouponsList"></div><input id="couponCode" placeholder="Código"><input id="couponDesc" placeholder="Descrição"><button id="addCouponBtn">Adicionar Cupom</button></div>
-            <!-- Aba Adicionar Ofertas -->
             <div id="tabAddOferta" class="tab-pane"><h3>⚡ Ofertas Relâmpago</h3><div id="adminOffersList"></div><select id="offerSelect"></select><input id="offerDiscount" placeholder="Ex: 30% OFF"><button id="addOfferBtn">Adicionar Oferta</button></div>
-            <!-- Aba Editar Produtos -->
             <div id="tabEditProduto" class="tab-pane"><h3>📦 Editar / Excluir Produtos</h3><div id="adminProductsGrid" class="admin-products-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;"></div></div>
             <button id="logoutAdmin" style="margin-top:20px;">Sair</button>
         </div>
@@ -134,14 +127,12 @@
     function parsePriceToNumber(p) { if(!p) return null; let n=parseFloat(p.toString().replace(',','.')); return isNaN(n)?null:Math.round(n*100)/100; }
     function formatPrice(v) { if(v===null||v==="") return null; let n=typeof v==='number'?v:parsePriceToNumber(v); return n===null?null:n.toFixed(2).replace('.',','); }
     
-    // Carregar categorias do Firestore e popular as existentes
     async function loadCategories() { const snap = await db.collection("categories").orderBy("name").get(); if(snap.empty) { await seedCategories(); return loadCategories(); } categories = snap.docs.map(d=>({id:d.id, ...d.data()})); renderFilters(); updateCategorySelects(); }
     async function seedCategories() {
         const defaultCats = [
             { name: "Eletrônicos", icon: "fas fa-laptop", keywords: "eletrônico,notebook,pc,computador" }, { name: "Smartphones", icon: "fas fa-mobile-alt", keywords: "smartphone,celular,iphone" }, { name: "Moda e Acessórios", icon: "fas fa-tshirt", keywords: "vestido,bolsa,sapato,moda" }, { name: "Casa e Decoração", icon: "fas fa-home", keywords: "casa,decoração,móvel" }, { name: "Eletrodomésticos", icon: "fas fa-blender", keywords: "geladeira,fogão,lavadora" }, { name: "Saúde e Beleza", icon: "fas fa-heartbeat", keywords: "saúde,beleza,perfume" }
         ];
         const extraIcons = ["fa-house","fa-bed","fa-table","fa-bath","fa-shower","fa-couch","fa-utensils","fa-kitchen-set","fa-rug","fa-lightbulb","fa-seedling","fa-wrench","fa-hammer","fa-box-open","fa-broom","fa-shield-halved","fa-baby","fa-baby-carriage","fa-shirt","fa-cubes","fa-puzzle-piece","fa-gamepad","fa-backpack","fa-bottle-droplet","fa-wind","fa-fire","fa-snowflake","fa-blender","fa-tv","fa-plug","fa-laptop","fa-desktop","fa-mobile-screen-button","fa-tablet-screen-button","fa-headphones","fa-volume-high","fa-camera","fa-computer-mouse","fa-sd-card","fa-stopwatch","fa-coat","fa-shoe-prints","fa-briefcase","fa-gem","fa-glasses","fa-clock","fa-hat-cowboy-side","fa-wand-magic-sparkles","fa-scissors","fa-spray-can-sparkles","fa-prescription-bottle-medical","fa-capsules","fa-tooth","fa-spa","fa-car","fa-motorcycle","fa-gears","fa-circle-dot","fa-screwdriver-wrench","fa-location-dot","fa-radio","fa-basketball","fa-soccer-ball","fa-dumbbell","fa-person-running","fa-bicycle","fa-tent","fa-bottle-water","fa-umbrella-beach","fa-paw","fa-dog","fa-cat","fa-fish","fa-dove","fa-bone","fa-basket-shopping","fa-apple-whole","fa-bacon","fa-bread-slice","fa-wine-glass","fa-beer-mug-empty","fa-mug-hot","fa-cookie-bite","fa-book","fa-pen-to-square","fa-chair","fa-palette","fa-music","fa-industry","fa-hard-hat","fa-tractor","fa-box","fa-stethoscopes","fa-cake-candles","fa-film","fa-ticket","fa-mask"];
-        const nomesBase = ["Casa, Decoração e Utilidades","Bebês, Crianças e Brinquedos","Eletrodomésticos","Tecnologia","Moda, Calçados","Beleza, Saúde","Automotivo","Esportes","Pet Shop","Supermercado","Livraria","Serviços","Entretenimento"];
         for(let i=0; i<defaultCats.length; i++) await db.collection("categories").add(defaultCats[i]);
         for(let i=0; i<extraIcons.length; i++) { if(i<15) await db.collection("categories").add({ name: `Categoria ${i+1}`, icon: `fas ${extraIcons[i]}`, keywords: "" }); }
     }
@@ -153,14 +144,97 @@
     function openModal(prod){ const m=document.getElementById("productModal"); document.getElementById("modalImg").src=prod.imageUrl||logoUrl; document.getElementById("modalTitle").innerText=prod.title; let disc=null, oldF=formatPrice(prod.oldPrice),curF=formatPrice(prod.currentPrice); if(prod.oldPrice&&prod.currentPrice){let o=parsePriceToNumber(prod.oldPrice),c=parsePriceToNumber(prod.currentPrice); if(o&&c) disc=Math.round(((o-c)/o)*100);} let pHtml=''; if(oldF||curF) pHtml=`<div>${oldF?`<span style="text-decoration:line-through;">R$ ${oldF}</span> `:''}<span style="font-size:1.3rem;font-weight:bold;">R$ ${curF}</span>${disc?` <span style="background:#10d3dd;padding:2px 10px;border-radius:20px;">${disc}% OFF</span>`:''}</div>`; document.getElementById("modalDescFull").innerHTML=`<strong>Descrição:</strong> ${prod.description}<br>👀 ${prod.visitCount||0} views`; document.getElementById("modalPriceInfo").innerHTML=pHtml; document.getElementById("modalBuyLink").href=prod.affiliateLink; const shareUrl = `${window.location.origin}/Dicasdapoli/?produto=${prod.id}`; document.getElementById("modalShareBtn").onclick=()=>window.open(`https://wa.me/?text=${encodeURIComponent(prod.title+" - "+shareUrl)}`,'_blank'); m.style.display="flex"; }
     function closeModal(){ document.getElementById("productModal").style.display="none"; }
     
-    // Admin: categorias
     function renderCategoriasAdmin(){ const container=document.getElementById("categoriasList"); if(!container) return; container.innerHTML=categories.map(cat=>`<div class="category-item"><div><i class="${cat.icon}"></i> <strong>${cat.name}</strong><br><small>Palavras: ${cat.keywords||''}</small></div><div><button class="edit-cat btn-small" data-id="${cat.id}">✏️ Editar</button> <button class="del-cat btn-small" data-id="${cat.id}">🗑️ Excluir</button></div></div>`).join(''); document.querySelectorAll('.edit-cat').forEach(btn=>btn.addEventListener('click',()=>openCategoryModal(btn.dataset.id))); document.querySelectorAll('.del-cat').forEach(btn=>btn.addEventListener('click',async()=>{ const id=btn.dataset.id; const hasProducts=products.some(p=>p.category===categories.find(c=>c.id===id)?.name); if(hasProducts){ alert("Existem produtos com essa categoria. Remova ou edite os produtos primeiro."); return; } if(confirm("Excluir categoria?")){ await db.collection("categories").doc(id).delete(); await loadAllData(); } })); }
     function openCategoryModal(catId=null){ const cat=catId?categories.find(c=>c.id===catId):null; document.getElementById("iconSelectModal").style.display="flex"; window.selectedCatId=catId; window.tempCatName=cat?cat.name:""; window.tempCatKeywords=cat?cat.keywords:""; window.tempCatIcon=cat?cat.icon:"fas fa-tag"; }
     async function saveCategory(name, icon, keywords, id=null){ if(!name) return; const data={ name, icon, keywords:keywords||"" }; if(id) await db.collection("categories").doc(id).update(data); else await db.collection("categories").add(data); await loadAllData(); }
     
-    // Ícones
     const iconsList = ["fa-house","fa-bed","fa-table","fa-bath","fa-shower","fa-couch","fa-utensils","fa-kitchen-set","fa-rug","fa-lightbulb","fa-seedling","fa-wrench","fa-hammer","fa-box-open","fa-broom","fa-shield-halved","fa-baby","fa-baby-carriage","fa-shirt","fa-cubes","fa-puzzle-piece","fa-gamepad","fa-backpack","fa-bottle-droplet","fa-wind","fa-fire","fa-snowflake","fa-blender","fa-tv","fa-plug","fa-laptop","fa-desktop","fa-mobile-screen-button","fa-tablet-screen-button","fa-headphones","fa-volume-high","fa-camera","fa-computer-mouse","fa-sd-card","fa-stopwatch","fa-coat","fa-shoe-prints","fa-briefcase","fa-gem","fa-glasses","fa-clock","fa-hat-cowboy-side","fa-wand-magic-sparkles","fa-scissors","fa-spray-can-sparkles","fa-prescription-bottle-medical","fa-capsules","fa-tooth","fa-spa","fa-car","fa-motorcycle","fa-gears","fa-circle-dot","fa-screwdriver-wrench","fa-location-dot","fa-radio","fa-basketball","fa-soccer-ball","fa-dumbbell","fa-person-running","fa-bicycle","fa-tent","fa-bottle-water","fa-umbrella-beach","fa-paw","fa-dog","fa-cat","fa-fish","fa-dove","fa-bone","fa-basket-shopping","fa-apple-whole","fa-bacon","fa-bread-slice","fa-wine-glass","fa-beer-mug-empty","fa-mug-hot","fa-cookie-bite","fa-book","fa-pen-to-square","fa-chair","fa-palette","fa-music","fa-industry","fa-hard-hat","fa-tractor","fa-box","fa-stethoscopes","fa-cake-candles","fa-film","fa-ticket","fa-mask"];
     function renderIconGrid(){ const grid=document.getElementById("iconGrid"); if(!grid) return; grid.innerHTML=iconsList.map(ic=>`<div class="icon-option" data-icon="fas ${ic}"><i class="fas ${ic}"></i><span style="font-size:10px;">${ic.replace('fa-','')}</span></div>`).join(''); document.querySelectorAll('.icon-option').forEach(el=>el.addEventListener('click',async()=>{ const chosen=el.dataset.icon; const name=prompt("Nome da categoria:", window.tempCatName||""); if(name){ const keywords=prompt("Palavras-chave (separadas por vírgula):", window.tempCatKeywords||""); await saveCategory(name, chosen, keywords, window.selectedCatId); } document.getElementById("iconSelectModal").style.display="none"; })); }
+    
+    // ================== AUTO FETCH MELHORADO ==================
+    async function enhancedFetchProductData(url) {
+        const statusDiv = document.getElementById("fetchStatus");
+        statusDiv.innerText = "🔍 Buscando dados (1/2)...";
+        let title = "", description = "", imageUrl = "";
+        
+        // Tentativa 1: microlink.io
+        try {
+            const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
+            const data = await res.json();
+            if (data.data) {
+                title = data.data.title || "";
+                description = data.data.description || "";
+                imageUrl = data.data.image?.url || "";
+            }
+        } catch(e) { console.warn("microlink falhou", e); }
+        
+        // Se faltar imagem ou título, tentar via proxy allorigins para extrair metatags
+        if (!imageUrl || !title || title.length < 5) {
+            statusDiv.innerText = "🔄 Busca avançada (2/2)...";
+            try {
+                const proxyRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+                const proxyData = await proxyRes.json();
+                const html = proxyData.contents;
+                // Extrair título
+                const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i);
+                if (titleMatch && titleMatch[1]) title = titleMatch[1].trim();
+                // Extrair meta tags og:image
+                const ogImageMatch = html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i);
+                if (ogImageMatch && ogImageMatch[1]) imageUrl = ogImageMatch[1];
+                // Se não, twitter:image
+                if (!imageUrl) {
+                    const twImageMatch = html.match(/<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["']/i);
+                    if (twImageMatch && twImageMatch[1]) imageUrl = twImageMatch[1];
+                }
+                // Extrair descrição
+                const descMatch = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
+                if (descMatch && descMatch[1]) description = descMatch[1];
+                const ogDescMatch = html.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i);
+                if (ogDescMatch && ogDescMatch[1]) description = ogDescMatch[1];
+            } catch(e) { console.warn("proxy falhou", e); }
+        }
+        
+        // Limpar título (remover marca do site)
+        if (title) {
+            title = title.replace(/\s*[|–—-]\s*.*$/i, "").trim();
+            title = title.substring(0, 100);
+        }
+        if (description && description.length > 200) description = description.substring(0, 200);
+        
+        // Detecção automática de categoria
+        let detectedCategory = "";
+        const searchText = (title + " " + description).toLowerCase();
+        for (let cat of categories) {
+            if (cat.keywords) {
+                const keywords = cat.keywords.toLowerCase().split(/[ ,]+/);
+                for (let kw of keywords) {
+                    if (kw && searchText.includes(kw)) {
+                        detectedCategory = cat.name;
+                        break;
+                    }
+                }
+            }
+            if (detectedCategory) break;
+        }
+        
+        // Preencher os campos
+        if (title) document.getElementById("prodTitle").value = title;
+        if (description) document.getElementById("prodDesc").value = description;
+        if (imageUrl) document.getElementById("prodImage").value = imageUrl;
+        if (detectedCategory) {
+            const catSelect = document.getElementById("prodCategory");
+            for (let i = 0; i < catSelect.options.length; i++) {
+                if (catSelect.options[i].value === detectedCategory) {
+                    catSelect.selectedIndex = i;
+                    break;
+                }
+            }
+            statusDiv.innerText = `✅ Dados obtidos! Categoria: ${detectedCategory}`;
+        } else {
+            statusDiv.innerText = "✅ Dados obtidos! (categoria não detectada)";
+        }
+        if (!title && !description && !imageUrl) statusDiv.innerText = "⚠️ Não foi possível extrair dados. Preencha manualmente.";
+    }
     
     async function loadAllData(){ 
         const ps=await db.collection("products").get(); products=ps.docs.map(d=>({id:d.id,...d.data()}));
@@ -191,7 +265,7 @@
         document.getElementById("addCouponBtn").onclick=async()=>{ await addCoupon(document.getElementById("couponCode").value,document.getElementById("couponDesc").value); alert("Cupom adicionado!"); };
         document.getElementById("saveLogoBtn").onclick=async()=>{ await updateConfig(document.getElementById("logoUrlInput").value, social.instagram, social.whatsapp); };
         document.getElementById("saveSocialBtn").onclick=async()=>{ await updateConfig(logoUrl, document.getElementById("instaInput").value, document.getElementById("whatsInput").value); };
-        document.getElementById("autoFetchBtn").onclick=async()=>{ const link=document.getElementById("prodLink").value; if(link){ document.getElementById("fetchStatus").innerText="Buscando..."; try{ const res=await fetch(`https://api.microlink.io?url=${encodeURIComponent(link)}`); const data=await res.json(); if(data.data){ if(data.data.title) document.getElementById("prodTitle").value=data.data.title; if(data.data.description) document.getElementById("prodDesc").value=data.data.description; if(data.data.image?.url) document.getElementById("prodImage").value=data.data.image.url; } document.getElementById("fetchStatus").innerText="Concluído"; }catch(e){ document.getElementById("fetchStatus").innerText="Erro"; } } };
+        document.getElementById("autoFetchBtn").onclick=()=>{ const link=document.getElementById("prodLink").value.trim(); if(link) enhancedFetchProductData(link); else alert("Cole um link do produto"); };
         document.getElementById("searchInput").addEventListener("input",e=>renderCliente(e.target.value));
         document.getElementById("closeModalBtn").onclick=closeModal; document.getElementById("closeEditModalBtn").onclick=()=>document.getElementById("editProductModal").style.display="none"; document.getElementById("cancelEditBtn").onclick=()=>document.getElementById("editProductModal").style.display="none"; document.getElementById("saveEditBtn").onclick=saveEdit;
         document.getElementById("novaCategoriaBtn").onclick=()=>openCategoryModal(null);
