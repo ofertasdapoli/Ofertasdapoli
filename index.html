@@ -312,7 +312,7 @@
         
         // Link de compartilhamento correto e curto
         const baseUrl = window.location.origin + window.location.pathname;
-        const shareUrl = `${baseUrl}?produto=${prod.id}`;
+        const shareUrl = `https://dicasdapoli.com.br/compartilhar.php?id=${prod.id}`;
         // Título resumido para evitar URI Too Long
         let shortTitle = prod.title.length > 40 ? prod.title.substring(0,37) + '...' : prod.title;
         const whatsappText = `${shortTitle} - ${shareUrl}`;
