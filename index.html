@@ -105,7 +105,7 @@
             <div class="admin-tabs-container" id="adminTabsContainer"></div>
             <div id="tabInfo" class="tab-pane"><h3>🖼️ Logo & Redes</h3><input type="text" id="logoUrlInput" placeholder="URL da logo"><button id="saveLogoBtn">Salvar Logo</button><h4>📱 Redes Sociais</h4><input id="instaInput" placeholder="Instagram URL"><input id="whatsInput" placeholder="WhatsApp Link"><button id="saveSocialBtn">Salvar</button></div>
             <div id="tabCategorias" class="tab-pane"><h3>📂 Gerenciar Categorias</h3><button id="novaCategoriaBtn">+ Nova Categoria</button><div id="categoriasList"></div></div>
-            <div id="tabAddProduto" class="tab-pane"><h3>➕ Adicionar Produto</h3><input id="prodLink" placeholder="Link Afiliado"><button id="autoFetchBtn">🔍 Buscar dados automáticos</button><div id="fetchStatus" style="font-size:0.8rem; margin:5px 0;"></div><input id="prodTitle" placeholder="Título *"><textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea><input id="prodImage" placeholder="URL da imagem"><div style="display:flex;gap:8px;"><input id="prodOldPrice" placeholder="Preço original"><input id="prodCurrentPrice" placeholder="Preço atual"></div><select id="prodCategory"></select><button id="saveProductBtn">Salvar Produto</button></div>
+            <div id="tabAddProduto" class="tab-pane"><h3>➕ Adicionar Produto</h3><input id="prodLink" placeholder="Link Afiliado (Shopee, Amazon, etc.)"><button id="autoFetchBtn">🔍 Buscar dados automáticos</button><div id="fetchStatus" style="font-size:0.8rem; margin:5px 0; color:#0647b7;"></div><input id="prodTitle" placeholder="Título *"><textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea><input id="prodImage" placeholder="URL da imagem"><div style="display:flex;gap:8px;"><input id="prodOldPrice" placeholder="Preço original"><input id="prodCurrentPrice" placeholder="Preço atual"></div><select id="prodCategory"></select><button id="saveProductBtn">Salvar Produto</button></div>
             <div id="tabAddCupom" class="tab-pane"><h3>🎫 Gerenciar Cupons</h3><div id="adminCouponsList"></div><input id="couponCode" placeholder="Código"><input id="couponDesc" placeholder="Descrição"><button id="addCouponBtn">Adicionar Cupom</button></div>
             <div id="tabAddOferta" class="tab-pane"><h3>⚡ Ofertas Relâmpago</h3><div id="adminOffersList"></div><select id="offerSelect"></select><input id="offerDiscount" placeholder="Ex: 30% OFF"><button id="addOfferBtn">Adicionar Oferta</button></div>
             <div id="tabEditProduto" class="tab-pane"><h3>📦 Editar / Excluir Produtos</h3><div id="adminProductsGrid" class="admin-products-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;"></div></div>
@@ -150,15 +150,29 @@
     const iconsList = ["fa-house","fa-bed","fa-table","fa-bath","fa-shower","fa-couch","fa-utensils","fa-kitchen-set","fa-rug","fa-lightbulb","fa-seedling","fa-wrench","fa-hammer","fa-box-open","fa-broom","fa-shield-halved","fa-baby","fa-baby-carriage","fa-shirt","fa-cubes","fa-puzzle-piece","fa-gamepad","fa-backpack","fa-bottle-droplet","fa-wind","fa-fire","fa-snowflake","fa-blender","fa-tv","fa-plug","fa-laptop","fa-desktop","fa-mobile-screen-button","fa-tablet-screen-button","fa-headphones","fa-volume-high","fa-camera","fa-computer-mouse","fa-sd-card","fa-stopwatch","fa-coat","fa-shoe-prints","fa-briefcase","fa-gem","fa-glasses","fa-clock","fa-hat-cowboy-side","fa-wand-magic-sparkles","fa-scissors","fa-spray-can-sparkles","fa-prescription-bottle-medical","fa-capsules","fa-tooth","fa-spa","fa-car","fa-motorcycle","fa-gears","fa-circle-dot","fa-screwdriver-wrench","fa-location-dot","fa-radio","fa-basketball","fa-soccer-ball","fa-dumbbell","fa-person-running","fa-bicycle","fa-tent","fa-bottle-water","fa-umbrella-beach","fa-paw","fa-dog","fa-cat","fa-fish","fa-dove","fa-bone","fa-basket-shopping","fa-apple-whole","fa-bacon","fa-bread-slice","fa-wine-glass","fa-beer-mug-empty","fa-mug-hot","fa-cookie-bite","fa-book","fa-pen-to-square","fa-chair","fa-palette","fa-music","fa-industry","fa-hard-hat","fa-tractor","fa-box","fa-stethoscopes","fa-cake-candles","fa-film","fa-ticket","fa-mask"];
     function renderIconGrid(){ const grid=document.getElementById("iconGrid"); if(!grid) return; grid.innerHTML=iconsList.map(ic=>`<div class="icon-option" data-icon="fas ${ic}"><i class="fas ${ic}"></i><span style="font-size:10px;">${ic.replace('fa-','')}</span></div>`).join(''); document.querySelectorAll('.icon-option').forEach(el=>el.addEventListener('click',async()=>{ const chosen=el.dataset.icon; const name=prompt("Nome da categoria:", window.tempCatName||""); if(name){ const keywords=prompt("Palavras-chave (separadas por vírgula):", window.tempCatKeywords||""); await saveCategory(name, chosen, keywords, window.selectedCatId); } document.getElementById("iconSelectModal").style.display="none"; })); }
     
-    // ================== BUSCA FORÇADA PARA SHOPEE E AMAZON ==================
+    // ================== BUSCA INTELIGENTE (SUPORTA SHOPEE) ==================
     async function enhancedFetchProductData(url) {
         const statusDiv = document.getElementById("fetchStatus");
-        statusDiv.innerText = "🔍 Buscando dados (1/3) - Microlink...";
+        statusDiv.innerHTML = "🔍 Resolvendo link de afiliado...";
+        let finalUrl = url;
+        
+        // Tenta seguir redirecionamento (importante para links encurtados da Shopee)
+        try {
+            const headRes = await fetch(url, { method: 'HEAD', redirect: 'follow', mode: 'cors' });
+            finalUrl = headRes.url;
+            if (finalUrl !== url) {
+                statusDiv.innerHTML = `🔄 Redirecionado para: ${finalUrl.substring(0, 70)}...`;
+            }
+        } catch(e) {
+            console.warn("Não foi possível seguir redirecionamento, usando URL original", e);
+        }
+        
+        statusDiv.innerHTML = "🔍 Buscando dados... (1/3) Microlink";
         let title = "", description = "", imageUrl = "", oldPrice = "", currentPrice = "";
         
-        // 1. Microlink
+        // 1. Microlink (rápido)
         try {
-            const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
+            const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(finalUrl)}`);
             const data = await res.json();
             if (data.data) {
                 title = data.data.title || "";
@@ -168,11 +182,11 @@
             }
         } catch(e) { console.warn("microlink falhou", e); }
         
-        // 2. Proxy AllOrigins para obter HTML
-        statusDiv.innerText = "🔄 Busca avançada (2/3) - Extraindo HTML...";
+        // 2. Proxy AllOrigins + análise profunda
+        statusDiv.innerHTML = "🔄 Analisando página da Shopee (2/3)...";
         let htmlContent = "";
         try {
-            const proxyRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+            const proxyRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(finalUrl)}`);
             const proxyData = await proxyRes.json();
             htmlContent = proxyData.contents || "";
         } catch(e) { console.warn("allorigins falhou", e); }
@@ -192,7 +206,7 @@
                     if (ogDesc && ogDesc[1]) description = ogDesc[1];
                 }
             }
-            // Imagem (og:image, twitter:image)
+            // Imagem
             if (!imageUrl) {
                 const ogImg = htmlContent.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i);
                 if (ogImg && ogImg[1]) imageUrl = ogImg[1];
@@ -200,21 +214,13 @@
                     const twImg = htmlContent.match(/<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["']/i);
                     if (twImg && twImg[1]) imageUrl = twImg[1];
                 }
+                // Shopee: imagem no json
+                if (!imageUrl) {
+                    const imgMatch = htmlContent.match(/"images"\s*:\s*\[\s*"([^"]+)"/i);
+                    if (imgMatch && imgMatch[1]) imageUrl = imgMatch[1];
+                }
             }
-            // JSON-LD (preços e imagem)
-            const jsonLdMatch = htmlContent.match(/<script type="application\/ld\+json">(.*?)<\/script>/s);
-            if (jsonLdMatch && jsonLdMatch[1]) {
-                try {
-                    const ldJson = JSON.parse(jsonLdMatch[1]);
-                    if (ldJson.image) imageUrl = ldJson.image;
-                    if (ldJson.offers) {
-                        if (ldJson.offers.price) currentPrice = ldJson.offers.price;
-                        if (ldJson.offers.priceSpecification?.price) currentPrice = ldJson.offers.priceSpecification.price;
-                    }
-                    if (ldJson.name && !title) title = ldJson.name;
-                } catch(e) {}
-            }
-            // ESPECÍFICO SHOPEE: __NEXT_DATA__
+            // Extração específica Shopee: __NEXT_DATA__
             const nextDataMatch = htmlContent.match(/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s);
             if (nextDataMatch && nextDataMatch[1]) {
                 try {
@@ -228,7 +234,7 @@
                     }
                 } catch(e) {}
             }
-            // Preços via regex genérico
+            // Preços via regex (fallback)
             if (!currentPrice) {
                 const priceRegex = /"price"\s*:\s*"([\d.,]+)"/i;
                 const priceMatch = htmlContent.match(priceRegex);
@@ -244,7 +250,7 @@
             if (oldMatch && oldMatch[1]) oldPrice = oldMatch[1];
         }
         
-        // Limpeza de título
+        // Limpeza
         if (title) title = title.replace(/\s*[|–—-]\s*.*$/, "").trim().substring(0, 100);
         if (description && description.length > 200) description = description.substring(0, 200);
         
@@ -272,11 +278,11 @@
             for (let i=0; i<catSelect.options.length; i++) {
                 if (catSelect.options[i].value === detectedCategory) { catSelect.selectedIndex = i; break; }
             }
-            statusDiv.innerText = `✅ Sucesso! Imagem: ${imageUrl ? "OK" : "N/A"} | Preço: R$ ${currentPrice || "não encontrado"} | Categoria: ${detectedCategory}`;
+            statusDiv.innerHTML = `✅ Concluído! Imagem: ${imageUrl ? "OK" : "N/A"} | Preço: R$ ${currentPrice || "não encontrado"} | Categoria: ${detectedCategory}`;
         } else {
-            statusDiv.innerText = `✅ Busca concluída. Imagem: ${imageUrl ? "OK" : "falhou"} | Preço atual: ${currentPrice || "não encontrado"}`;
+            statusDiv.innerHTML = `✅ Busca finalizada. Imagem: ${imageUrl ? "OK" : "falhou"} | Preço atual: ${currentPrice || "não encontrado"}<br>💡 Se faltar dados, preencha manualmente.`;
         }
-        if (!title && !description && !imageUrl && !currentPrice) statusDiv.innerText = "⚠️ Falha completa. Preencha manualmente. (Shopee pode bloquear)";
+        if (!title && !description && !imageUrl && !currentPrice) statusDiv.innerHTML = "⚠️ Não foi possível extrair dados automaticamente. Preencha os campos manualmente.";
     }
     
     async function loadAllData(){ 
