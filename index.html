@@ -59,6 +59,7 @@
         .current-price { font-size: 1rem; font-weight: 700; color: #ca0223; }
         .discount-percent { background: #10d3dd; color: white; padding: 2px 8px; border-radius: 15px; font-size: 0.65rem; font-weight: 600; }
         .btn-buy { background: #ca0223; color: white; border: none; padding: 8px 0; border-radius: 40px; font-weight: 600; width: 100%; margin-top: 10px; font-size: 0.7rem; cursor: pointer; }
+        .visit-counter { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: #ca0223; background: rgba(202,2,35,0.1); padding: 3px 8px; border-radius: 20px; width: fit-content; margin-top: 6px; }
         .admin-tabs-container { position: sticky; top: 0; z-index: 50; background: rgba(255,250,245,0.95); backdrop-filter: blur(16px); border-radius: 60px; padding: 8px; margin: -8px 0 16px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .admin-tabs { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: thin; flex-wrap: nowrap; justify-content: flex-start; }
         .admin-tab { background: rgba(202,2,35,0.1); border: none; padding: 10px 20px; border-radius: 40px; font-weight: 600; color: #ca0223; cursor: pointer; white-space: nowrap; transition: 0.2s; }
@@ -72,6 +73,9 @@
         .icon-option i { font-size: 24px; margin-bottom: 5px; }
         .category-item { background: rgba(255,240,245,0.6); border-radius: 20px; padding: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         input, textarea, select, button { border-radius: 60px; border: 1px solid rgba(202,2,35,0.2); padding: 12px 18px; background: rgba(255,250,245,0.9); width: 100%; margin: 8px 0; font-size: 0.9rem; }
+        .file-upload-group { display: flex; gap: 8px; align-items: center; }
+        .file-upload-group input[type="file"] { flex: 1; }
+        .btn-secondary { background: #0647b7; color: white; width: auto; padding: 12px 20px; margin: 0; }
         .btn-small { width: auto; padding: 6px 14px; margin: 0; }
         .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: rgba(255, 248, 245, 0.96); backdrop-filter: blur(35px); border-radius: 48px; max-width: 600px; width: 90%; padding: 24px; text-align: center; max-height: 80vh; overflow-y: auto; }
@@ -105,7 +109,22 @@
             <div class="admin-tabs-container" id="adminTabsContainer"></div>
             <div id="tabInfo" class="tab-pane"><h3>🖼️ Logo & Redes</h3><input type="text" id="logoUrlInput" placeholder="URL da logo"><button id="saveLogoBtn">Salvar Logo</button><h4>📱 Redes Sociais</h4><input id="instaInput" placeholder="Instagram URL"><input id="whatsInput" placeholder="WhatsApp Link"><button id="saveSocialBtn">Salvar</button></div>
             <div id="tabCategorias" class="tab-pane"><h3>📂 Gerenciar Categorias</h3><button id="novaCategoriaBtn">+ Nova Categoria</button><div id="categoriasList"></div></div>
-            <div id="tabAddProduto" class="tab-pane"><h3>➕ Adicionar Produto</h3><input id="prodLink" placeholder="Link Afiliado (Shopee, Amazon, etc.)"><button id="autoFetchBtn">🔍 Buscar dados automáticos</button><div id="fetchStatus" style="font-size:0.8rem; margin:5px 0; color:#0647b7;"></div><input id="prodTitle" placeholder="Título *"><textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea><input id="prodImage" placeholder="URL da imagem"><div style="display:flex;gap:8px;"><input id="prodOldPrice" placeholder="Preço original"><input id="prodCurrentPrice" placeholder="Preço atual"></div><select id="prodCategory"></select><button id="saveProductBtn">Salvar Produto</button></div>
+            <div id="tabAddProduto" class="tab-pane">
+                <h3>➕ Adicionar Produto</h3>
+                <input id="prodLink" placeholder="Link Afiliado (Shopee, Amazon, etc.)">
+                <button id="autoFetchBtn">🔍 Buscar dados automáticos</button>
+                <div id="fetchStatus" style="font-size:0.8rem; margin:5px 0; color:#0647b7;"></div>
+                <input id="prodTitle" placeholder="Título *">
+                <textarea id="prodDesc" rows="2" placeholder="Descrição"></textarea>
+                <div class="file-upload-group">
+                    <input type="file" id="prodImageFile" accept="image/*">
+                    <button id="uploadImageBtn" class="btn-secondary">📤 Enviar imagem</button>
+                </div>
+                <input id="prodImage" placeholder="URL da imagem (ou cole após upload)">
+                <div style="display:flex;gap:8px;"><input id="prodOldPrice" placeholder="Preço original"><input id="prodCurrentPrice" placeholder="Preço atual"></div>
+                <select id="prodCategory"></select>
+                <button id="saveProductBtn">Salvar Produto</button>
+            </div>
             <div id="tabAddCupom" class="tab-pane"><h3>🎫 Gerenciar Cupons</h3><div id="adminCouponsList"></div><input id="couponCode" placeholder="Código"><input id="couponDesc" placeholder="Descrição"><button id="addCouponBtn">Adicionar Cupom</button></div>
             <div id="tabAddOferta" class="tab-pane"><h3>⚡ Ofertas Relâmpago</h3><div id="adminOffersList"></div><select id="offerSelect"></select><input id="offerDiscount" placeholder="Ex: 30% OFF"><button id="addOfferBtn">Adicionar Oferta</button></div>
             <div id="tabEditProduto" class="tab-pane"><h3>📦 Editar / Excluir Produtos</h3><div id="adminProductsGrid" class="admin-products-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;"></div></div>
@@ -119,6 +138,7 @@
 <div id="productModal" class="modal"><div class="modal-content"><span style="float:right;font-size:28px;cursor:pointer;" id="closeModalBtn">&times;</span><img id="modalImg" style="width:100%;border-radius:28px;max-height:250px;object-fit:contain;"><h3 id="modalTitle"></h3><p id="modalDescFull"></p><div id="modalPriceInfo"></div><div style="display:flex;gap:10px;margin-top:15px;"><button id="modalShareBtn" class="share-btn" style="background:#25D366;"><i class="fab fa-whatsapp"></i> Compartilhar</button><a id="modalBuyLink" href="#" target="_blank" style="background:#ca0223;color:white;text-decoration:none;padding:10px;border-radius:60px;flex:1;text-align:center;">Comprar</a></div></div></div>
 <div id="editProductModal" class="modal"><div class="modal-content"><span style="float:right;font-size:28px;cursor:pointer;" id="closeEditModalBtn">&times;</span><h3>✏️ Editar Produto</h3><input type="text" id="editProdId" style="display:none;"><input id="editTitle" placeholder="Título"><textarea id="editDesc" rows="2" placeholder="Descrição"></textarea><input id="editImage" placeholder="URL imagem"><input id="editLink" placeholder="Link"><div style="display:flex;gap:8px;"><input id="editOldPrice" placeholder="Preço antigo"><input id="editCurrentPrice" placeholder="Preço atual"></div><select id="editCategory"></select><button id="saveEditBtn">Salvar</button><button id="cancelEditBtn" style="background:#aaa;">Cancelar</button></div></div>
 <div id="iconSelectModal" class="modal"><div class="modal-content"><h3>Escolha um ícone <i class="fas fa-icons"></i></h3><input type="text" id="iconSearch" placeholder="Buscar ícone..."><div id="iconGrid" class="icon-grid"></div><button id="closeIconModal">Fechar</button></div></div>
+
 <script>
     const firebaseConfig = { apiKey: "AIzaSyDNsPEpaYJ_RfMTXQqPxb3A-wu1sb5UClc", authDomain: "ofertasdapoliana.firebaseapp.com", projectId: "ofertasdapoliana", storageBucket: "ofertasdapoliana.firebasestorage.app", messagingSenderId: "688903682077", appId: "1:688903682077:web:259c751cd41b28529d6ef4" };
     firebase.initializeApp(firebaseConfig);
@@ -127,6 +147,58 @@
     function escapeHtml(s) { return String(s).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
     function parsePriceToNumber(p) { if(!p) return null; let n=parseFloat(p.toString().replace(/[^\d,.-]/g,'').replace(',','.')); return isNaN(n)?null:Math.round(n*100)/100; }
     function formatPrice(v) { if(v===null||v==="") return null; let n=typeof v==='number'?v:parsePriceToNumber(v); return n===null?null:n.toFixed(2).replace('.',','); }
+    
+    // ========== UPLOAD PARA CLOUDINARY ==========
+    async function uploadImageToCloudinary(file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "Dicas da poli"); // Nome exato do preset (com espaço)
+        formData.append("cloud_name", "dgi9mtxxe");
+        
+        try {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/dgi9mtxxe/image/upload`, {
+                method: "POST",
+                body: formData
+            });
+            const data = await response.json();
+            if (data.secure_url) {
+                return data.secure_url;
+            } else {
+                console.error("Erro no upload:", data);
+                return null;
+            }
+        } catch (error) {
+            console.error("Erro ao enviar para Cloudinary:", error);
+            return null;
+        }
+    }
+    
+    // Configurar botão de upload
+    function setupImageUpload() {
+        const fileInput = document.getElementById("prodImageFile");
+        const uploadBtn = document.getElementById("uploadImageBtn");
+        const imageUrlField = document.getElementById("prodImage");
+        
+        uploadBtn.addEventListener("click", async () => {
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Selecione uma imagem primeiro.");
+                return;
+            }
+            const file = fileInput.files[0];
+            uploadBtn.disabled = true;
+            uploadBtn.innerText = "📤 Enviando...";
+            const url = await uploadImageToCloudinary(file);
+            if (url) {
+                imageUrlField.value = url;
+                alert("Imagem enviada com sucesso! URL preenchida.");
+            } else {
+                alert("Falha no upload. Verifique o preset e cloud name.");
+            }
+            uploadBtn.disabled = false;
+            uploadBtn.innerText = "📤 Enviar imagem";
+            fileInput.value = ""; // limpa o input
+        });
+    }
     
     async function loadCategories() { const snap = await db.collection("categories").orderBy("name").get(); if(snap.empty) { await seedCategories(); return loadCategories(); } categories = snap.docs.map(d=>({id:d.id, ...d.data()})); renderFilters(); updateCategorySelects(); }
     async function seedCategories() {
@@ -137,10 +209,10 @@
     }
     function renderFilters() { const container=document.getElementById("filtersContainer"); if(!container) return; container.innerHTML=`<div class="filter-chip ${currentFilter===''?'active':''}" data-filter=""><i class="fas fa-th-large"></i><span>Todos</span></div>`+categories.map(cat=>`<div class="filter-chip ${currentFilter===cat.name?'active':''}" data-filter="${cat.name}"><i class="${cat.icon}"></i><span>${cat.name}</span></div>`).join(''); document.querySelectorAll('.filter-chip').forEach(ch=>ch.addEventListener('click',()=>{ currentFilter=ch.dataset.filter; renderFilters(); renderCliente(document.getElementById("searchInput").value); })); }
     function updateCategorySelects() { const selects = ["prodCategory","editCategory"]; selects.forEach(selId=>{ const sel=document.getElementById(selId); if(sel) sel.innerHTML='<option value="">Selecione</option>'+categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join(''); }); }
-    async function renderCliente(search=""){ let filtered=products.filter(p=>p.title.toLowerCase().includes(search.toLowerCase())); if(currentFilter) filtered=filtered.filter(p=>p.category===currentFilter); filtered.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)); const grid=document.getElementById("produtosGrid"); if(!filtered.length){grid.innerHTML="<div style='grid-column:1/-1;text-align:center;'>Nenhum produto encontrado 💔</div>";return;} grid.innerHTML=filtered.map(p=>{ let disc=null; if(p.oldPrice&&p.currentPrice){let o=parsePriceToNumber(p.oldPrice),c=parsePriceToNumber(p.currentPrice);if(o&&c) disc=Math.round(((o-c)/o)*100);} let oldF=formatPrice(p.oldPrice),curF=formatPrice(p.currentPrice); return `<div class="product-card" data-id="${p.id}">${disc?`<div class="price-badge">-${disc}%</div>`:''}<img class="card-img" src="${p.imageUrl||'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'"><div class="card-info"><div class="card-title">${escapeHtml(p.title)}</div><div class="price-info">${oldF?`<span class="old-price">R$ ${oldF}</span>`:''}${curF?`<span class="current-price">R$ ${curF}</span>`:''}${disc?`<span class="discount-percent">-${disc}%</span>`:''}</div><div class="card-desc">${escapeHtml((p.description||'').substring(0,80))}</div><button class="btn-buy" data-link="${p.affiliateLink}"><i class="fas fa-shopping-bag"></i> Comprar</button></div></div>`;}).join('');
-        document.querySelectorAll('.product-card').forEach(c=>{ c.addEventListener('click',async(e)=>{ if(e.target.classList.contains('btn-buy')){ window.open(e.target.getAttribute('data-link'),'_blank'); e.stopPropagation(); return; } const id=c.dataset.id, prod=products.find(p=>p.id===id); if(prod){ await db.collection("products").doc(prod.id).update({visitCount:(prod.visitCount||0)+1}); prod.visitCount=(prod.visitCount||0)+1; openModal(prod); renderCliente(document.getElementById("searchInput").value); } }); c.querySelector('.btn-buy')?.addEventListener('click',(e)=>{ e.stopPropagation(); window.open(c.querySelector('.btn-buy').dataset.link,'_blank'); }); });
+    async function renderCliente(search=""){ let filtered=products.filter(p=>p.title.toLowerCase().includes(search.toLowerCase())); if(currentFilter) filtered=filtered.filter(p=>p.category===currentFilter); filtered.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)); const grid=document.getElementById("produtosGrid"); if(!filtered.length){grid.innerHTML="<div style='grid-column:1/-1;text-align:center;'>Nenhum produto encontrado 💔</div>";return;} grid.innerHTML=filtered.map(p=>{ let disc=null; if(p.oldPrice&&p.currentPrice){let o=parsePriceToNumber(p.oldPrice),c=parsePriceToNumber(p.currentPrice);if(o&&c) disc=Math.round(((o-c)/o)*100);} let oldF=formatPrice(p.oldPrice),curF=formatPrice(p.currentPrice); return `<div class="product-card" data-id="${p.id}">${disc?`<div class="price-badge">-${disc}%</div>`:''}<img class="card-img" src="${p.imageUrl||'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'"><div class="card-info"><div class="card-title">${escapeHtml(p.title)}</div><div class="price-info">${oldF?`<span class="old-price">R$ ${oldF}</span>`:''}${curF?`<span class="current-price">R$ ${curF}</span>`:''}${disc?`<span class="discount-percent">-${disc}%</span>`:''}</div><div class="card-desc">${escapeHtml((p.description||'').substring(0,80))}</div><div class="visit-counter"><i class="fas fa-eye"></i> ${p.visitCount || 0} visualizações</div><button class="btn-buy" data-link="${p.affiliateLink}"><i class="fas fa-shopping-bag"></i> Comprar</button></div></div>`;}).join('');
+        document.querySelectorAll('.product-card').forEach(c=>{ c.addEventListener('click',async(e)=>{ if(e.target.classList.contains('btn-buy')){ window.open(e.target.getAttribute('data-link'),'_blank'); e.stopPropagation(); return; } const id=c.dataset.id, prod=products.find(p=>p.id===id); if(prod){ const newCount = (prod.visitCount||0)+1; await db.collection("products").doc(prod.id).update({visitCount:newCount}); prod.visitCount=newCount; openModal(prod); renderCliente(document.getElementById("searchInput").value); } }); c.querySelector('.btn-buy')?.addEventListener('click',(e)=>{ e.stopPropagation(); window.open(c.querySelector('.btn-buy').dataset.link,'_blank'); }); });
     }
-    function openModal(prod){ const m=document.getElementById("productModal"); document.getElementById("modalImg").src=prod.imageUrl||logoUrl; document.getElementById("modalTitle").innerText=prod.title; let disc=null, oldF=formatPrice(prod.oldPrice),curF=formatPrice(prod.currentPrice); if(prod.oldPrice&&prod.currentPrice){let o=parsePriceToNumber(prod.oldPrice),c=parsePriceToNumber(prod.currentPrice); if(o&&c) disc=Math.round(((o-c)/o)*100);} let pHtml=''; if(oldF||curF) pHtml=`<div>${oldF?`<span style="text-decoration:line-through;">R$ ${oldF}</span> `:''}<span style="font-size:1.3rem;font-weight:bold;">R$ ${curF}</span>${disc?` <span style="background:#10d3dd;padding:2px 10px;border-radius:20px;">${disc}% OFF</span>`:''}</div>`; document.getElementById("modalDescFull").innerHTML=`<strong>Descrição:</strong> ${prod.description}<br>👀 ${prod.visitCount||0} views`; document.getElementById("modalPriceInfo").innerHTML=pHtml; document.getElementById("modalBuyLink").href=prod.affiliateLink; const shareUrl = `${window.location.origin}/Dicasdapoli/?produto=${prod.id}`; document.getElementById("modalShareBtn").onclick=()=>window.open(`https://wa.me/?text=${encodeURIComponent(prod.title+" - "+shareUrl)}`,'_blank'); m.style.display="flex"; }
+    function openModal(prod){ const m=document.getElementById("productModal"); document.getElementById("modalImg").src=prod.imageUrl||logoUrl; document.getElementById("modalTitle").innerText=prod.title; let disc=null, oldF=formatPrice(prod.oldPrice),curF=formatPrice(prod.currentPrice); if(prod.oldPrice&&prod.currentPrice){let o=parsePriceToNumber(prod.oldPrice),c=parsePriceToNumber(prod.currentPrice); if(o&&c) disc=Math.round(((o-c)/o)*100);} let pHtml=''; if(oldF||curF) pHtml=`<div>${oldF?`<span style="text-decoration:line-through;">R$ ${oldF}</span> `:''}<span style="font-size:1.3rem;font-weight:bold;">R$ ${curF}</span>${disc?` <span style="background:#10d3dd;padding:2px 10px;border-radius:20px;">${disc}% OFF</span>`:''}</div>`; document.getElementById("modalDescFull").innerHTML=`<strong>Descrição:</strong> ${prod.description}<br><div class="visit-counter" style="margin-top:8px;"><i class="fas fa-eye"></i> ${prod.visitCount||0} visualizações</div>`; document.getElementById("modalPriceInfo").innerHTML=pHtml; document.getElementById("modalBuyLink").href=prod.affiliateLink; const shareUrl = `${window.location.origin}/Dicasdapoli/?produto=${prod.id}`; document.getElementById("modalShareBtn").onclick=()=>window.open(`https://wa.me/?text=${encodeURIComponent(prod.title+" - "+shareUrl)}`,'_blank'); m.style.display="flex"; }
     function closeModal(){ document.getElementById("productModal").style.display="none"; }
     
     function renderCategoriasAdmin(){ const container=document.getElementById("categoriasList"); if(!container) return; container.innerHTML=categories.map(cat=>`<div class="category-item"><div><i class="${cat.icon}"></i> <strong>${cat.name}</strong><br><small>Palavras: ${cat.keywords||''}</small></div><div><button class="edit-cat btn-small" data-id="${cat.id}">✏️ Editar</button> <button class="del-cat btn-small" data-id="${cat.id}">🗑️ Excluir</button></div></div>`).join(''); document.querySelectorAll('.edit-cat').forEach(btn=>btn.addEventListener('click',()=>openCategoryModal(btn.dataset.id))); document.querySelectorAll('.del-cat').forEach(btn=>btn.addEventListener('click',async()=>{ const id=btn.dataset.id; const hasProducts=products.some(p=>p.category===categories.find(c=>c.id===id)?.name); if(hasProducts){ alert("Existem produtos com essa categoria. Remova ou edite os produtos primeiro."); return; } if(confirm("Excluir categoria?")){ await db.collection("categories").doc(id).delete(); await loadAllData(); } })); }
@@ -150,27 +222,18 @@
     const iconsList = ["fa-house","fa-bed","fa-table","fa-bath","fa-shower","fa-couch","fa-utensils","fa-kitchen-set","fa-rug","fa-lightbulb","fa-seedling","fa-wrench","fa-hammer","fa-box-open","fa-broom","fa-shield-halved","fa-baby","fa-baby-carriage","fa-shirt","fa-cubes","fa-puzzle-piece","fa-gamepad","fa-backpack","fa-bottle-droplet","fa-wind","fa-fire","fa-snowflake","fa-blender","fa-tv","fa-plug","fa-laptop","fa-desktop","fa-mobile-screen-button","fa-tablet-screen-button","fa-headphones","fa-volume-high","fa-camera","fa-computer-mouse","fa-sd-card","fa-stopwatch","fa-coat","fa-shoe-prints","fa-briefcase","fa-gem","fa-glasses","fa-clock","fa-hat-cowboy-side","fa-wand-magic-sparkles","fa-scissors","fa-spray-can-sparkles","fa-prescription-bottle-medical","fa-capsules","fa-tooth","fa-spa","fa-car","fa-motorcycle","fa-gears","fa-circle-dot","fa-screwdriver-wrench","fa-location-dot","fa-radio","fa-basketball","fa-soccer-ball","fa-dumbbell","fa-person-running","fa-bicycle","fa-tent","fa-bottle-water","fa-umbrella-beach","fa-paw","fa-dog","fa-cat","fa-fish","fa-dove","fa-bone","fa-basket-shopping","fa-apple-whole","fa-bacon","fa-bread-slice","fa-wine-glass","fa-beer-mug-empty","fa-mug-hot","fa-cookie-bite","fa-book","fa-pen-to-square","fa-chair","fa-palette","fa-music","fa-industry","fa-hard-hat","fa-tractor","fa-box","fa-stethoscopes","fa-cake-candles","fa-film","fa-ticket","fa-mask"];
     function renderIconGrid(){ const grid=document.getElementById("iconGrid"); if(!grid) return; grid.innerHTML=iconsList.map(ic=>`<div class="icon-option" data-icon="fas ${ic}"><i class="fas ${ic}"></i><span style="font-size:10px;">${ic.replace('fa-','')}</span></div>`).join(''); document.querySelectorAll('.icon-option').forEach(el=>el.addEventListener('click',async()=>{ const chosen=el.dataset.icon; const name=prompt("Nome da categoria:", window.tempCatName||""); if(name){ const keywords=prompt("Palavras-chave (separadas por vírgula):", window.tempCatKeywords||""); await saveCategory(name, chosen, keywords, window.selectedCatId); } document.getElementById("iconSelectModal").style.display="none"; })); }
     
-    // ================== BUSCA INTELIGENTE (SUPORTA SHOPEE) ==================
+    // ================== BUSCA INTELIGENTE (mantida) ==================
     async function enhancedFetchProductData(url) {
         const statusDiv = document.getElementById("fetchStatus");
         statusDiv.innerHTML = "🔍 Resolvendo link de afiliado...";
         let finalUrl = url;
-        
-        // Tenta seguir redirecionamento (importante para links encurtados da Shopee)
         try {
             const headRes = await fetch(url, { method: 'HEAD', redirect: 'follow', mode: 'cors' });
             finalUrl = headRes.url;
-            if (finalUrl !== url) {
-                statusDiv.innerHTML = `🔄 Redirecionado para: ${finalUrl.substring(0, 70)}...`;
-            }
-        } catch(e) {
-            console.warn("Não foi possível seguir redirecionamento, usando URL original", e);
-        }
-        
+            if (finalUrl !== url) statusDiv.innerHTML = `🔄 Redirecionado para: ${finalUrl.substring(0, 70)}...`;
+        } catch(e) { console.warn(e); }
         statusDiv.innerHTML = "🔍 Buscando dados... (1/3) Microlink";
         let title = "", description = "", imageUrl = "", oldPrice = "", currentPrice = "";
-        
-        // 1. Microlink (rápido)
         try {
             const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(finalUrl)}`);
             const data = await res.json();
@@ -181,93 +244,42 @@
                 if (data.data.price?.amount) currentPrice = data.data.price.amount;
             }
         } catch(e) { console.warn("microlink falhou", e); }
-        
-        // 2. Proxy AllOrigins + análise profunda
-        statusDiv.innerHTML = "🔄 Analisando página da Shopee (2/3)...";
+        statusDiv.innerHTML = "🔄 Analisando página (2/3)...";
         let htmlContent = "";
         try {
             const proxyRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(finalUrl)}`);
             const proxyData = await proxyRes.json();
             htmlContent = proxyData.contents || "";
         } catch(e) { console.warn("allorigins falhou", e); }
-        
         if (htmlContent) {
-            // Título
-            if (!title) {
-                const titleMatch = htmlContent.match(/<title[^>]*>([^<]*)<\/title>/i);
-                if (titleMatch && titleMatch[1]) title = titleMatch[1].trim();
-            }
-            // Descrição
-            if (!description) {
-                const descMatch = htmlContent.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
-                if (descMatch && descMatch[1]) description = descMatch[1];
-                else {
-                    const ogDesc = htmlContent.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i);
-                    if (ogDesc && ogDesc[1]) description = ogDesc[1];
-                }
-            }
-            // Imagem
-            if (!imageUrl) {
-                const ogImg = htmlContent.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i);
-                if (ogImg && ogImg[1]) imageUrl = ogImg[1];
-                if (!imageUrl) {
-                    const twImg = htmlContent.match(/<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["']/i);
-                    if (twImg && twImg[1]) imageUrl = twImg[1];
-                }
-                // Shopee: imagem no json
-                if (!imageUrl) {
-                    const imgMatch = htmlContent.match(/"images"\s*:\s*\[\s*"([^"]+)"/i);
-                    if (imgMatch && imgMatch[1]) imageUrl = imgMatch[1];
-                }
-            }
-            // Extração específica Shopee: __NEXT_DATA__
-            const nextDataMatch = htmlContent.match(/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s);
-            if (nextDataMatch && nextDataMatch[1]) {
+            if (!title) { const tm = htmlContent.match(/<title[^>]*>([^<]*)<\/title>/i); if(tm && tm[1]) title = tm[1].trim(); }
+            if (!description) { const dm = htmlContent.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i); if(dm && dm[1]) description = dm[1]; else { const od = htmlContent.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i); if(od && od[1]) description = od[1]; } }
+            if (!imageUrl) { const og = htmlContent.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i); if(og && og[1]) imageUrl = og[1]; else { const tw = htmlContent.match(/<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["']/i); if(tw && tw[1]) imageUrl = tw[1]; } }
+            const nextData = htmlContent.match(/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s);
+            if (nextData && nextData[1]) {
                 try {
-                    const nextData = JSON.parse(nextDataMatch[1]);
-                    const product = nextData?.props?.pageProps?.initialState?.product;
-                    if (product) {
-                        if (product.product_info?.image_list?.[0]) imageUrl = product.product_info.image_list[0];
-                        if (product.product_info?.price_min) currentPrice = (product.product_info.price_min / 100000).toString();
-                        if (product.product_info?.price_max) currentPrice = (product.product_info.price_max / 100000).toString();
-                        if (product.product_info?.name && !title) title = product.product_info.name;
+                    const data = JSON.parse(nextData[1]);
+                    const prod = data?.props?.pageProps?.initialState?.product;
+                    if (prod) {
+                        if (prod.product_info?.image_list?.[0]) imageUrl = prod.product_info.image_list[0];
+                        if (prod.product_info?.price_min) currentPrice = (prod.product_info.price_min / 100000).toString();
+                        if (prod.product_info?.name && !title) title = prod.product_info.name;
                     }
                 } catch(e) {}
             }
-            // Preços via regex (fallback)
-            if (!currentPrice) {
-                const priceRegex = /"price"\s*:\s*"([\d.,]+)"/i;
-                const priceMatch = htmlContent.match(priceRegex);
-                if (priceMatch && priceMatch[1]) currentPrice = priceMatch[1].replace(/[^\d.,]/g,'').replace(',','.');
-                if (!currentPrice) {
-                    const priceSpan = htmlContent.match(/R\$\s*([\d.,]+)/);
-                    if (priceSpan && priceSpan[1]) currentPrice = priceSpan[1].replace(/\./g,'').replace(',','.');
-                }
-            }
-            // Preço antigo
-            const oldPriceRegex = /"original_price"\s*:\s*([\d.]+)/i;
-            const oldMatch = htmlContent.match(oldPriceRegex);
-            if (oldMatch && oldMatch[1]) oldPrice = oldMatch[1];
+            if (!currentPrice) { const pm = htmlContent.match(/"price"\s*:\s*"([\d.,]+)"/i); if(pm && pm[1]) currentPrice = pm[1].replace(/[^\d.,]/g,'').replace(',','.'); else { const ps = htmlContent.match(/R\$\s*([\d.,]+)/); if(ps && ps[1]) currentPrice = ps[1].replace(/\./g,'').replace(',','.'); } }
+            const oldM = htmlContent.match(/"original_price"\s*:\s*([\d.]+)/i); if(oldM && oldM[1]) oldPrice = oldM[1];
         }
-        
-        // Limpeza
         if (title) title = title.replace(/\s*[|–—-]\s*.*$/, "").trim().substring(0, 100);
         if (description && description.length > 200) description = description.substring(0, 200);
-        
-        // Detecção de categoria
         let detectedCategory = "";
         const searchText = (title + " " + description).toLowerCase();
         for (let cat of categories) {
             if (cat.keywords) {
                 const keywords = cat.keywords.toLowerCase().split(/[ ,]+/);
-                for (let kw of keywords) {
-                    if (kw && searchText.includes(kw)) { detectedCategory = cat.name; break; }
-                }
-            }
-            if (detectedCategory) break;
+                for (let kw of keywords) if (kw && searchText.includes(kw)) { detectedCategory = cat.name; break; }
+            } if (detectedCategory) break;
         }
-        
-        // Preencher campos
         if (title) document.getElementById("prodTitle").value = title;
         if (description) document.getElementById("prodDesc").value = description;
         if (imageUrl) document.getElementById("prodImage").value = imageUrl;
@@ -275,14 +287,9 @@
         if (oldPrice) document.getElementById("prodOldPrice").value = oldPrice;
         if (detectedCategory) {
             const catSelect = document.getElementById("prodCategory");
-            for (let i=0; i<catSelect.options.length; i++) {
-                if (catSelect.options[i].value === detectedCategory) { catSelect.selectedIndex = i; break; }
-            }
+            for (let i=0; i<catSelect.options.length; i++) if (catSelect.options[i].value === detectedCategory) { catSelect.selectedIndex = i; break; }
             statusDiv.innerHTML = `✅ Concluído! Imagem: ${imageUrl ? "OK" : "N/A"} | Preço: R$ ${currentPrice || "não encontrado"} | Categoria: ${detectedCategory}`;
-        } else {
-            statusDiv.innerHTML = `✅ Busca finalizada. Imagem: ${imageUrl ? "OK" : "falhou"} | Preço atual: ${currentPrice || "não encontrado"}<br>💡 Se faltar dados, preencha manualmente.`;
-        }
-        if (!title && !description && !imageUrl && !currentPrice) statusDiv.innerHTML = "⚠️ Não foi possível extrair dados automaticamente. Preencha os campos manualmente.";
+        } else statusDiv.innerHTML = `✅ Busca finalizada. Imagem: ${imageUrl ? "OK" : "falhou"} | Preço atual: ${currentPrice || "não encontrado"}<br>💡 Se faltar dados, preencha manualmente.`;
     }
     
     async function loadAllData(){ 
@@ -294,7 +301,7 @@
         const sh=`<a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i></a><a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i></a>`; document.getElementById("socialMiniHeader").innerHTML=sh; document.getElementById("footerSocial").innerHTML=sh;
         await loadCategories(); renderCategoriasAdmin(); renderAdminLists(); renderCliente(document.getElementById("searchInput")?.value||""); updateDrawerContent("offers");
     }
-    function renderAdminLists(){ const offDiv=document.getElementById("adminOffersList"); if(offDiv) offDiv.innerHTML=offers.map((off,i)=>`<div>${products.find(p=>p.id===off.productId)?.title||'?'} - ${off.discountText}<button data-idx="${i}" class="del-offer">🗑️</button></div>`).join(''); document.querySelectorAll('.del-offer').forEach(b=>b.addEventListener('click',async()=>{ const off=offers[b.dataset.idx]; if(off.id) await db.collection("offers").doc(off.id).delete(); await loadAllData(); })); const couDiv=document.getElementById("adminCouponsList"); if(couDiv) couDiv.innerHTML=coupons.map((c,i)=>`<div>${c.code} - ${c.description}<button data-idx="${i}" class="del-coupon">🗑️</button></div>`).join(''); document.querySelectorAll('.del-coupon').forEach(b=>b.addEventListener('click',async()=>{ const cp=coupons[b.dataset.idx]; if(cp.id) await db.collection("coupons").doc(cp.id).delete(); await loadAllData(); })); const sel=document.getElementById("offerSelect"); if(sel) sel.innerHTML=products.map(p=>`<option value="${p.id}">${p.title}</option>`).join(''); const adminGrid=document.getElementById("adminProductsGrid"); if(adminGrid) adminGrid.innerHTML=products.map(p=>`<div class="product-card" style="cursor:default;"><img class="card-img" src="${p.imageUrl||'https://placehold.co/400x250/ca0223/white'}"><div class="card-info"><div class="card-title">${escapeHtml(p.title)}</div><div class="price-info">${formatPrice(p.currentPrice)?`R$ ${formatPrice(p.currentPrice)}`:''}</div><div class="admin-card-buttons" style="display:flex;gap:6px;margin-top:8px;"><button class="edit-prod-btn" data-id="${p.id}">✏️</button><button class="del-prod-btn" data-id="${p.id}">🗑️</button></div></div></div>`).join(''); document.querySelectorAll('.edit-prod-btn').forEach(b=>b.addEventListener('click',()=>{ const prod=products.find(p=>p.id===b.dataset.id); openEditModal(prod); })); document.querySelectorAll('.del-prod-btn').forEach(b=>b.addEventListener('click',async()=>{ if(confirm("Excluir produto?")){ await db.collection("products").doc(b.dataset.id).delete(); await loadAllData(); } }));
+    function renderAdminLists(){ const offDiv=document.getElementById("adminOffersList"); if(offDiv) offDiv.innerHTML=offers.map((off,i)=>`<div>${products.find(p=>p.id===off.productId)?.title||'?'} - ${off.discountText}<button data-idx="${i}" class="del-offer">🗑️</button></div>`).join(''); document.querySelectorAll('.del-offer').forEach(b=>b.addEventListener('click',async()=>{ const off=offers[b.dataset.idx]; if(off.id) await db.collection("offers").doc(off.id).delete(); await loadAllData(); })); const couDiv=document.getElementById("adminCouponsList"); if(couDiv) couDiv.innerHTML=coupons.map((c,i)=>`<div>${c.code} - ${c.description}<button data-idx="${i}" class="del-coupon">🗑️</button></div>`).join(''); document.querySelectorAll('.del-coupon').forEach(b=>b.addEventListener('click',async()=>{ const cp=coupons[b.dataset.idx]; if(cp.id) await db.collection("coupons").doc(cp.id).delete(); await loadAllData(); })); const sel=document.getElementById("offerSelect"); if(sel) sel.innerHTML=products.map(p=>`<option value="${p.id}">${p.title}</option>`).join(''); const adminGrid=document.getElementById("adminProductsGrid"); if(adminGrid) adminGrid.innerHTML=products.map(p=>`<div class="product-card" style="cursor:default;"><img class="card-img" src="${p.imageUrl||'https://placehold.co/400x250/ca0223/white'}"><div class="card-info"><div class="card-title">${escapeHtml(p.title)}</div><div class="price-info">${formatPrice(p.currentPrice)?`R$ ${formatPrice(p.currentPrice)}`:''}</div><div class="visit-counter"><i class="fas fa-eye"></i> ${p.visitCount||0}</div><div class="admin-card-buttons" style="display:flex;gap:6px;margin-top:8px;"><button class="edit-prod-btn" data-id="${p.id}">✏️</button><button class="del-prod-btn" data-id="${p.id}">🗑️</button></div></div></div>`).join(''); document.querySelectorAll('.edit-prod-btn').forEach(b=>b.addEventListener('click',()=>{ const prod=products.find(p=>p.id===b.dataset.id); openEditModal(prod); })); document.querySelectorAll('.del-prod-btn').forEach(b=>b.addEventListener('click',async()=>{ if(confirm("Excluir produto?")){ await db.collection("products").doc(b.dataset.id).delete(); await loadAllData(); } }));
     }
     async function addProduct(l,t,d,i,c,op,cp){ await db.collection("products").add({ affiliateLink:l, title:t, description:d, imageUrl:i||"https://placehold.co/400x250/ca0223/white", visitCount:0, createdAt:new Date().toISOString(), category:c, oldPrice:parsePriceToNumber(op)||"", currentPrice:parsePriceToNumber(cp)||"" }); await loadAllData(); }
     async function addOffer(pid,disc){ await db.collection("offers").add({ productId:pid, discountText:disc }); await loadAllData(); }
@@ -322,6 +329,7 @@
         renderIconGrid(); document.getElementById("iconSearch").addEventListener("input",e=>{ const term=e.target.value.toLowerCase(); const items=document.querySelectorAll('.icon-option'); items.forEach(it=>{ const name=it.querySelector('span')?.innerText.toLowerCase(); it.style.display=name.includes(term)?"flex":"none"; }); });
         const drawer=document.getElementById("floatingDrawer"); document.getElementById("fabTrigger").onclick=()=>{ drawer.style.display=drawer.style.display==="flex"?"none":"flex"; if(drawer.style.display==="flex") updateDrawerContent(document.querySelector(".drawer-tab.active")?.dataset.tab); }; document.getElementById("closeDrawer").onclick=()=>drawer.style.display="none"; document.querySelectorAll(".drawer-tab").forEach(t=>t.addEventListener("click",()=>{ document.querySelectorAll(".drawer-tab").forEach(tt=>tt.classList.remove("active")); t.classList.add("active"); updateDrawerContent(t.dataset.tab); }));
         document.getElementById("btnOfertasNav").onclick=()=>{ drawer.style.display="flex"; updateDrawerContent("offers"); }; document.getElementById("btnCupomNav").onclick=()=>{ drawer.style.display="flex"; updateDrawerContent("coupons"); };
+        setupImageUpload(); // ativar upload
     }
     function setupAdminTabs(){ const tabs=["Info","Categorias","AddProduto","AddCupom","AddOferta","EditProduto"]; const container=document.getElementById("adminTabsContainer"); container.innerHTML=`<div class="admin-tabs">`+tabs.map(t=>`<button class="admin-tab" data-tab="${t}">${t==="Info"?"Informações":t==="Categorias"?"Categorias":t==="AddProduto"?"Adicionar Produto":t==="AddCupom"?"Cupons":t==="AddOferta"?"Ofertas":"Editar Produtos"}</button>`).join('')+`</div>`; document.querySelectorAll('.admin-tab').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active')); document.getElementById(`tab${btn.dataset.tab}`).classList.add('active'); }); }); document.querySelector('.admin-tab').click(); }
     loadAllData().then(()=>initUI());
