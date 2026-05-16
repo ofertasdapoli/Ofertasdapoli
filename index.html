@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -58,7 +59,6 @@
         .current-price { font-size: 1rem; font-weight: 700; color: #ca0223; }
         .discount-percent { background: #10d3dd; color: white; padding: 2px 8px; border-radius: 15px; font-size: 0.65rem; font-weight: 600; }
         .btn-buy { background: #ca0223; color: white; border: none; padding: 8px 0; border-radius: 40px; font-weight: 600; width: 100%; margin-top: 10px; font-size: 0.7rem; cursor: pointer; }
-        /* Abas Admin fixas */
         .admin-tabs-container { position: sticky; top: 0; z-index: 50; background: rgba(255,250,245,0.95); backdrop-filter: blur(16px); border-radius: 60px; padding: 8px; margin: -8px 0 16px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .admin-tabs { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: thin; flex-wrap: nowrap; justify-content: flex-start; }
         .admin-tab { background: rgba(202,2,35,0.1); border: none; padding: 10px 20px; border-radius: 40px; font-weight: 600; color: #ca0223; cursor: pointer; white-space: nowrap; transition: 0.2s; }
@@ -150,22 +150,13 @@
     const iconsList = ["fa-house","fa-bed","fa-table","fa-bath","fa-shower","fa-couch","fa-utensils","fa-kitchen-set","fa-rug","fa-lightbulb","fa-seedling","fa-wrench","fa-hammer","fa-box-open","fa-broom","fa-shield-halved","fa-baby","fa-baby-carriage","fa-shirt","fa-cubes","fa-puzzle-piece","fa-gamepad","fa-backpack","fa-bottle-droplet","fa-wind","fa-fire","fa-snowflake","fa-blender","fa-tv","fa-plug","fa-laptop","fa-desktop","fa-mobile-screen-button","fa-tablet-screen-button","fa-headphones","fa-volume-high","fa-camera","fa-computer-mouse","fa-sd-card","fa-stopwatch","fa-coat","fa-shoe-prints","fa-briefcase","fa-gem","fa-glasses","fa-clock","fa-hat-cowboy-side","fa-wand-magic-sparkles","fa-scissors","fa-spray-can-sparkles","fa-prescription-bottle-medical","fa-capsules","fa-tooth","fa-spa","fa-car","fa-motorcycle","fa-gears","fa-circle-dot","fa-screwdriver-wrench","fa-location-dot","fa-radio","fa-basketball","fa-soccer-ball","fa-dumbbell","fa-person-running","fa-bicycle","fa-tent","fa-bottle-water","fa-umbrella-beach","fa-paw","fa-dog","fa-cat","fa-fish","fa-dove","fa-bone","fa-basket-shopping","fa-apple-whole","fa-bacon","fa-bread-slice","fa-wine-glass","fa-beer-mug-empty","fa-mug-hot","fa-cookie-bite","fa-book","fa-pen-to-square","fa-chair","fa-palette","fa-music","fa-industry","fa-hard-hat","fa-tractor","fa-box","fa-stethoscopes","fa-cake-candles","fa-film","fa-ticket","fa-mask"];
     function renderIconGrid(){ const grid=document.getElementById("iconGrid"); if(!grid) return; grid.innerHTML=iconsList.map(ic=>`<div class="icon-option" data-icon="fas ${ic}"><i class="fas ${ic}"></i><span style="font-size:10px;">${ic.replace('fa-','')}</span></div>`).join(''); document.querySelectorAll('.icon-option').forEach(el=>el.addEventListener('click',async()=>{ const chosen=el.dataset.icon; const name=prompt("Nome da categoria:", window.tempCatName||""); if(name){ const keywords=prompt("Palavras-chave (separadas por vírgula):", window.tempCatKeywords||""); await saveCategory(name, chosen, keywords, window.selectedCatId); } document.getElementById("iconSelectModal").style.display="none"; })); }
     
-    // ================== BUSCA FORÇADA COM PREÇOS E IMAGENS ==================
+    // ================== BUSCA FORÇADA PARA SHOPEE E AMAZON ==================
     async function enhancedFetchProductData(url) {
         const statusDiv = document.getElementById("fetchStatus");
         statusDiv.innerText = "🔍 Buscando dados (1/3) - Microlink...";
         let title = "", description = "", imageUrl = "", oldPrice = "", currentPrice = "";
         
-        // Tenta extrair preço e imagem de forma agressiva
-        async function fetchViaProxy(proxyUrl) {
-            try {
-                const res = await fetch(proxyUrl + encodeURIComponent(url));
-                const data = await res.json();
-                return data.contents || "";
-            } catch(e) { return ""; }
-        }
-        
-        // 1. Microlink (preferencial)
+        // 1. Microlink
         try {
             const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
             const data = await res.json();
@@ -173,57 +164,84 @@
                 title = data.data.title || "";
                 description = data.data.description || "";
                 imageUrl = data.data.image?.url || "";
-                // Microlink às vezes traz preço no `price`
-                if (data.data.price && data.data.price.amount) currentPrice = data.data.price.amount;
+                if (data.data.price?.amount) currentPrice = data.data.price.amount;
             }
         } catch(e) { console.warn("microlink falhou", e); }
         
-        // 2. Proxy allorigins + regex para Shopee/Amazon
+        // 2. Proxy AllOrigins para obter HTML
+        statusDiv.innerText = "🔄 Busca avançada (2/3) - Extraindo HTML...";
         let htmlContent = "";
-        if (!imageUrl || !currentPrice || !title) {
-            statusDiv.innerText = "🔄 Busca avançada (2/3) - AllOrigins...";
-            htmlContent = await fetchViaProxy("https://api.allorigins.win/get?url=");
-            if (!htmlContent) htmlContent = await fetchViaProxy("https://cors-anywhere.herokuapp.com/");
-            if (htmlContent) {
-                // Extrair título
+        try {
+            const proxyRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+            const proxyData = await proxyRes.json();
+            htmlContent = proxyData.contents || "";
+        } catch(e) { console.warn("allorigins falhou", e); }
+        
+        if (htmlContent) {
+            // Título
+            if (!title) {
                 const titleMatch = htmlContent.match(/<title[^>]*>([^<]*)<\/title>/i);
-                if (titleMatch && titleMatch[1] && !title) title = titleMatch[1].trim();
-                // Extrair imagem: og:image, twitter:image, ou json+ld
+                if (titleMatch && titleMatch[1]) title = titleMatch[1].trim();
+            }
+            // Descrição
+            if (!description) {
+                const descMatch = htmlContent.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
+                if (descMatch && descMatch[1]) description = descMatch[1];
+                else {
+                    const ogDesc = htmlContent.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i);
+                    if (ogDesc && ogDesc[1]) description = ogDesc[1];
+                }
+            }
+            // Imagem (og:image, twitter:image)
+            if (!imageUrl) {
                 const ogImg = htmlContent.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i);
                 if (ogImg && ogImg[1]) imageUrl = ogImg[1];
                 if (!imageUrl) {
                     const twImg = htmlContent.match(/<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["']/i);
                     if (twImg && twImg[1]) imageUrl = twImg[1];
                 }
-                // Descrição
-                const desc = htmlContent.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
-                if (desc && desc[1] && !description) description = desc[1];
-                // PREÇOS: padrões comuns
-                // Shopee: "product_price" ou "price"
-                let priceMatch = htmlContent.match(/"price"\s*:\s*"([\d.,]+)"/i);
-                if (!priceMatch) priceMatch = htmlContent.match(/"product_price"\s*:\s*([\d.]+)/i);
-                if (!priceMatch) priceMatch = htmlContent.match(/"currentPrice"\s*:\s*([\d.]+)/i);
-                if (!priceMatch) priceMatch = htmlContent.match(/"amount"\s*:\s*([\d.]+)/i);
+            }
+            // JSON-LD (preços e imagem)
+            const jsonLdMatch = htmlContent.match(/<script type="application\/ld\+json">(.*?)<\/script>/s);
+            if (jsonLdMatch && jsonLdMatch[1]) {
+                try {
+                    const ldJson = JSON.parse(jsonLdMatch[1]);
+                    if (ldJson.image) imageUrl = ldJson.image;
+                    if (ldJson.offers) {
+                        if (ldJson.offers.price) currentPrice = ldJson.offers.price;
+                        if (ldJson.offers.priceSpecification?.price) currentPrice = ldJson.offers.priceSpecification.price;
+                    }
+                    if (ldJson.name && !title) title = ldJson.name;
+                } catch(e) {}
+            }
+            // ESPECÍFICO SHOPEE: __NEXT_DATA__
+            const nextDataMatch = htmlContent.match(/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/s);
+            if (nextDataMatch && nextDataMatch[1]) {
+                try {
+                    const nextData = JSON.parse(nextDataMatch[1]);
+                    const product = nextData?.props?.pageProps?.initialState?.product;
+                    if (product) {
+                        if (product.product_info?.image_list?.[0]) imageUrl = product.product_info.image_list[0];
+                        if (product.product_info?.price_min) currentPrice = (product.product_info.price_min / 100000).toString();
+                        if (product.product_info?.price_max) currentPrice = (product.product_info.price_max / 100000).toString();
+                        if (product.product_info?.name && !title) title = product.product_info.name;
+                    }
+                } catch(e) {}
+            }
+            // Preços via regex genérico
+            if (!currentPrice) {
+                const priceRegex = /"price"\s*:\s*"([\d.,]+)"/i;
+                const priceMatch = htmlContent.match(priceRegex);
                 if (priceMatch && priceMatch[1]) currentPrice = priceMatch[1].replace(/[^\d.,]/g,'').replace(',','.');
-                // Amazon: "priceToDisplay" ou "price"
                 if (!currentPrice) {
-                    const amzPrice = htmlContent.match(/"price":\s*["']?([\d.,]+)["']?/i);
-                    if (amzPrice && amzPrice[1]) currentPrice = amzPrice[1];
+                    const priceSpan = htmlContent.match(/R\$\s*([\d.,]+)/);
+                    if (priceSpan && priceSpan[1]) currentPrice = priceSpan[1].replace(/\./g,'').replace(',','.');
                 }
-                // Preço antigo: "original_price" ou "listPrice"
-                let oldMatch = htmlContent.match(/"original_price"\s*:\s*([\d.]+)/i);
-                if (!oldMatch) oldMatch = htmlContent.match(/"listPrice"\s*:\s*([\d.]+)/i);
-                if (oldMatch && oldMatch[1]) oldPrice = oldMatch[1];
             }
-        }
-        
-        // 3. Fallback: tenta extrair preço de elementos comuns (através de regex mais abrangente)
-        if (!currentPrice && htmlContent) {
-            const patterns = [/R\$\s*([\d.,]+)/, /₹\s*([\d.,]+)/, /([\d.,]+)\s*USD/, /"price_display":"R\$([\d.,]+)/];
-            for (let pat of patterns) {
-                const m = htmlContent.match(pat);
-                if (m && m[1]) { currentPrice = m[1].replace(/\./g, '').replace(',', '.'); break; }
-            }
+            // Preço antigo
+            const oldPriceRegex = /"original_price"\s*:\s*([\d.]+)/i;
+            const oldMatch = htmlContent.match(oldPriceRegex);
+            if (oldMatch && oldMatch[1]) oldPrice = oldMatch[1];
         }
         
         // Limpeza de título
@@ -254,11 +272,11 @@
             for (let i=0; i<catSelect.options.length; i++) {
                 if (catSelect.options[i].value === detectedCategory) { catSelect.selectedIndex = i; break; }
             }
-            statusDiv.innerText = `✅ Dados completos! Imagem: ${imageUrl ? "OK" : "N/A"} | Preço: R$ ${currentPrice || "não encontrado"} | Categoria: ${detectedCategory}`;
+            statusDiv.innerText = `✅ Sucesso! Imagem: ${imageUrl ? "OK" : "N/A"} | Preço: R$ ${currentPrice || "não encontrado"} | Categoria: ${detectedCategory}`;
         } else {
             statusDiv.innerText = `✅ Busca concluída. Imagem: ${imageUrl ? "OK" : "falhou"} | Preço atual: ${currentPrice || "não encontrado"}`;
         }
-        if (!title && !description && !imageUrl && !currentPrice) statusDiv.innerText = "⚠️ Falha completa. Preencha manualmente.";
+        if (!title && !description && !imageUrl && !currentPrice) statusDiv.innerText = "⚠️ Falha completa. Preencha manualmente. (Shopee pode bloquear)";
     }
     
     async function loadAllData(){ 
