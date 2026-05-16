@@ -9,10 +9,10 @@
     
     <!-- Meta tags padrão (serão sobrescritas dinamicamente quando necessário) -->
     <title id="pageTitle">Dicas da Poli | Seu guia de compras online</title>
-    <link id="appleTouchIcon" rel="apple-touch-icon" href="https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg">
+    <link id="appleTouchIcon" rel="apple-touch-icon" href="https://i.ibb.co/Fk3bdXRb/logo.png">
     <meta property="og:title" content="Dicas da Poli | Seu guia de compras online">
     <meta property="og:description" content="As melhores ofertas em moda, eletrônicos e muito mais!">
-    <meta property="og:image" content="https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg">
+    <meta property="og:image" content="https://i.ibb.co/Fk3bdXRb/logo.png">
     <meta property="og:url" content="">
     <meta property="og:type" content="website">
     <meta name="description" content="As melhores ofertas em moda, eletrônicos e muito mais!">
@@ -41,7 +41,12 @@
         .search-box { display: flex; align-items: center; gap: 8px; padding: 8px 20px; margin: 10px 0 8px; background: rgba(255,255,245,0.75); backdrop-filter: blur(16px); border-radius: 60px; }
         .search-box i { font-size: 1rem; color: #ca0223; }
         .search-box input { flex: 1; background: transparent; border: none; padding: 10px 0; font-size: 0.9rem; outline: none; }
-        .news-badge { display: inline-block; background: linear-gradient(95deg, #10d3dd, #0647b7); padding: 5px 20px; border-radius: 60px; color: white; font-weight: 600; font-size: 0.75rem; margin-bottom: 12px; }
+        .section-badge { display: inline-block; background: linear-gradient(95deg, #10d3dd, #0647b7); padding: 5px 20px; border-radius: 60px; color: white; font-weight: 600; font-size: 0.75rem; margin-bottom: 12px; }
+        .section-title { font-size: 1.2rem; font-weight: 700; margin: 20px 0 10px 0; display: flex; align-items: center; gap: 8px; }
+        .section-title i { color: #ca0223; font-size: 1.3rem; }
+        .scrollable-row { overflow-x: auto; overflow-y: hidden; white-space: nowrap; scrollbar-width: thin; -webkit-overflow-scrolling: touch; margin-bottom: 30px; padding-bottom: 10px; }
+        .scrollable-row .products-row { display: inline-flex; gap: 16px; padding: 4px 2px; }
+        .scrollable-row .product-card { display: inline-block; width: 220px; white-space: normal; vertical-align: top; margin: 0; }
         .filters-section { margin: 12px 0 16px; overflow-x: auto; white-space: nowrap; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
         .filters-container { display: inline-flex; gap: 12px; padding: 4px 2px; }
         .filter-chip { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; background: rgba(255,255,245,0.7); backdrop-filter: blur(12px); border-radius: 60px; padding: 8px 18px; cursor: pointer; transition: 0.2s; border: 1px solid rgba(202,2,35,0.15); }
@@ -50,9 +55,9 @@
         .filter-chip.active { background: #ca0223; border-color: #ca0223; }
         .filter-chip.active i, .filter-chip.active span { color: white; }
         .products-grid { display: grid; gap: 24px; margin: 20px 0 40px; }
-        @media (max-width: 640px) { .products-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
-        @media (min-width: 641px) and (max-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
-        @media (min-width: 1025px) { .products-grid { grid-template-columns: repeat(5, 1fr); gap: 24px; } }
+        @media (max-width: 640px) { .products-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; } .scrollable-row .product-card { width: 160px; } }
+        @media (min-width: 641px) and (max-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } .scrollable-row .product-card { width: 200px; } }
+        @media (min-width: 1025px) { .products-grid { grid-template-columns: repeat(5, 1fr); gap: 24px; } .scrollable-row .product-card { width: 220px; } }
         .product-card { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(18px); border-radius: 28px; overflow: hidden; transition: 0.25s ease; cursor: pointer; border: 1px solid rgba(255,255,240,0.7); position: relative; }
         .product-card:hover { transform: translateY(-6px); background: rgba(255,255,250,0.92); box-shadow: 0 20px 32px -12px rgba(202,2,35,0.25); }
         .card-img { width: 100%; height: 200px; object-fit: cover; background: #faf0f3; transition: transform 0.3s; }
@@ -90,6 +95,8 @@
         .fab-trigger { position: fixed; bottom: 24px; right: 24px; background: #ca0223; width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(202,2,35,0.4); cursor: pointer; color: white; font-size: 26px; z-index: 150; }
         @media (max-width: 640px) { .card-img { height: 150px; } .admin-tab { padding: 6px 12px; font-size: 0.75rem; } }
         .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; color: #ca0223; transition: opacity 0.3s; }
+        .flash-icon { animation: flash 0.8s ease-in-out; }
+        @keyframes flash { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; transform: scale(1.05); } }
     </style>
 </head>
 <body>
@@ -98,7 +105,7 @@
 <div class="header">
     <div class="container">
         <div class="top-bar">
-            <div class="logo-area"><img id="siteLogo" class="logo-img" src="https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg" alt="Logo"><span class="site-title">Dicas da Poli</span></div>
+            <div class="logo-area"><img id="siteLogo" class="logo-img" src="https://i.ibb.co/Fk3bdXRb/logo.png" alt="Logo"><span class="site-title">Dicas da Poli</span></div>
             <div class="social-mini-header" id="socialMiniHeader"></div>
         </div>
         <div class="nav-links"><button class="nav-btn special" id="btnClienteNav">Cliente</button><button class="nav-btn" id="btnOfertasNav">Ofertas</button><button class="nav-btn" id="btnCupomNav">Cupom</button><button class="nav-btn" id="btnAdminNav">Admin</button></div>
@@ -108,8 +115,18 @@
     <div id="clienteView" style="display: none;">
         <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Buscar produtos..."></div>
         <div class="filters-section"><div class="filters-container" id="filtersContainer"></div></div>
-        <div class="news-badge"><i class="fas fa-gem"></i> NOVIDADES + OFERTAS RELÂMPAGO</div>
-        <div id="produtosGrid" class="products-grid"></div>
+        
+        <!-- Seção de Ofertas Relâmpago (linha deslizável) -->
+        <div id="ofertasRelampagoSection" style="margin-bottom: 30px;">
+            <div class="section-title"><i class="fas fa-bolt" style="color: #ca0223;"></i> <span>⚡ OFERTAS RELÂMPAGO</span></div>
+            <div id="ofertasScrollable" class="scrollable-row"></div>
+        </div>
+        
+        <!-- Seção de Novidades (grid normal) -->
+        <div id="novidadesSection">
+            <div class="section-title"><i class="fas fa-gem"></i> <span>✨ NOVIDADES</span></div>
+            <div id="produtosGrid" class="products-grid"></div>
+        </div>
     </div>
     <div id="adminView" class="hidden">
         <div id="adminLoginArea"><input type="text" id="adminUser" placeholder="Usuário"><input type="password" id="adminPass" placeholder="Senha"><button id="doLogin">Entrar</button></div>
@@ -155,6 +172,7 @@
                 <input id="prodImage" placeholder="URL da imagem (ou cole após upload)">
                 <div style="display:flex;gap:8px;"><input id="prodOldPrice" placeholder="Preço original"><input id="prodCurrentPrice" placeholder="Preço atual"></div>
                 <select id="prodCategory"></select>
+                <label><input type="checkbox" id="isOfertaRelampago"> Marcar como Oferta Relâmpago</label>
                 <button id="saveProductBtn">Salvar Produto</button>
             </div>
             <div id="tabAddCupom" class="tab-pane"><h3>🎫 Gerenciar Cupons</h3><div id="adminCouponsList"></div><input id="couponCode" placeholder="Código"><input id="couponDesc" placeholder="Descrição"><button id="addCouponBtn">Adicionar Cupom</button></div>
@@ -168,20 +186,20 @@
 <div id="floatingDrawer" class="floating-drawer"><div class="drawer-header"><span>⚡ Ofertas & Cupons</span><span id="closeDrawer" style="cursor:pointer;">✕</span></div><div class="drawer-tabs"><div class="drawer-tab active" data-tab="offers">Ofertas</div><div class="drawer-tab" data-tab="coupons">Cupons</div><div class="drawer-tab" data-tab="social">Redes</div></div><div class="drawer-content" id="drawerContent"></div></div>
 <div class="fab-trigger" id="fabTrigger"><i class="fas fa-tag"></i></div>
 <div id="productModal" class="modal"><div class="modal-content"><span style="float:right;font-size:28px;cursor:pointer;" id="closeModalBtn">&times;</span><img id="modalImg" style="width:100%;border-radius:28px;max-height:250px;object-fit:contain;"><h3 id="modalTitle"></h3><p id="modalDescFull"></p><div id="modalPriceInfo"></div><div style="display:flex;gap:10px;margin-top:15px;"><button id="modalShareBtn" class="share-btn" style="background:#25D366;"><i class="fab fa-whatsapp"></i> Compartilhar</button><a id="modalBuyLink" href="#" target="_blank" style="background:#ca0223;color:white;text-decoration:none;padding:10px;border-radius:60px;flex:1;text-align:center;">Comprar</a></div></div></div>
-<div id="editProductModal" class="modal"><div class="modal-content"><span style="float:right;font-size:28px;cursor:pointer;" id="closeEditModalBtn">&times;</span><h3>✏️ Editar Produto</h3><input type="text" id="editProdId" style="display:none;"><input id="editTitle" placeholder="Título"><textarea id="editDesc" rows="2" placeholder="Descrição"></textarea><div class="file-upload-group"><input type="file" id="editImageFile" accept="image/*"><button id="uploadEditImageBtn" class="btn-secondary">📤 Enviar imagem</button></div><input id="editImage" placeholder="URL da imagem (ou cole após upload)"><input id="editLink" placeholder="Link"><div style="display:flex;gap:8px;"><input id="editOldPrice" placeholder="Preço antigo"><input id="editCurrentPrice" placeholder="Preço atual"></div><select id="editCategory"></select><button id="saveEditBtn">Salvar</button><button id="cancelEditBtn" style="background:#aaa;">Cancelar</button></div></div>
+<div id="editProductModal" class="modal"><div class="modal-content"><span style="float:right;font-size:28px;cursor:pointer;" id="closeEditModalBtn">&times;</span><h3>✏️ Editar Produto</h3><input type="text" id="editProdId" style="display:none;"><input id="editTitle" placeholder="Título"><textarea id="editDesc" rows="2" placeholder="Descrição"></textarea><div class="file-upload-group"><input type="file" id="editImageFile" accept="image/*"><button id="uploadEditImageBtn" class="btn-secondary">📤 Enviar imagem</button></div><input id="editImage" placeholder="URL da imagem (ou cole após upload)"><input id="editLink" placeholder="Link"><div style="display:flex;gap:8px;"><input id="editOldPrice" placeholder="Preço antigo"><input id="editCurrentPrice" placeholder="Preço atual"></div><select id="editCategory"></select><label><input type="checkbox" id="editIsOfertaRelampago"> Marcar como Oferta Relâmpago</label><button id="saveEditBtn">Salvar</button><button id="cancelEditBtn" style="background:#aaa;">Cancelar</button></div></div>
 <div id="iconSelectModal" class="modal"><div class="modal-content"><h3>Escolha um ícone <i class="fas fa-icons"></i></h3><input type="text" id="iconSearch" placeholder="Buscar ícone..."><div id="iconGrid" class="icon-grid"></div><button id="closeIconModal">Fechar</button></div></div>
 
 <script>
     const firebaseConfig = { apiKey: "AIzaSyDNsPEpaYJ_RfMTXQqPxb3A-wu1sb5UClc", authDomain: "ofertasdapoliana.firebaseapp.com", projectId: "ofertasdapoliana", storageBucket: "ofertasdapoliana.firebasestorage.app", messagingSenderId: "688903682077", appId: "1:688903682077:web:259c751cd41b28529d6ef4" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    let products = [], offers = [], coupons = [], categories = [], social = { instagram: "", whatsapp: "" }, logoUrl = "https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg", isAdmin = false;
+    let products = [], offers = [], coupons = [], categories = [], social = { instagram: "", whatsapp: "" }, logoUrl = "https://i.ibb.co/Fk3bdXRb/logo.png", isAdmin = false;
     let siteConfig = {
         siteTitle: "Dicas da Poli | Seu guia de compras online",
-        appleIconUrl: "https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg",
+        appleIconUrl: "https://i.ibb.co/Fk3bdXRb/logo.png",
         ogTitle: "Dicas da Poli | Seu guia de compras online",
         ogDescription: "As melhores ofertas em moda, eletrônicos e muito mais!",
-        ogImage: "https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg"
+        ogImage: "https://i.ibb.co/Fk3bdXRb/logo.png"
     };
     
     const loadingOverlay = document.getElementById("loadingOverlay");
@@ -192,10 +210,8 @@
         const compartilharId = urlParams.get('compartilhar');
         
         if (compartilharId && compartilharId.length > 5) {
-            // Mostrar loading
             loadingOverlay.style.display = "flex";
             
-            // Buscar produto e atualizar meta tags
             db.collection('products').doc(compartilharId).get().then(doc => {
                 if (doc.exists) {
                     const produto = doc.data();
@@ -204,19 +220,16 @@
                     const imgUrl = produto.imageUrl || siteConfig.ogImage;
                     const finalUrl = window.location.origin + '/?produto=' + compartilharId;
                     
-                    // Atualizar meta tags
                     document.title = shortTitle;
                     document.querySelector('meta[property="og:title"]').setAttribute('content', shortTitle);
                     document.querySelector('meta[property="og:description"]').setAttribute('content', shortDesc);
                     document.querySelector('meta[property="og:image"]').setAttribute('content', imgUrl);
                     document.querySelector('meta[property="og:url"]').setAttribute('content', finalUrl);
                     
-                    // Redirecionar para a página real do produto após 300ms
                     setTimeout(() => {
                         window.location.href = finalUrl;
                     }, 300);
                 } else {
-                    // Produto não encontrado, redirecionar para home
                     setTimeout(() => {
                         window.location.href = window.location.origin + '/';
                     }, 300);
@@ -233,7 +246,6 @@
     function parsePriceToNumber(p) { if(!p) return null; let n=parseFloat(p.toString().replace(/[^\d,.-]/g,'').replace(',','.')); return isNaN(n)?null:Math.round(n*100)/100; }
     function formatPrice(v) { if(v===null||v==="") return null; let n=typeof v==='number'?v:parsePriceToNumber(v); return n===null?null:n.toFixed(2).replace('.',','); }
     
-    // Atualizar meta tags do site
     function updateSiteMetaTags() {
         document.title = siteConfig.siteTitle;
         const appleLink = document.getElementById("appleTouchIcon");
@@ -245,7 +257,6 @@
         document.getElementById("pageTitle").innerText = siteConfig.siteTitle;
     }
     
-    // Atualizar meta tags para produto (quando abrir modal)
     function updateProductMetaTags(prod) {
         let desc = prod.description ? prod.description.substring(0, 150) : siteConfig.ogDescription;
         document.querySelector('meta[property="og:title"]').setAttribute('content', prod.title);
@@ -258,7 +269,6 @@
         updateSiteMetaTags();
     }
     
-    // Upload para Cloudinary
     async function uploadImageToCloudinary(file, preset = "Dicasdapoli") {
         const formData = new FormData();
         formData.append("file", file);
@@ -338,8 +348,73 @@
     }
     function renderFilters() { const container=document.getElementById("filtersContainer"); if(!container) return; container.innerHTML=`<div class="filter-chip ${currentFilter===''?'active':''}" data-filter=""><i class="fas fa-th-large"></i><span>Todos</span></div>`+categories.map(cat=>`<div class="filter-chip ${currentFilter===cat.name?'active':''}" data-filter="${cat.name}"><i class="${cat.icon}"></i><span>${cat.name}</span></div>`).join(''); document.querySelectorAll('.filter-chip').forEach(ch=>ch.addEventListener('click',()=>{ currentFilter=ch.dataset.filter; renderFilters(); renderCliente(document.getElementById("searchInput").value); })); }
     function updateCategorySelects() { const selects = ["prodCategory","editCategory"]; selects.forEach(selId=>{ const sel=document.getElementById(selId); if(sel) sel.innerHTML='<option value="">Selecione</option>'+categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join(''); }); }
-    async function renderCliente(search=""){ let filtered=products.filter(p=>p.title.toLowerCase().includes(search.toLowerCase())); if(currentFilter) filtered=filtered.filter(p=>p.category===currentFilter); filtered.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)); const grid=document.getElementById("produtosGrid"); if(!filtered.length){grid.innerHTML="<div style='grid-column:1/-1;text-align:center;'>Nenhum produto encontrado 💔</div>";return;} grid.innerHTML=filtered.map(p=>{ let disc=null; if(p.oldPrice&&p.currentPrice){let o=parsePriceToNumber(p.oldPrice),c=parsePriceToNumber(p.currentPrice);if(o&&c) disc=Math.round(((o-c)/o)*100);} let oldF=formatPrice(p.oldPrice),curF=formatPrice(p.currentPrice); return `<div class="product-card" data-id="${p.id}">${disc?`<div class="price-badge">-${disc}%</div>`:''}<img class="card-img" src="${p.imageUrl||'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'"><div class="card-info"><div class="card-title">${escapeHtml(p.title)}</div><div class="price-info">${oldF?`<span class="old-price">R$ ${oldF}</span>`:''}${curF?`<span class="current-price">R$ ${curF}</span>`:''}${disc?`<span class="discount-percent">-${disc}%</span>`:''}</div><div class="card-desc">${escapeHtml((p.description||'').substring(0,80))}</div><div class="visit-counter"><i class="fas fa-eye"></i> ${p.visitCount || 0} visualizações</div><button class="btn-buy" data-link="${p.affiliateLink}"><i class="fas fa-shopping-bag"></i> Comprar</button></div></div>`;}).join('');
-        document.querySelectorAll('.product-card').forEach(c=>{ c.addEventListener('click',async(e)=>{ if(e.target.classList.contains('btn-buy')){ window.open(e.target.getAttribute('data-link'),'_blank'); e.stopPropagation(); return; } const id=c.dataset.id, prod=products.find(p=>p.id===id); if(prod){ const newCount = (prod.visitCount||0)+1; await db.collection("products").doc(prod.id).update({visitCount:newCount}); prod.visitCount=newCount; openModal(prod); renderCliente(document.getElementById("searchInput").value); } }); c.querySelector('.btn-buy')?.addEventListener('click',(e)=>{ e.stopPropagation(); window.open(c.querySelector('.btn-buy').dataset.link,'_blank'); }); });
+    
+    function renderOfertasRelampago() {
+        const ofertasProdutos = products.filter(p => p.isOfertaRelampago === true);
+        const container = document.getElementById("ofertasScrollable");
+        if (!container) return;
+        
+        if (ofertasProdutos.length === 0) {
+            container.innerHTML = '<div style="padding: 20px; text-align: center; background: rgba(255,240,245,0.5); border-radius: 20px;">Nenhuma oferta relâmpago no momento 🔥</div>';
+            return;
+        }
+        
+        container.innerHTML = `<div class="products-row">${ofertasProdutos.map(p => renderProductCard(p)).join('')}</div>`;
+        attachProductCardEvents();
+    }
+    
+    function renderNovidades(search = "") {
+        let novidadesProdutos = products.filter(p => p.isOfertaRelampago !== true);
+        if (search) novidadesProdutos = novidadesProdutos.filter(p => p.title.toLowerCase().includes(search.toLowerCase()));
+        if (currentFilter) novidadesProdutos = novidadesProdutos.filter(p => p.category === currentFilter);
+        novidadesProdutos.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        const grid = document.getElementById("produtosGrid");
+        if (!novidadesProdutos.length) {
+            grid.innerHTML = "<div style='grid-column:1/-1;text-align:center;'>Nenhum produto encontrado 💔</div>";
+            return;
+        }
+        grid.innerHTML = novidadesProdutos.map(p => renderProductCard(p)).join('');
+        attachProductCardEvents();
+    }
+    
+    function renderProductCard(p) {
+        let disc = null;
+        if (p.oldPrice && p.currentPrice) {
+            let o = parsePriceToNumber(p.oldPrice), c = parsePriceToNumber(p.currentPrice);
+            if (o && c) disc = Math.round(((o - c) / o) * 100);
+        }
+        let oldF = formatPrice(p.oldPrice), curF = formatPrice(p.currentPrice);
+        return `<div class="product-card" data-id="${p.id}">${disc ? `<div class="price-badge">-${disc}%</div>` : ''}<img class="card-img" src="${p.imageUrl || 'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'"><div class="card-info"><div class="card-title">${escapeHtml(p.title)}</div><div class="price-info">${oldF ? `<span class="old-price">R$ ${oldF}</span>` : ''}${curF ? `<span class="current-price">R$ ${curF}</span>` : ''}${disc ? `<span class="discount-percent">-${disc}%</span>` : ''}</div><div class="card-desc">${escapeHtml((p.description || '').substring(0, 80))}</div><div class="visit-counter"><i class="fas fa-eye"></i> ${p.visitCount || 0} visualizações</div><button class="btn-buy" data-link="${p.affiliateLink}"><i class="fas fa-shopping-bag"></i> Comprar</button></div></div>`;
+    }
+    
+    function attachProductCardEvents() {
+        document.querySelectorAll('.product-card').forEach(c => {
+            c.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('btn-buy')) {
+                    window.open(e.target.getAttribute('data-link'), '_blank');
+                    e.stopPropagation();
+                    return;
+                }
+                const id = c.dataset.id, prod = products.find(p => p.id === id);
+                if (prod) {
+                    const newCount = (prod.visitCount || 0) + 1;
+                    await db.collection("products").doc(prod.id).update({ visitCount: newCount });
+                    prod.visitCount = newCount;
+                    openModal(prod);
+                    renderCliente(document.getElementById("searchInput").value);
+                }
+            });
+            c.querySelector('.btn-buy')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.open(c.querySelector('.btn-buy').dataset.link, '_blank');
+            });
+        });
+    }
+    
+    async function renderCliente(search = "") {
+        renderOfertasRelampago();
+        renderNovidades(search);
     }
     
     function openModal(prod){ 
@@ -353,7 +428,6 @@
         document.getElementById("modalPriceInfo").innerHTML=pHtml; 
         document.getElementById("modalBuyLink").href=prod.affiliateLink; 
         
-        // URL de compartilhamento com ?compartilhar=ID (para o robô do WhatsApp)
         const baseUrl = window.location.origin + window.location.pathname;
         const shareUrl = `${baseUrl}?compartilhar=${prod.id}`;
         let shortTitle = prod.title.length > 40 ? prod.title.substring(0,37) + '...' : prod.title;
@@ -457,10 +531,10 @@
             social = { instagram: d.instagram || "", whatsapp: d.whatsapp || "" };
             siteConfig = {
                 siteTitle: d.siteTitle || "Dicas da Poli | Seu guia de compras online",
-                appleIconUrl: d.appleIconUrl || "https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg",
+                appleIconUrl: d.appleIconUrl || "https://i.ibb.co/Fk3bdXRb/logo.png",
                 ogTitle: d.ogTitle || "Dicas da Poli | Seu guia de compras online",
                 ogDescription: d.ogDescription || "As melhores ofertas em moda, eletrônicos e muito mais!",
-                ogImage: d.ogImage || "https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg"
+                ogImage: d.ogImage || "https://i.ibb.co/Fk3bdXRb/logo.png"
             };
         } else {
             await db.collection("config").doc("site").set({ 
@@ -480,7 +554,7 @@
         document.getElementById("instaInput").value = social.instagram;
         document.getElementById("whatsInput").value = social.whatsapp;
         
-        const ps=await db.collection("products").get(); products=ps.docs.map(d=>({id:d.id,...d.data()}));
+        const ps=await db.collection("products").get(); products=ps.docs.map(d=>({id:d.id, ...d.data(), isOfertaRelampago: d.data().isOfertaRelampago || false}));
         const os=await db.collection("offers").get(); offers=os.docs.map(d=>({id:d.id,...d.data()}));
         const cs=await db.collection("coupons").get(); coupons=cs.docs.map(d=>({id:d.id,...d.data()}));
         
@@ -514,7 +588,7 @@
     
     function renderAdminLists(){ const offDiv=document.getElementById("adminOffersList"); if(offDiv) offDiv.innerHTML=offers.map((off,i)=>`<div>${products.find(p=>p.id===off.productId)?.title||'?'} - ${off.discountText}<button data-idx="${i}" class="del-offer">🗑️</button></div>`).join(''); document.querySelectorAll('.del-offer').forEach(b=>b.addEventListener('click',async()=>{ const off=offers[b.dataset.idx]; if(off.id) await db.collection("offers").doc(off.id).delete(); await loadAllData(); })); const couDiv=document.getElementById("adminCouponsList"); if(couDiv) couDiv.innerHTML=coupons.map((c,i)=>`<div>${c.code} - ${c.description}<button data-idx="${i}" class="del-coupon">🗑️</button></div>`).join(''); document.querySelectorAll('.del-coupon').forEach(b=>b.addEventListener('click',async()=>{ const cp=coupons[b.dataset.idx]; if(cp.id) await db.collection("coupons").doc(cp.id).delete(); await loadAllData(); })); const sel=document.getElementById("offerSelect"); if(sel) sel.innerHTML=products.map(p=>`<option value="${p.id}">${p.title}</option>`).join(''); const adminGrid=document.getElementById("adminProductsGrid"); if(adminGrid) adminGrid.innerHTML=products.map(p=>`<div class="product-card" style="cursor:default;"><img class="card-img" src="${p.imageUrl||'https://placehold.co/400x250/ca0223/white'}"><div class="card-info"><div class="card-title">${escapeHtml(p.title)}</div><div class="price-info">${formatPrice(p.currentPrice)?`R$ ${formatPrice(p.currentPrice)}`:''}</div><div class="visit-counter"><i class="fas fa-eye"></i> ${p.visitCount||0}</div><div class="admin-card-buttons" style="display:flex;gap:6px;margin-top:8px;"><button class="edit-prod-btn" data-id="${p.id}">✏️</button><button class="del-prod-btn" data-id="${p.id}">🗑️</button></div></div></div>`).join(''); document.querySelectorAll('.edit-prod-btn').forEach(b=>b.addEventListener('click',()=>{ const prod=products.find(p=>p.id===b.dataset.id); openEditModal(prod); })); document.querySelectorAll('.del-prod-btn').forEach(b=>b.addEventListener('click',async()=>{ if(confirm("Excluir produto?")){ await db.collection("products").doc(b.dataset.id).delete(); await loadAllData(); } }));
     }
-    async function addProduct(l,t,d,i,c,op,cp){ await db.collection("products").add({ affiliateLink:l, title:t, description:d, imageUrl:i||"https://placehold.co/400x250/ca0223/white", visitCount:0, createdAt:new Date().toISOString(), category:c, oldPrice:parsePriceToNumber(op)||"", currentPrice:parsePriceToNumber(cp)||"" }); await loadAllData(); }
+    async function addProduct(l,t,d,i,c,op,cp, isOferta){ await db.collection("products").add({ affiliateLink:l, title:t, description:d, imageUrl:i||"https://placehold.co/400x250/ca0223/white", visitCount:0, createdAt:new Date().toISOString(), category:c, oldPrice:parsePriceToNumber(op)||"", currentPrice:parsePriceToNumber(cp)||"", isOfertaRelampago: isOferta || false }); await loadAllData(); }
     async function addOffer(pid,disc){ await db.collection("offers").add({ productId:pid, discountText:disc }); await loadAllData(); }
     async function addCoupon(code,desc){ await db.collection("coupons").add({ code, description:desc }); await loadAllData(); }
     async function updateConfig(logo, insta, wa, newConfig){ 
@@ -522,8 +596,8 @@
         await db.collection("config").doc("site").set(data, { merge: true }); 
         await loadAllData();
     }
-    function openEditModal(p){ document.getElementById("editProdId").value=p.id; document.getElementById("editTitle").value=p.title; document.getElementById("editDesc").value=p.description; document.getElementById("editImage").value=p.imageUrl; document.getElementById("editLink").value=p.affiliateLink; document.getElementById("editOldPrice").value=formatPrice(p.oldPrice)||""; document.getElementById("editCurrentPrice").value=formatPrice(p.currentPrice)||""; updateCategorySelects(); document.getElementById("editCategory").value=p.category||""; document.getElementById("editProductModal").style.display="flex"; }
-    async function saveEdit(){ const id=document.getElementById("editProdId").value; const up={ title:document.getElementById("editTitle").value, description:document.getElementById("editDesc").value, imageUrl:document.getElementById("editImage").value, affiliateLink:document.getElementById("editLink").value, oldPrice:parsePriceToNumber(document.getElementById("editOldPrice").value)||"", currentPrice:parsePriceToNumber(document.getElementById("editCurrentPrice").value)||"", category:document.getElementById("editCategory").value }; await db.collection("products").doc(id).update(up); await loadAllData(); document.getElementById("editProductModal").style.display="none"; }
+    function openEditModal(p){ document.getElementById("editProdId").value=p.id; document.getElementById("editTitle").value=p.title; document.getElementById("editDesc").value=p.description; document.getElementById("editImage").value=p.imageUrl; document.getElementById("editLink").value=p.affiliateLink; document.getElementById("editOldPrice").value=formatPrice(p.oldPrice)||""; document.getElementById("editCurrentPrice").value=formatPrice(p.currentPrice)||""; updateCategorySelects(); document.getElementById("editCategory").value=p.category||""; document.getElementById("editIsOfertaRelampago").checked = p.isOfertaRelampago || false; document.getElementById("editProductModal").style.display="flex"; }
+    async function saveEdit(){ const id=document.getElementById("editProdId").value; const up={ title:document.getElementById("editTitle").value, description:document.getElementById("editDesc").value, imageUrl:document.getElementById("editImage").value, affiliateLink:document.getElementById("editLink").value, oldPrice:parsePriceToNumber(document.getElementById("editOldPrice").value)||"", currentPrice:parsePriceToNumber(document.getElementById("editCurrentPrice").value)||"", category:document.getElementById("editCategory").value, isOfertaRelampago: document.getElementById("editIsOfertaRelampago").checked }; await db.collection("products").doc(id).update(up); await loadAllData(); document.getElementById("editProductModal").style.display="none"; }
     function updateDrawerContent(tab){ const c=document.getElementById("drawerContent"); if(tab==="offers"){ let h=`<div>🔥 Ofertas</div>`; offers.forEach(off=>{ const p=products.find(p=>p.id===off.productId); if(p) h+=`<div style="padding:10px;margin-bottom:8px;background:rgba(255,240,245,0.8);border-radius:20px;"><b>${p.title}</b><br>${off.discountText}<br><button class="offer-buy" data-link="${p.affiliateLink}">Comprar</button></div>`; }); c.innerHTML=h; document.querySelectorAll('.offer-buy').forEach(b=>b.addEventListener('click',()=>window.open(b.dataset.link,'_blank'))); } else if(tab==="coupons"){ c.innerHTML=`<div>🎟️ Cupons</div>`+coupons.map(cp=>`<div style="background:white;border-radius:16px;padding:10px;margin:8px 0;"><span style="background:#0647b7;color:white;padding:4px 12px;border-radius:50px;">${cp.code}</span><br><small>${cp.description}</small></div>`).join(''); } else c.innerHTML=`<div><a href="${social.instagram}" target="_blank"><i class="fab fa-instagram"></i> Instagram</a><br><a href="${social.whatsapp}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a></div>`; }
     let currentFilter="";
     function initUI(){
@@ -531,7 +605,11 @@
         document.getElementById("btnAdminNav").onclick=()=>{ document.getElementById("clienteView").style.display = "none"; document.getElementById("adminView").classList.remove("hidden"); if(!isAdmin) document.getElementById("adminLoginArea").classList.remove("hidden"); };
         document.getElementById("doLogin").onclick=()=>{ if(document.getElementById("adminUser").value==="poli" && document.getElementById("adminPass").value==="ofertas2024"){ isAdmin=true; document.getElementById("adminLoginArea").classList.add("hidden"); document.getElementById("adminDashboard").classList.remove("hidden"); setupAdminTabs(); renderAdminLists(); } else alert("Acesso negado"); };
         document.getElementById("logoutAdmin").onclick=()=>{ isAdmin=false; document.getElementById("adminDashboard").classList.add("hidden"); document.getElementById("adminLoginArea").classList.remove("hidden"); document.getElementById("clienteView").style.display = "block"; document.getElementById("adminView").classList.add("hidden"); };
-        document.getElementById("saveProductBtn").onclick=async()=>{ await addProduct(document.getElementById("prodLink").value,document.getElementById("prodTitle").value,document.getElementById("prodDesc").value,document.getElementById("prodImage").value,document.getElementById("prodCategory").value,document.getElementById("prodOldPrice").value,document.getElementById("prodCurrentPrice").value); alert("Produto adicionado!"); };
+        document.getElementById("saveProductBtn").onclick=async()=>{ 
+            const isOferta = document.getElementById("isOfertaRelampago").checked;
+            await addProduct(document.getElementById("prodLink").value, document.getElementById("prodTitle").value, document.getElementById("prodDesc").value, document.getElementById("prodImage").value, document.getElementById("prodCategory").value, document.getElementById("prodOldPrice").value, document.getElementById("prodCurrentPrice").value, isOferta); 
+            alert("Produto adicionado!"); 
+        };
         document.getElementById("addOfferBtn").onclick=async()=>{ await addOffer(document.getElementById("offerSelect").value,document.getElementById("offerDiscount").value); alert("Oferta adicionada!"); };
         document.getElementById("addCouponBtn").onclick=async()=>{ await addCoupon(document.getElementById("couponCode").value,document.getElementById("couponDesc").value); alert("Cupom adicionado!"); };
         document.getElementById("saveLogoBtn").onclick=async()=>{ await updateConfig(document.getElementById("logoUrlInput").value, social.instagram, social.whatsapp, {}); alert("Logo salva!"); };
