@@ -148,7 +148,10 @@
 <div id="floatingDrawer" class="floating-drawer"><div class="drawer-header"><span>⚡ Ofertas & Cupons</span><span id="closeDrawer" style="cursor:pointer;">✕</span></div><div class="drawer-tabs"><div class="drawer-tab active" data-tab="offers">Ofertas</div><div class="drawer-tab" data-tab="coupons">Cupons</div><div class="drawer-tab" data-tab="social">Redes</div></div><div class="drawer-content" id="drawerContent"></div></div>
 <div class="fab-trigger" id="fabTrigger"><i class="fas fa-tag"></i></div>
 <div id="productModal" class="modal"><div class="modal-content"><span style="float:right;font-size:28px;cursor:pointer;" id="closeModalBtn">&times;</span><img id="modalImg" style="width:100%;border-radius:28px;max-height:250px;object-fit:contain;"><h3 id="modalTitle"></h3><p id="modalDescFull"></p><div id="modalPriceInfo"></div><div style="display:flex;gap:10px;margin-top:15px;"><button id="modalShareBtn" class="share-btn" style="background:#25D366;"><i class="fab fa-whatsapp"></i> Compartilhar</button><a id="modalBuyLink" href="#" target="_blank" style="background:#ca0223;color:white;text-decoration:none;padding:10px;border-radius:60px;flex:1;text-align:center;">Comprar</a></div></div></div>
-<div id="editProductModal" class="modal"><div class="modal-content"><span style="float:right;font-size:28px;cursor:pointer;" id="closeEditModalBtn">&times;</span><h3>✏️ Editar Produto</h3><input type="text" id="editProdId" style="display:none;"><input id="editTitle" placeholder="Título"><textarea id="editDesc" rows="2" placeholder="Descrição"></textarea><input id="editImage" placeholder="URL imagem"><input id="editLink" placeholder="Link"><div style="display:flex;gap:8px;"><input id="editOldPrice" placeholder="Preço antigo"><input id="editCurrentPrice" placeholder="Preço atual"></div><select id="editCategory"></select><button id="saveEditBtn">Salvar</button><button id="cancelEditBtn" style="background:#aaa;">Cancelar</button></div></div>
+
+<!-- Modal de Edição com upload de imagem -->
+<div id="editProductModal" class="modal"><div class="modal-content"><span style="float:right;font-size:28px;cursor:pointer;" id="closeEditModalBtn">&times;</span><h3>✏️ Editar Produto</h3><input type="text" id="editProdId" style="display:none;"><input id="editTitle" placeholder="Título"><textarea id="editDesc" rows="2" placeholder="Descrição"></textarea><div class="file-upload-group"><input type="file" id="editImageFile" accept="image/*"><button id="uploadEditImageBtn" class="btn-secondary">📤 Enviar imagem</button></div><input id="editImage" placeholder="URL da imagem (ou cole após upload)"><input id="editLink" placeholder="Link"><div style="display:flex;gap:8px;"><input id="editOldPrice" placeholder="Preço antigo"><input id="editCurrentPrice" placeholder="Preço atual"></div><select id="editCategory"></select><button id="saveEditBtn">Salvar</button><button id="cancelEditBtn" style="background:#aaa;">Cancelar</button></div></div>
+
 <div id="iconSelectModal" class="modal"><div class="modal-content"><h3>Escolha um ícone <i class="fas fa-icons"></i></h3><input type="text" id="iconSearch" placeholder="Buscar ícone..."><div id="iconGrid" class="icon-grid"></div><button id="closeIconModal">Fechar</button></div></div>
 
 <script>
@@ -164,7 +167,7 @@
     async function uploadImageToCloudinary(file) {
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("upload_preset", "Dicasdapoli"); // Atualizado
+        formData.append("upload_preset", "Dicasdapoli");
         formData.append("cloud_name", "dgi9mtxxe");
         try {
             const response = await fetch(`https://api.cloudinary.com/v1_1/dgi9mtxxe/image/upload`, { method: "POST", body: formData });
@@ -198,6 +201,23 @@
             uploadBtn.disabled = true; uploadBtn.innerText = "📤 Enviando...";
             const url = await uploadImageToCloudinary(fileInput.files[0]);
             if (url) { imageUrlField.value = url; alert("Imagem enviada com sucesso!"); }
+            else alert("Falha no upload.");
+            uploadBtn.disabled = false; uploadBtn.innerText = "📤 Enviar imagem";
+            fileInput.value = "";
+        });
+    }
+    
+    // === NOVA FUNÇÃO: upload de imagem no modal de edição ===
+    function setupEditImageUpload() {
+        const fileInput = document.getElementById("editImageFile");
+        const uploadBtn = document.getElementById("uploadEditImageBtn");
+        const imageUrlField = document.getElementById("editImage");
+        if (!fileInput || !uploadBtn) return;
+        uploadBtn.addEventListener("click", async () => {
+            if (!fileInput.files || fileInput.files.length === 0) { alert("Selecione uma imagem."); return; }
+            uploadBtn.disabled = true; uploadBtn.innerText = "📤 Enviando...";
+            const url = await uploadImageToCloudinary(fileInput.files[0]);
+            if (url) { imageUrlField.value = url; alert("Imagem enviada! URL preenchida no campo."); }
             else alert("Falha no upload.");
             uploadBtn.disabled = false; uploadBtn.innerText = "📤 Enviar imagem";
             fileInput.value = "";
@@ -335,6 +355,7 @@
         document.getElementById("btnOfertasNav").onclick=()=>{ drawer.style.display="flex"; updateDrawerContent("offers"); }; document.getElementById("btnCupomNav").onclick=()=>{ drawer.style.display="flex"; updateDrawerContent("coupons"); };
         setupLogoUpload();
         setupProductImageUpload();
+        setupEditImageUpload(); // <--- ATIVA UPLOAD NA EDIÇÃO
     }
     function setupAdminTabs(){ const tabs=["Info","Categorias","AddProduto","AddCupom","AddOferta","EditProduto"]; const container=document.getElementById("adminTabsContainer"); container.innerHTML=`<div class="admin-tabs">`+tabs.map(t=>`<button class="admin-tab" data-tab="${t}">${t==="Info"?"Informações":t==="Categorias"?"Categorias":t==="AddProduto"?"Adicionar Produto":t==="AddCupom"?"Cupons":t==="AddOferta"?"Ofertas":"Editar Produtos"}</button>`).join('')+`</div>`; document.querySelectorAll('.admin-tab').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active')); document.getElementById(`tab${btn.dataset.tab}`).classList.add('active'); }); }); document.querySelector('.admin-tab').click(); }
     loadAllData().then(()=>initUI());
