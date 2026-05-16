@@ -26,7 +26,7 @@
         .container { max-width: 1600px; margin: 0 auto; padding: 0 16px; }
         .top-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
         .logo-area { display: flex; align-items: center; gap: 10px; flex: 1; }
-        .logo-img { height: 48px; width: auto; border-radius: 16px; background: rgba(255,240,245,0.5); padding: 3px; }
+        .logo-img { height: 48px; width: auto; border-radius: 16px; background: rgba(255,240,245,0.5); padding: 3px; object-fit: contain; }
         .site-title { font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #ca0223, #10d3dd); background-clip: text; -webkit-background-clip: text; color: transparent; }
         .social-mini-header { display: flex; gap: 12px; font-size: 1.2rem; }
         .social-mini-header a { color: #ca0223; }
@@ -107,7 +107,19 @@
         <div id="adminLoginArea"><input type="text" id="adminUser" placeholder="Usuário"><input type="password" id="adminPass" placeholder="Senha"><button id="doLogin">Entrar</button></div>
         <div id="adminDashboard" class="hidden">
             <div class="admin-tabs-container" id="adminTabsContainer"></div>
-            <div id="tabInfo" class="tab-pane"><h3>🖼️ Logo & Redes</h3><input type="text" id="logoUrlInput" placeholder="URL da logo"><button id="saveLogoBtn">Salvar Logo</button><h4>📱 Redes Sociais</h4><input id="instaInput" placeholder="Instagram URL"><input id="whatsInput" placeholder="WhatsApp Link"><button id="saveSocialBtn">Salvar</button></div>
+            <div id="tabInfo" class="tab-pane">
+                <h3>🖼️ Logo do Site</h3>
+                <input type="text" id="logoUrlInput" placeholder="URL da logo (ou faça upload)">
+                <div class="file-upload-group">
+                    <input type="file" id="logoFile" accept="image/*">
+                    <button id="uploadLogoBtn" class="btn-secondary">📤 Enviar nova logo</button>
+                </div>
+                <button id="saveLogoBtn">Salvar Logo (URL ou upload)</button>
+                <h4>📱 Redes Sociais</h4>
+                <input id="instaInput" placeholder="Instagram URL">
+                <input id="whatsInput" placeholder="WhatsApp Link">
+                <button id="saveSocialBtn">Salvar Redes</button>
+            </div>
             <div id="tabCategorias" class="tab-pane"><h3>📂 Gerenciar Categorias</h3><button id="novaCategoriaBtn">+ Nova Categoria</button><div id="categoriasList"></div></div>
             <div id="tabAddProduto" class="tab-pane">
                 <h3>➕ Adicionar Produto</h3>
@@ -148,55 +160,47 @@
     function parsePriceToNumber(p) { if(!p) return null; let n=parseFloat(p.toString().replace(/[^\d,.-]/g,'').replace(',','.')); return isNaN(n)?null:Math.round(n*100)/100; }
     function formatPrice(v) { if(v===null||v==="") return null; let n=typeof v==='number'?v:parsePriceToNumber(v); return n===null?null:n.toFixed(2).replace('.',','); }
     
-    // ========== UPLOAD PARA CLOUDINARY ==========
+    // ========== UPLOAD PARA CLOUDINARY (PRESET: Dicasdapoli) ==========
     async function uploadImageToCloudinary(file) {
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("upload_preset", "Dicas da poli"); // Nome exato do preset (com espaço)
+        formData.append("upload_preset", "Dicasdapoli"); // Atualizado
         formData.append("cloud_name", "dgi9mtxxe");
-        
         try {
-            const response = await fetch(`https://api.cloudinary.com/v1_1/dgi9mtxxe/image/upload`, {
-                method: "POST",
-                body: formData
-            });
+            const response = await fetch(`https://api.cloudinary.com/v1_1/dgi9mtxxe/image/upload`, { method: "POST", body: formData });
             const data = await response.json();
-            if (data.secure_url) {
-                return data.secure_url;
-            } else {
-                console.error("Erro no upload:", data);
-                return null;
-            }
-        } catch (error) {
-            console.error("Erro ao enviar para Cloudinary:", error);
-            return null;
-        }
+            return data.secure_url || null;
+        } catch (error) { console.error("Upload error:", error); return null; }
     }
     
-    // Configurar botão de upload
-    function setupImageUpload() {
+    // Upload para logo
+    function setupLogoUpload() {
+        const fileInput = document.getElementById("logoFile");
+        const uploadBtn = document.getElementById("uploadLogoBtn");
+        const logoUrlField = document.getElementById("logoUrlInput");
+        uploadBtn.addEventListener("click", async () => {
+            if (!fileInput.files || fileInput.files.length === 0) { alert("Selecione uma imagem."); return; }
+            uploadBtn.disabled = true; uploadBtn.innerText = "📤 Enviando...";
+            const url = await uploadImageToCloudinary(fileInput.files[0]);
+            if (url) { logoUrlField.value = url; alert("Logo enviada! Clique em 'Salvar Logo' para aplicar."); }
+            else alert("Falha no upload.");
+            uploadBtn.disabled = false; uploadBtn.innerText = "📤 Enviar nova logo";
+            fileInput.value = "";
+        });
+    }
+    
+    function setupProductImageUpload() {
         const fileInput = document.getElementById("prodImageFile");
         const uploadBtn = document.getElementById("uploadImageBtn");
         const imageUrlField = document.getElementById("prodImage");
-        
         uploadBtn.addEventListener("click", async () => {
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert("Selecione uma imagem primeiro.");
-                return;
-            }
-            const file = fileInput.files[0];
-            uploadBtn.disabled = true;
-            uploadBtn.innerText = "📤 Enviando...";
-            const url = await uploadImageToCloudinary(file);
-            if (url) {
-                imageUrlField.value = url;
-                alert("Imagem enviada com sucesso! URL preenchida.");
-            } else {
-                alert("Falha no upload. Verifique o preset e cloud name.");
-            }
-            uploadBtn.disabled = false;
-            uploadBtn.innerText = "📤 Enviar imagem";
-            fileInput.value = ""; // limpa o input
+            if (!fileInput.files || fileInput.files.length === 0) { alert("Selecione uma imagem."); return; }
+            uploadBtn.disabled = true; uploadBtn.innerText = "📤 Enviando...";
+            const url = await uploadImageToCloudinary(fileInput.files[0]);
+            if (url) { imageUrlField.value = url; alert("Imagem enviada com sucesso!"); }
+            else alert("Falha no upload.");
+            uploadBtn.disabled = false; uploadBtn.innerText = "📤 Enviar imagem";
+            fileInput.value = "";
         });
     }
     
@@ -222,7 +226,7 @@
     const iconsList = ["fa-house","fa-bed","fa-table","fa-bath","fa-shower","fa-couch","fa-utensils","fa-kitchen-set","fa-rug","fa-lightbulb","fa-seedling","fa-wrench","fa-hammer","fa-box-open","fa-broom","fa-shield-halved","fa-baby","fa-baby-carriage","fa-shirt","fa-cubes","fa-puzzle-piece","fa-gamepad","fa-backpack","fa-bottle-droplet","fa-wind","fa-fire","fa-snowflake","fa-blender","fa-tv","fa-plug","fa-laptop","fa-desktop","fa-mobile-screen-button","fa-tablet-screen-button","fa-headphones","fa-volume-high","fa-camera","fa-computer-mouse","fa-sd-card","fa-stopwatch","fa-coat","fa-shoe-prints","fa-briefcase","fa-gem","fa-glasses","fa-clock","fa-hat-cowboy-side","fa-wand-magic-sparkles","fa-scissors","fa-spray-can-sparkles","fa-prescription-bottle-medical","fa-capsules","fa-tooth","fa-spa","fa-car","fa-motorcycle","fa-gears","fa-circle-dot","fa-screwdriver-wrench","fa-location-dot","fa-radio","fa-basketball","fa-soccer-ball","fa-dumbbell","fa-person-running","fa-bicycle","fa-tent","fa-bottle-water","fa-umbrella-beach","fa-paw","fa-dog","fa-cat","fa-fish","fa-dove","fa-bone","fa-basket-shopping","fa-apple-whole","fa-bacon","fa-bread-slice","fa-wine-glass","fa-beer-mug-empty","fa-mug-hot","fa-cookie-bite","fa-book","fa-pen-to-square","fa-chair","fa-palette","fa-music","fa-industry","fa-hard-hat","fa-tractor","fa-box","fa-stethoscopes","fa-cake-candles","fa-film","fa-ticket","fa-mask"];
     function renderIconGrid(){ const grid=document.getElementById("iconGrid"); if(!grid) return; grid.innerHTML=iconsList.map(ic=>`<div class="icon-option" data-icon="fas ${ic}"><i class="fas ${ic}"></i><span style="font-size:10px;">${ic.replace('fa-','')}</span></div>`).join(''); document.querySelectorAll('.icon-option').forEach(el=>el.addEventListener('click',async()=>{ const chosen=el.dataset.icon; const name=prompt("Nome da categoria:", window.tempCatName||""); if(name){ const keywords=prompt("Palavras-chave (separadas por vírgula):", window.tempCatKeywords||""); await saveCategory(name, chosen, keywords, window.selectedCatId); } document.getElementById("iconSelectModal").style.display="none"; })); }
     
-    // ================== BUSCA INTELIGENTE (mantida) ==================
+    // ================== BUSCA INTELIGENTE ==================
     async function enhancedFetchProductData(url) {
         const statusDiv = document.getElementById("fetchStatus");
         statusDiv.innerHTML = "🔍 Resolvendo link de afiliado...";
@@ -319,8 +323,8 @@
         document.getElementById("saveProductBtn").onclick=async()=>{ await addProduct(document.getElementById("prodLink").value,document.getElementById("prodTitle").value,document.getElementById("prodDesc").value,document.getElementById("prodImage").value,document.getElementById("prodCategory").value,document.getElementById("prodOldPrice").value,document.getElementById("prodCurrentPrice").value); alert("Produto adicionado!"); };
         document.getElementById("addOfferBtn").onclick=async()=>{ await addOffer(document.getElementById("offerSelect").value,document.getElementById("offerDiscount").value); alert("Oferta adicionada!"); };
         document.getElementById("addCouponBtn").onclick=async()=>{ await addCoupon(document.getElementById("couponCode").value,document.getElementById("couponDesc").value); alert("Cupom adicionado!"); };
-        document.getElementById("saveLogoBtn").onclick=async()=>{ await updateConfig(document.getElementById("logoUrlInput").value, social.instagram, social.whatsapp); };
-        document.getElementById("saveSocialBtn").onclick=async()=>{ await updateConfig(logoUrl, document.getElementById("instaInput").value, document.getElementById("whatsInput").value); };
+        document.getElementById("saveLogoBtn").onclick=async()=>{ await updateConfig(document.getElementById("logoUrlInput").value, social.instagram, social.whatsapp); alert("Logo salva!"); };
+        document.getElementById("saveSocialBtn").onclick=async()=>{ await updateConfig(logoUrl, document.getElementById("instaInput").value, document.getElementById("whatsInput").value); alert("Redes salvas!"); };
         document.getElementById("autoFetchBtn").onclick=()=>{ const link=document.getElementById("prodLink").value.trim(); if(link) enhancedFetchProductData(link); else alert("Cole um link do produto"); };
         document.getElementById("searchInput").addEventListener("input",e=>renderCliente(e.target.value));
         document.getElementById("closeModalBtn").onclick=closeModal; document.getElementById("closeEditModalBtn").onclick=()=>document.getElementById("editProductModal").style.display="none"; document.getElementById("cancelEditBtn").onclick=()=>document.getElementById("editProductModal").style.display="none"; document.getElementById("saveEditBtn").onclick=saveEdit;
@@ -329,7 +333,8 @@
         renderIconGrid(); document.getElementById("iconSearch").addEventListener("input",e=>{ const term=e.target.value.toLowerCase(); const items=document.querySelectorAll('.icon-option'); items.forEach(it=>{ const name=it.querySelector('span')?.innerText.toLowerCase(); it.style.display=name.includes(term)?"flex":"none"; }); });
         const drawer=document.getElementById("floatingDrawer"); document.getElementById("fabTrigger").onclick=()=>{ drawer.style.display=drawer.style.display==="flex"?"none":"flex"; if(drawer.style.display==="flex") updateDrawerContent(document.querySelector(".drawer-tab.active")?.dataset.tab); }; document.getElementById("closeDrawer").onclick=()=>drawer.style.display="none"; document.querySelectorAll(".drawer-tab").forEach(t=>t.addEventListener("click",()=>{ document.querySelectorAll(".drawer-tab").forEach(tt=>tt.classList.remove("active")); t.classList.add("active"); updateDrawerContent(t.dataset.tab); }));
         document.getElementById("btnOfertasNav").onclick=()=>{ drawer.style.display="flex"; updateDrawerContent("offers"); }; document.getElementById("btnCupomNav").onclick=()=>{ drawer.style.display="flex"; updateDrawerContent("coupons"); };
-        setupImageUpload(); // ativar upload
+        setupLogoUpload();
+        setupProductImageUpload();
     }
     function setupAdminTabs(){ const tabs=["Info","Categorias","AddProduto","AddCupom","AddOferta","EditProduto"]; const container=document.getElementById("adminTabsContainer"); container.innerHTML=`<div class="admin-tabs">`+tabs.map(t=>`<button class="admin-tab" data-tab="${t}">${t==="Info"?"Informações":t==="Categorias"?"Categorias":t==="AddProduto"?"Adicionar Produto":t==="AddCupom"?"Cupons":t==="AddOferta"?"Ofertas":"Editar Produtos"}</button>`).join('')+`</div>`; document.querySelectorAll('.admin-tab').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active')); document.getElementById(`tab${btn.dataset.tab}`).classList.add('active'); }); }); document.querySelector('.admin-tab').click(); }
     loadAllData().then(()=>initUI());
