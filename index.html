@@ -9,10 +9,10 @@
     
     <!-- Meta tags padrão (serão sobrescritas dinamicamente quando necessário) -->
     <title id="pageTitle">Dicas da Poli | Seu guia de compras online</title>
-    <link id="appleTouchIcon" rel="apple-touch-icon" href="https://i.ibb.co/Fk3bdXRb/logo.png">
+    <link id="appleTouchIcon" rel="apple-touch-icon" href="https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg">
     <meta property="og:title" content="Dicas da Poli | Seu guia de compras online">
     <meta property="og:description" content="As melhores ofertas em moda, eletrônicos e muito mais!">
-    <meta property="og:image" content="https://i.ibb.co/Fk3bdXRb/logo.png">
+    <meta property="og:image" content="https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg">
     <meta property="og:url" content="">
     <meta property="og:type" content="website">
     <meta name="description" content="As melhores ofertas em moda, eletrônicos e muito mais!">
@@ -98,7 +98,7 @@
 <div class="header">
     <div class="container">
         <div class="top-bar">
-            <div class="logo-area"><img id="siteLogo" class="logo-img" src="https://i.ibb.co/Fk3bdXRb/logo.png" alt="Logo"><span class="site-title">Dicas da Poli</span></div>
+            <div class="logo-area"><img id="siteLogo" class="logo-img" src="https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg" alt="Logo"><span class="site-title">Dicas da Poli</span></div>
             <div class="social-mini-header" id="socialMiniHeader"></div>
         </div>
         <div class="nav-links"><button class="nav-btn special" id="btnClienteNav">Cliente</button><button class="nav-btn" id="btnOfertasNav">Ofertas</button><button class="nav-btn" id="btnCupomNav">Cupom</button><button class="nav-btn" id="btnAdminNav">Admin</button></div>
@@ -175,13 +175,13 @@
     const firebaseConfig = { apiKey: "AIzaSyDNsPEpaYJ_RfMTXQqPxb3A-wu1sb5UClc", authDomain: "ofertasdapoliana.firebaseapp.com", projectId: "ofertasdapoliana", storageBucket: "ofertasdapoliana.firebasestorage.app", messagingSenderId: "688903682077", appId: "1:688903682077:web:259c751cd41b28529d6ef4" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    let products = [], offers = [], coupons = [], categories = [], social = { instagram: "", whatsapp: "" }, logoUrl = "https://i.ibb.co/Fk3bdXRb/logo.png", isAdmin = false;
+    let products = [], offers = [], coupons = [], categories = [], social = { instagram: "", whatsapp: "" }, logoUrl = "https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg", isAdmin = false;
     let siteConfig = {
         siteTitle: "Dicas da Poli | Seu guia de compras online",
-        appleIconUrl: "https://i.ibb.co/Fk3bdXRb/logo.png",
+        appleIconUrl: "https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg",
         ogTitle: "Dicas da Poli | Seu guia de compras online",
         ogDescription: "As melhores ofertas em moda, eletrônicos e muito mais!",
-        ogImage: "https://i.ibb.co/Fk3bdXRb/logo.png"
+        ogImage: "https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg"
     };
     
     const loadingOverlay = document.getElementById("loadingOverlay");
@@ -457,10 +457,10 @@
             social = { instagram: d.instagram || "", whatsapp: d.whatsapp || "" };
             siteConfig = {
                 siteTitle: d.siteTitle || "Dicas da Poli | Seu guia de compras online",
-                appleIconUrl: d.appleIconUrl || "https://i.ibb.co/Fk3bdXRb/logo.png",
+                appleIconUrl: d.appleIconUrl || "https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg",
                 ogTitle: d.ogTitle || "Dicas da Poli | Seu guia de compras online",
                 ogDescription: d.ogDescription || "As melhores ofertas em moda, eletrônicos e muito mais!",
-                ogImage: d.ogImage || "https://i.ibb.co/Fk3bdXRb/logo.png"
+                ogImage: d.ogImage || "https://res.cloudinary.com/dgi9mtxxe/image/upload/v1778957669/hrb3nesdqbc2a0qeqpif.jpg"
             };
         } else {
             await db.collection("config").doc("site").set({ 
