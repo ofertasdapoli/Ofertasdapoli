@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
-    <!-- Meta tags dinâmicas (editáveis via admin) -->
+    <meta name="theme-color" content="#ca0223">
+    
+    <!-- Meta tags padrão (serão sobrescritas dinamicamente quando necessário) -->
     <title id="pageTitle">Dicas da Poli | Seu guia de compras online</title>
     <link id="appleTouchIcon" rel="apple-touch-icon" href="https://i.ibb.co/Fk3bdXRb/logo.png">
     <meta property="og:title" content="Dicas da Poli | Seu guia de compras online">
@@ -14,12 +16,13 @@
     <meta property="og:url" content="">
     <meta property="og:type" content="website">
     <meta name="description" content="As melhores ofertas em moda, eletrônicos e muito mais!">
+    
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ca0223">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
     <style>
         * { touch-action: pan-x pan-y; }
         body { background: radial-gradient(circle at 20% 30%, rgba(202,2,35,0.05), rgba(16,211,221,0.02)); min-height: 100vh; padding-bottom: 80px; font-family: 'Inter', sans-serif; }
@@ -183,11 +186,54 @@
     
     const loadingOverlay = document.getElementById("loadingOverlay");
     
+    // ========== DETECÇÃO DE COMPARTILHAMENTO (SOLUÇÃO GRATUITA) ==========
+    (function detectSharedProduct() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const compartilharId = urlParams.get('compartilhar');
+        
+        if (compartilharId && compartilharId.length > 5) {
+            // Mostrar loading
+            loadingOverlay.style.display = "flex";
+            
+            // Buscar produto e atualizar meta tags
+            db.collection('products').doc(compartilharId).get().then(doc => {
+                if (doc.exists) {
+                    const produto = doc.data();
+                    const shortTitle = produto.title && produto.title.length > 60 ? produto.title.substring(0,57) + '...' : (produto.title || siteConfig.ogTitle);
+                    const shortDesc = produto.description ? produto.description.substring(0, 150) : siteConfig.ogDescription;
+                    const imgUrl = produto.imageUrl || siteConfig.ogImage;
+                    const finalUrl = window.location.origin + '/?produto=' + compartilharId;
+                    
+                    // Atualizar meta tags
+                    document.title = shortTitle;
+                    document.querySelector('meta[property="og:title"]').setAttribute('content', shortTitle);
+                    document.querySelector('meta[property="og:description"]').setAttribute('content', shortDesc);
+                    document.querySelector('meta[property="og:image"]').setAttribute('content', imgUrl);
+                    document.querySelector('meta[property="og:url"]').setAttribute('content', finalUrl);
+                    
+                    // Redirecionar para a página real do produto após 300ms
+                    setTimeout(() => {
+                        window.location.href = finalUrl;
+                    }, 300);
+                } else {
+                    // Produto não encontrado, redirecionar para home
+                    setTimeout(() => {
+                        window.location.href = window.location.origin + '/';
+                    }, 300);
+                }
+            }).catch(() => {
+                setTimeout(() => {
+                    window.location.href = window.location.origin + '/';
+                }, 300);
+            });
+        }
+    })();
+    
     function escapeHtml(s) { return String(s).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
     function parsePriceToNumber(p) { if(!p) return null; let n=parseFloat(p.toString().replace(/[^\d,.-]/g,'').replace(',','.')); return isNaN(n)?null:Math.round(n*100)/100; }
     function formatPrice(v) { if(v===null||v==="") return null; let n=typeof v==='number'?v:parsePriceToNumber(v); return n===null?null:n.toFixed(2).replace('.',','); }
     
-    // Atualizar todas as meta tags do site (padrão)
+    // Atualizar meta tags do site
     function updateSiteMetaTags() {
         document.title = siteConfig.siteTitle;
         const appleLink = document.getElementById("appleTouchIcon");
@@ -199,7 +245,7 @@
         document.getElementById("pageTitle").innerText = siteConfig.siteTitle;
     }
     
-    // Atualizar meta tags para um produto específico (quando abrir modal)
+    // Atualizar meta tags para produto (quando abrir modal)
     function updateProductMetaTags(prod) {
         let desc = prod.description ? prod.description.substring(0, 150) : siteConfig.ogDescription;
         document.querySelector('meta[property="og:title"]').setAttribute('content', prod.title);
@@ -225,7 +271,6 @@
         } catch (error) { console.error("Upload error:", error); return null; }
     }
     
-    // Configurações de UI para uploads
     function setupLogoUpload() {
         const fileInput = document.getElementById("logoFile");
         const uploadBtn = document.getElementById("uploadLogoBtn");
@@ -284,7 +329,6 @@
         });
     }
     
-    // Categorias
     async function loadCategories() { const snap = await db.collection("categories").orderBy("name").get(); if(snap.empty) { await seedCategories(); return loadCategories(); } categories = snap.docs.map(d=>({id:d.id, ...d.data()})); renderFilters(); updateCategorySelects(); }
     async function seedCategories() {
         const defaultCats = [
@@ -298,7 +342,6 @@
         document.querySelectorAll('.product-card').forEach(c=>{ c.addEventListener('click',async(e)=>{ if(e.target.classList.contains('btn-buy')){ window.open(e.target.getAttribute('data-link'),'_blank'); e.stopPropagation(); return; } const id=c.dataset.id, prod=products.find(p=>p.id===id); if(prod){ const newCount = (prod.visitCount||0)+1; await db.collection("products").doc(prod.id).update({visitCount:newCount}); prod.visitCount=newCount; openModal(prod); renderCliente(document.getElementById("searchInput").value); } }); c.querySelector('.btn-buy')?.addEventListener('click',(e)=>{ e.stopPropagation(); window.open(c.querySelector('.btn-buy').dataset.link,'_blank'); }); });
     }
     
-    // Função de compartilhamento corrigida
     function openModal(prod){ 
         const m=document.getElementById("productModal"); 
         document.getElementById("modalImg").src=prod.imageUrl||logoUrl; 
@@ -310,21 +353,18 @@
         document.getElementById("modalPriceInfo").innerHTML=pHtml; 
         document.getElementById("modalBuyLink").href=prod.affiliateLink; 
         
-        // Link de compartilhamento correto e curto
+        // URL de compartilhamento com ?compartilhar=ID (para o robô do WhatsApp)
         const baseUrl = window.location.origin + window.location.pathname;
-        const shareUrl = `https://dicasdapoli.com.br/compartilhar.php?id=${prod.id}`;
-        // Título resumido para evitar URI Too Long
+        const shareUrl = `${baseUrl}?compartilhar=${prod.id}`;
         let shortTitle = prod.title.length > 40 ? prod.title.substring(0,37) + '...' : prod.title;
         const whatsappText = `${shortTitle} - ${shareUrl}`;
         document.getElementById("modalShareBtn").onclick=()=>{
             window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
         };
         
-        // Atualizar meta tags para o produto (para pré-visualização no WhatsApp ao compartilhar)
         updateProductMetaTags(prod);
         m.style.display="flex";
-        // Atualizar a URL sem recarregar a página
-        history.pushState(null, '', shareUrl);
+        history.pushState(null, '', `/?produto=${prod.id}`);
     }
     
     function closeModal(){ 
@@ -333,7 +373,6 @@
         history.pushState(null, '', window.location.pathname);
     }
     
-    // Admin render
     function renderCategoriasAdmin(){ const container=document.getElementById("categoriasList"); if(!container) return; container.innerHTML=categories.map(cat=>`<div class="category-item"><div><i class="${cat.icon}"></i> <strong>${cat.name}</strong><br><small>Palavras: ${cat.keywords||''}</small></div><div><button class="edit-cat btn-small" data-id="${cat.id}">✏️ Editar</button> <button class="del-cat btn-small" data-id="${cat.id}">🗑️ Excluir</button></div></div>`).join(''); document.querySelectorAll('.edit-cat').forEach(btn=>btn.addEventListener('click',()=>openCategoryModal(btn.dataset.id))); document.querySelectorAll('.del-cat').forEach(btn=>btn.addEventListener('click',async()=>{ const id=btn.dataset.id; const hasProducts=products.some(p=>p.category===categories.find(c=>c.id===id)?.name); if(hasProducts){ alert("Existem produtos com essa categoria. Remova ou edite os produtos primeiro."); return; } if(confirm("Excluir categoria?")){ await db.collection("categories").doc(id).delete(); await loadAllData(); } })); }
     function openCategoryModal(catId=null){ const cat=catId?categories.find(c=>c.id===catId):null; document.getElementById("iconSelectModal").style.display="flex"; window.selectedCatId=catId; window.tempCatName=cat?cat.name:""; window.tempCatKeywords=cat?cat.keywords:""; window.tempCatIcon=cat?cat.icon:"fas fa-tag"; }
     async function saveCategory(name, icon, keywords, id=null){ if(!name) return; const data={ name, icon, keywords:keywords||"" }; if(id) await db.collection("categories").doc(id).update(data); else await db.collection("categories").add(data); await loadAllData(); }
@@ -341,7 +380,6 @@
     const iconsList = ["fa-house","fa-bed","fa-table","fa-bath","fa-shower","fa-couch","fa-utensils","fa-kitchen-set","fa-rug","fa-lightbulb","fa-seedling","fa-wrench","fa-hammer","fa-box-open","fa-broom","fa-shield-halved","fa-baby","fa-baby-carriage","fa-shirt","fa-cubes","fa-puzzle-piece","fa-gamepad","fa-backpack","fa-bottle-droplet","fa-wind","fa-fire","fa-snowflake","fa-blender","fa-tv","fa-plug","fa-laptop","fa-desktop","fa-mobile-screen-button","fa-tablet-screen-button","fa-headphones","fa-volume-high","fa-camera","fa-computer-mouse","fa-sd-card","fa-stopwatch","fa-coat","fa-shoe-prints","fa-briefcase","fa-gem","fa-glasses","fa-clock","fa-hat-cowboy-side","fa-wand-magic-sparkles","fa-scissors","fa-spray-can-sparkles","fa-prescription-bottle-medical","fa-capsules","fa-tooth","fa-spa","fa-car","fa-motorcycle","fa-gears","fa-circle-dot","fa-screwdriver-wrench","fa-location-dot","fa-radio","fa-basketball","fa-soccer-ball","fa-dumbbell","fa-person-running","fa-bicycle","fa-tent","fa-bottle-water","fa-umbrella-beach","fa-paw","fa-dog","fa-cat","fa-fish","fa-dove","fa-bone","fa-basket-shopping","fa-apple-whole","fa-bacon","fa-bread-slice","fa-wine-glass","fa-beer-mug-empty","fa-mug-hot","fa-cookie-bite","fa-book","fa-pen-to-square","fa-chair","fa-palette","fa-music","fa-industry","fa-hard-hat","fa-tractor","fa-box","fa-stethoscopes","fa-cake-candles","fa-film","fa-ticket","fa-mask"];
     function renderIconGrid(){ const grid=document.getElementById("iconGrid"); if(!grid) return; grid.innerHTML=iconsList.map(ic=>`<div class="icon-option" data-icon="fas ${ic}"><i class="fas ${ic}"></i><span style="font-size:10px;">${ic.replace('fa-','')}</span></div>`).join(''); document.querySelectorAll('.icon-option').forEach(el=>el.addEventListener('click',async()=>{ const chosen=el.dataset.icon; const name=prompt("Nome da categoria:", window.tempCatName||""); if(name){ const keywords=prompt("Palavras-chave (separadas por vírgula):", window.tempCatKeywords||""); await saveCategory(name, chosen, keywords, window.selectedCatId); } document.getElementById("iconSelectModal").style.display="none"; })); }
     
-    // Busca automática
     async function enhancedFetchProductData(url) {
         const statusDiv = document.getElementById("fetchStatus");
         statusDiv.innerHTML = "🔍 Resolvendo link de afiliado...";
@@ -412,7 +450,6 @@
     }
     
     async function loadAllData(){ 
-        // Carregar configurações do site
         const cfgDoc = await db.collection("config").doc("site").get();
         if (cfgDoc.exists) {
             const d = cfgDoc.data();
@@ -433,7 +470,6 @@
             });
         }
         updateSiteMetaTags();
-        // Preencher campos do admin
         document.getElementById("siteTitleInput").value = siteConfig.siteTitle;
         document.getElementById("appleIconUrlInput").value = siteConfig.appleIconUrl;
         document.getElementById("ogTitleInput").value = siteConfig.ogTitle;
@@ -463,10 +499,9 @@
             document.getElementById("clienteView").style.display = "block";
         }, 300);
         
-        // Verificar se há produto na URL
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('produto');
-        if (productId) {
+        if (productId && productId.length > 5) {
             const checkInterval = setInterval(() => {
                 const prod = products.find(p => p.id === productId);
                 if (prod) {
