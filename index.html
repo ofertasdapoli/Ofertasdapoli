@@ -238,7 +238,7 @@
     function renderProductCard(p) { let disc = null; if (p.oldPrice && p.currentPrice) { let o = parsePriceToNumber(p.oldPrice), c = parsePriceToNumber(p.currentPrice); if (o && c) disc = Math.round(((o - c) / o) * 100); } let oldF = formatPrice(p.oldPrice), curF = formatPrice(p.currentPrice); return `<div class="product-card" data-id="${p.id}">${disc ? `<div class="price-badge">-${disc}%</div>` : ''}<img class="card-img" src="${p.imageUrl || 'https://placehold.co/400x250/ca0223/white'}" onerror="this.src='https://placehold.co/400x250/ca0223/white'"><div class="card-info"><div class="card-title">${escapeHtml(p.title)}</div><div class="price-info">${oldF ? `<span class="old-price">R$ ${oldF}</span>` : ''}${curF ? `<span class="current-price">R$ ${curF}</span>` : ''}${disc ? `<span class="discount-percent">-${disc}%</span>` : ''}</div><div class="card-desc">${escapeHtml((p.description || '').substring(0, 80))}</div><div class="visit-counter"><i class="fas fa-eye"></i> ${p.visitCount || 0} visualizações</div><button class="btn-buy" data-link="${p.affiliateLink}"><i class="fas fa-shopping-bag"></i> Comprar</button></div></div>`; }
     function attachProductCardEvents() { document.querySelectorAll('.product-card').forEach(c => { c.addEventListener('click', async (e) => { if (e.target.classList.contains('btn-buy')) { window.open(e.target.getAttribute('data-link'), '_blank'); e.stopPropagation(); return; } const id = c.dataset.id, prod = products.find(p => p.id === id); if (prod) { const newCount = (prod.visitCount || 0) + 1; await db.collection("products").doc(prod.id).update({ visitCount: newCount }); prod.visitCount = newCount; openModal(prod); renderCliente(document.getElementById("searchInput").value); } }); c.querySelector('.btn-buy')?.addEventListener('click', (e) => { e.stopPropagation(); window.open(c.querySelector('.btn-buy').dataset.link, '_blank'); }); }); }
     async function renderCliente(search = "") { renderOfertasRelampago(); renderNovidades(search); }
-    function openModal(prod){ const m=document.getElementById("productModal"); document.getElementById("modalImg").src=prod.imageUrl||logoUrl; document.getElementById("modalTitle").innerText=prod.title; let disc=null, oldF=formatPrice(prod.oldPrice),curF=formatPrice(prod.currentPrice); if(prod.oldPrice&&prod.currentPrice){let o=parsePriceToNumber(prod.oldPrice),c=parsePriceToNumber(prod.currentPrice); if(o&&c) disc=Math.round(((o-c)/o)*100);} let pHtml=''; if(oldF||curF) pHtml=`<div>${oldF?`<span style="text-decoration:line-through;">R$ ${oldF}</span> `:''}<span style="font-size:1.3rem;font-weight:bold;">R$ ${curF}</span>${disc?` <span style="background:#10d3dd;padding:2px 10px;border-radius:20px;">${disc}% OFF</span>`:''}</div>`; document.getElementById("modalDescFull").innerHTML=`<strong>Descrição:</strong> ${prod.description}<br><div class="visit-counter" style="margin-top:8px;"><i class="fas fa-eye"></i> ${prod.visitCount||0} visualizações</div>`; document.getElementById("modalPriceInfo").innerHTML=pHtml; document.getElementById("modalBuyLink").href=prod.affiliateLink; const baseUrl = window.location.origin + window.location.pathname; const shareUrl = `${baseUrl}?compartilhar=${prod.id}`; let shortTitle = prod.title.length > 40 ? prod.title.substring(0,37) + '...' : prod.title; const whatsappText = `${shortTitle} - ${shareUrl}`; document.getElementById("modalShareBtn").onclick=()=>{ window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank'); }; updateProductMetaTags(prod); m.style.display="flex"; history.pushState(null, '', `/?produto=${prod.id}`); }
+    function openModal(prod){ const m=document.getElementById("productModal"); document.getElementById("modalImg").src=prod.imageUrl||logoUrl; document.getElementById("modalTitle").innerText=prod.title; let disc=null, oldF=formatPrice(prod.oldPrice),curF=formatPrice(prod.currentPrice); if(prod.oldPrice&&prod.currentPrice){let o=parsePriceToNumber(prod.oldPrice),c=parsePriceToNumber(prod.currentPrice); if(o&&c) disc=Math.round(((o-c)/o)*100);} let pHtml=''; if(oldF||curF) pHtml=`<div>${oldF?`<span style="text-decoration:line-through;">R$ ${oldF}</span> `:''}<span style="font-size:1.3rem;font-weight:bold;">R$ ${curF}</span>${disc?` <span style="background:#10d3dd;padding:2px 10px;border-radius:20px;">${disc}% OFF</span>`:''}</div>`; document.getElementById("modalDescFull").innerHTML=`<strong>Descrição:</strong> ${prod.description}<br><div class="visit-counter" style="margin-top:8px;"><i class="fas fa-eye"></i> ${prod.visitCount||0} visualizações</div>`; document.getElementById("modalPriceInfo").innerHTML=pHtml; document.getElementById("modalBuyLink").href=prod.affiliateLink; const baseUrl = window.location.origin + window.location.pathname; const shareUrl = `${baseUrl}?compartilhar=${prod.id}`; let shortTitle = prod.title.length > 40 ? prod.title.substring(0,37) + '...' : prod.title; const whatsappText = `${shortTitle} - ${shareUrl}`; document.getElementById("modalShareBtn").onclick=()=>{ window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank'); }; updateProductMetaTags(prod); m.style.display="flex"; history.pushState(null, '', `/?compartilhar=${prod.id}`); }
     function closeModal(){ document.getElementById("productModal").style.display="none"; resetMetaTagsToDefault(); history.pushState(null, '', window.location.pathname); }
     function renderCategoriasAdmin(){ const container=document.getElementById("categoriasList"); if(!container) return; container.innerHTML=categories.map(cat=>`<div class="category-item"><div><i class="${cat.icon}"></i> <strong>${cat.name}</strong><br><small>Palavras: ${cat.keywords||''}</small></div><div><button class="edit-cat btn-small" data-id="${cat.id}">✏️ Editar</button> <button class="del-cat btn-small" data-id="${cat.id}">🗑️ Excluir</button></div></div>`).join(''); document.querySelectorAll('.edit-cat').forEach(btn=>btn.addEventListener('click',()=>openCategoryModal(btn.dataset.id))); document.querySelectorAll('.del-cat').forEach(btn=>btn.addEventListener('click',async()=>{ const id=btn.dataset.id; const hasProducts=products.some(p=>p.category===categories.find(c=>c.id===id)?.name); if(hasProducts){ alert("Existem produtos com essa categoria."); return; } if(confirm("Excluir categoria?")){ await db.collection("categories").doc(id).delete(); await loadAllData(); } })); }
     function openCategoryModal(catId=null){ const cat=catId?categories.find(c=>c.id===catId):null; document.getElementById("iconSelectModal").style.display="flex"; window.selectedCatId=catId; window.tempCatName=cat?cat.name:""; window.tempCatKeywords=cat?cat.keywords:""; window.tempCatIcon=cat?cat.icon:"fas fa-tag"; }
@@ -247,8 +247,72 @@
     function renderIconGrid(){ const grid=document.getElementById("iconGrid"); if(!grid) return; grid.innerHTML=iconsList.map(ic=>`<div class="icon-option" data-icon="fas ${ic}"><i class="fas ${ic}"></i><span style="font-size:10px;">${ic.replace('fa-','')}</span></div>`).join(''); document.querySelectorAll('.icon-option').forEach(el=>el.addEventListener('click',async()=>{ const chosen=el.dataset.icon; const name=prompt("Nome da categoria:", window.tempCatName||""); if(name){ const keywords=prompt("Palavras-chave (separadas por vírgula):", window.tempCatKeywords||""); await saveCategory(name, chosen, keywords, window.selectedCatId); } document.getElementById("iconSelectModal").style.display="none"; })); }
     async function enhancedFetchProductData(url) { const statusDiv = document.getElementById("fetchStatus"); statusDiv.innerHTML = "🔍 Resolvendo link..."; let finalUrl = url; try { const headRes = await fetch(url, { method: 'HEAD', redirect: 'follow', mode: 'cors' }); finalUrl = headRes.url; if (finalUrl !== url) statusDiv.innerHTML = `🔄 Redirecionado`; } catch(e) { console.warn(e); } statusDiv.innerHTML = "🔍 Buscando dados..."; let title = "", description = "", imageUrl = "", oldPrice = "", currentPrice = ""; try { const res = await fetch(`https://api.microlink.io?url=${encodeURIComponent(finalUrl)}`); const data = await res.json(); if (data.data) { title = data.data.title || ""; description = data.data.description || ""; imageUrl = data.data.image?.url || ""; if (data.data.price?.amount) currentPrice = data.data.price.amount; } } catch(e) { console.warn(e); } let htmlContent = ""; try { const proxyRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(finalUrl)}`); const proxyData = await proxyRes.json(); htmlContent = proxyData.contents || ""; } catch(e) { console.warn(e); } if (htmlContent) { if (!title) { const tm = htmlContent.match(/<title[^>]*>([^<]*)<\/title>/i); if(tm && tm[1]) title = tm[1].trim(); } if (!description) { const dm = htmlContent.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i); if(dm && dm[1]) description = dm[1]; else { const od = htmlContent.match(/<meta\s+property=["']og:description["']\s+content=["']([^"']+)["']/i); if(od && od[1]) description = od[1]; } } if (!imageUrl) { const og = htmlContent.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i); if(og && og[1]) imageUrl = og[1]; } if (!currentPrice) { const ps = htmlContent.match(/R\$\s*([\d.,]+)/); if(ps && ps[1]) currentPrice = ps[1].replace(/\./g,'').replace(',','.'); } } if (title) title = title.replace(/\s*[|–—-]\s*.*$/, "").trim().substring(0, 100); if (description && description.length > 200) description = description.substring(0, 200); let detectedCategory = ""; const searchText = (title + " " + description).toLowerCase(); for (let cat of categories) { if (cat.keywords) { const keywords = cat.keywords.toLowerCase().split(/[ ,]+/); for (let kw of keywords) if (kw && searchText.includes(kw)) { detectedCategory = cat.name; break; } } if (detectedCategory) break; } if (title) document.getElementById("prodTitle").value = title; if (description) document.getElementById("prodDesc").value = description; if (imageUrl) document.getElementById("prodImage").value = imageUrl; if (currentPrice) document.getElementById("prodCurrentPrice").value = currentPrice; if (detectedCategory) { const catSelect = document.getElementById("prodCategory"); for (let i=0; i<catSelect.options.length; i++) if (catSelect.options[i].value === detectedCategory) { catSelect.selectedIndex = i; break; } statusDiv.innerHTML = `✅ Concluído! Categoria: ${detectedCategory}`; } else statusDiv.innerHTML = `✅ Busca finalizada. Preencha manualmente se necessário.`; }
     
-    // Variável para controlar se o modal do produto compartilhado já foi aberto
     let sharedProductOpened = false;
+    
+    // Função para abrir produto compartilhado a partir do ID
+    function openSharedProduct(productId) {
+        if (!productId || productId.length < 5) return false;
+        
+        // Tenta encontrar nos produtos já carregados
+        let prod = products.find(p => p.id === productId);
+        
+        if (prod) {
+            // Atualizar meta tags para compartilhamento
+            updateProductMetaTags(prod);
+            openModal(prod);
+            return true;
+        } else {
+            // Buscar diretamente do Firestore
+            loadingOverlay.style.display = "flex";
+            db.collection('products').doc(productId).get().then(doc => {
+                loadingOverlay.style.display = "none";
+                if (doc.exists) {
+                    const prodData = { id: doc.id, ...doc.data(), isOfertaRelampago: doc.data().isOfertaRelampago || false };
+                    products.push(prodData);
+                    updateProductMetaTags(prodData);
+                    openModal(prodData);
+                    renderCliente(document.getElementById("searchInput")?.value||"");
+                } else {
+                    console.log("Produto não encontrado:", productId);
+                    // Produto não encontrado, redirecionar para home sem parâmetros
+                    history.pushState(null, '', window.location.pathname);
+                }
+            }).catch(err => {
+                loadingOverlay.style.display = "none";
+                console.error("Erro ao buscar produto:", err);
+                history.pushState(null, '', window.location.pathname);
+            });
+            return true;
+        }
+    }
+    
+    // DETECÇÃO DE COMPARTILHAMENTO - CORRIGIDA
+    // Verifica tanto o parâmetro 'compartilhar' quanto o 'produto'
+    (function detectSharedProduct() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let sharedId = urlParams.get('compartilhar');
+        if (!sharedId) {
+            sharedId = urlParams.get('produto');
+        }
+        
+        if (sharedId && sharedId.length > 5) {
+            sharedProductOpened = true;
+            
+            // Se os produtos já foram carregados, tenta abrir
+            if (products.length > 0) {
+                openSharedProduct(sharedId);
+            } else {
+                // Aguarda o carregamento dos produtos
+                let checkInterval = setInterval(() => {
+                    if (products.length > 0) {
+                        clearInterval(checkInterval);
+                        openSharedProduct(sharedId);
+                    }
+                }, 200);
+                setTimeout(() => clearInterval(checkInterval), 5000);
+            }
+        }
+    })();
     
     async function loadAllData(){ 
         const cfgDoc = await db.collection("config").doc("site").get();
@@ -262,48 +326,16 @@
         await loadCategories(); renderCategoriasAdmin(); renderAdminLists(); await renderCliente(document.getElementById("searchInput")?.value||""); updateDrawerContent("offers");
         loadingOverlay.style.opacity = "0"; setTimeout(() => { loadingOverlay.style.display = "none"; document.getElementById("clienteView").style.display = "block"; }, 300);
         
-        // CORREÇÃO: Verificar na URL se tem parâmetro 'produto' e abrir o modal
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get('produto');
-        
-        if (productId && productId.length > 5 && !sharedProductOpened) {
-            sharedProductOpened = true;
-            // Aguardar um pouco para garantir que os produtos foram carregados
-            const openProductModal = () => {
-                const prod = products.find(p => p.id === productId);
-                if (prod) {
-                    // Atualizar meta tags para compartilhamento
-                    updateProductMetaTags(prod);
-                    openModal(prod);
-                } else {
-                    // Se não encontrou, tentar buscar diretamente do Firestore
-                    db.collection('products').doc(productId).get().then(doc => {
-                        if (doc.exists) {
-                            const prodData = { id: doc.id, ...doc.data() };
-                            products.push(prodData);
-                            updateProductMetaTags(prodData);
-                            openModal(prodData);
-                            renderCliente(document.getElementById("searchInput")?.value||"");
-                        } else {
-                            console.log("Produto não encontrado");
-                        }
-                    }).catch(err => console.error("Erro ao buscar produto:", err));
-                }
-            };
-            
-            // Se os produtos já foram carregados, abre imediatamente
-            if (products.length > 0) {
-                openProductModal();
-            } else {
-                // Aguarda o carregamento dos produtos
-                let checkInterval = setInterval(() => {
-                    if (products.length > 0) {
-                        clearInterval(checkInterval);
-                        openProductModal();
-                    }
-                }, 200);
-                // Timeout para evitar loop infinito
-                setTimeout(() => clearInterval(checkInterval), 5000);
+        // Verificar novamente se há produto compartilhado (caso a detecção inicial tenha ocorrido antes dos produtos carregarem)
+        if (!sharedProductOpened) {
+            const urlParams = new URLSearchParams(window.location.search);
+            let sharedId = urlParams.get('compartilhar');
+            if (!sharedId) {
+                sharedId = urlParams.get('produto');
+            }
+            if (sharedId && sharedId.length > 5) {
+                sharedProductOpened = true;
+                openSharedProduct(sharedId);
             }
         }
     }
